@@ -603,12 +603,12 @@ Konzept → Design → Entwicklung → Testing → Deployment → Feedback → I
 
 | Phase | Aktivitäten | Verantwortlich |
 |-------|-------------|----------------|
-| **Konzept** | User Stories, Wireframes | CPO (Nico) |
-| **Design** | UI/UX, Prototypen | CPO + Freelancer |
-| **Backend** | API, Datenbank, Verifizierung | CTO (Jiayi) |
-| **Frontend** | Web-Dashboard, Mobile App | CTO + Freelancer |
-| **Testing** | QA, User-Tests, Bug-Fixing | Team |
-| **Deployment** | Cloud-Infrastruktur, Monitoring | CTO |
+| **Konzept** | User Stories, Wireframes | open |
+| **Design** | UI/UX, Prototypen | open |
+| **Backend** | API, Datenbank, Verifizierung | open |
+| **Frontend** | Web-Dashboard, Mobile App | open |
+| **Testing** | QA, User-Tests, Bug-Fixing | open |
+| **Deployment** | Cloud-Infrastruktur, Monitoring | open |
 
 ### Ressourcenbedarf
 
@@ -616,21 +616,21 @@ Konzept → Design → Entwicklung → Testing → Deployment → Feedback → I
 
 | Kategorie | Kosten/Jahr | Details |
 |-----------|-------------|---------|
-| Cloud-Hosting (AWS/GCP) | €8.000 | Server, Datenbank, Storage |
-| Entwicklungstools | €3.000 | IDEs, CI/CD, Git |
-| Externe Services | €5.000 | Analytics, Push-Notifications, Maps API |
-| Design-Tools | €2.000 | Figma, Prototyping |
-| Sicherheit | €3.000 | SSL, Penetration Testing |
+| Cloud-Hosting | open | Server, Datenbank, Storage |
+| Entwicklungstools | open | IDEs, CI/CD, Git |
+| Externe Services | open | Analytics, Push-Notifications, Maps API |
+| Design-Tools (or AI-Powered Prototyping) | open | Figma, Prototyping |
+| Sicherheit | open | SSL, Penetration Testing |
 | Reserve | €4.000 | Unvorhergesehenes |
 
 **Personalressourcen:**
 
 | Rolle | Aufwand (Jahr 1) | Quelle |
 |-------|------------------|--------|
-| Produktentwicklung | ~1 FTE | CPO (Nico), CTO (Jiayi) |
-| Design/UX | 0,3 FTE | Freelancer |
-| Backend-Entwicklung | 0,5 FTE | CTO + Werkstudent |
-| Mobile-Entwicklung | 0,3 FTE | Freelancer |
+| Produktentwicklung | ~1 FTE | open |
+| Design/UX | 0,3 FTE | open |
+| Backend-Entwicklung | 0,5 FTE | open |
+| Mobile-Entwicklung | 0,3 FTE | open |
 
 ### Qualitätssicherung
 
@@ -650,28 +650,6 @@ Konzept → Design → Entwicklung → Testing → Deployment → Feedback → I
 - Kritische Bugs in Produktion: Ziel <1/Monat
 - App Store Rating: Ziel >4,0 Sterne
 - API-Uptime: Ziel >99,5%
-
-### Externe Leistungen
-
-| Leistung | Beschreibung | Geschätzte Kosten |
-|----------|--------------|-------------------|
-| **UX/UI Design** | Wireframes, High-Fidelity Designs, Design System | €8.000-12.000 (einmalig) |
-| **Mobile-Entwicklung** | React Native / Flutter App-Entwicklung | €10.000-15.000 (Phase 2) |
-| **Rechtsberatung** | AGB, Datenschutz, gGmbH-Gründung | €3.000-5.000 |
-| **Steuerberatung** | Gemeinnützigkeit, Förderung | €2.000-3.000/Jahr |
-| **Hosting/Cloud** | AWS/GCP Managed Services | €8.000/Jahr |
-| **Marketing** | Logo, Branding, Launch-Kampagne | €5.000-8.000 |
-
-**Make-or-Buy-Entscheidung:**
-
-| Komponente | Entscheidung | Begründung |
-|------------|--------------|------------|
-| Backend-Architektur | MAKE | Kernkompetenz, Differenzierung |
-| Verifizierungssystem | MAKE | Alleinstellungsmerkmal |
-| Mobile App | HYBRID | Framework + Freelancer, später intern |
-| UI/UX Design | BUY | Spezialkompetenz, einmalig |
-| Cloud-Infrastruktur | BUY | Standard, kosteneffizient |
-| Analytics | BUY | Standard (Google Analytics, Mixpanel) |
 
 ---
 
