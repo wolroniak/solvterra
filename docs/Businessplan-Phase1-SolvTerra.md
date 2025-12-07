@@ -1,7 +1,7 @@
 # SolvTerra Businessplan - Phase 1
 ## Gründungswettbewerb Dokumentation
 
-**Version:** 1.4
+**Version:** 1.5
 **Stand:** 07. Dezember 2025
 **Zielumfang:** ca. 18 Seiten
 
@@ -140,9 +140,9 @@ SolvTerra verfolgt eine **Hybrid-Strategie**, die gemeinnützige Ziele mit finan
 
 | Quartal | Meilenstein | Ziel |
 |---------|-------------|------|
-| Q1 2026 | **MVP Basis-Version** | Funktionsfähige Plattform mit Kernfunktionen (Challenge-Erstellung, -Annahme, -Verifizierung) |
+| Q1 2026 | **MVP Basis-Version** | Funktionsfähige Plattform mit Kernfunktionen (Challenge-Erstellung, -Annahme, -Verifizierung) inkl. Mobile App |
 | Q1 2026 | Erste NGOs onboarded | 5-10 Pilot-NGOs |
-| Q2 2026 | **MVP Vollversion** | Gamification, erweitertes Dashboard, mobile App |
+| Q2 2026 | **MVP Vollversion** | Erweiterte Gamification, Impact-Dashboard, Social Features (Multi-Person Challenges, Community Feed) |
 | Q2 2026 | Erste Studenten aktiv | 500 registrierte Nutzer |
 | Q3 2026 | Pilot-Phase abgeschlossen | 1.000 abgeschlossene Challenges |
 | Q4 2026 | Erstes Wachstum | 2.000+ aktive Studenten, 25+ NGOs |
@@ -208,7 +208,7 @@ SolvTerra verfolgt eine **Hybrid-Strategie**, die gemeinnützige Ziele mit finan
 | Bereich | Beschreibung | Zielgruppe |
 |---------|--------------|------------|
 | **NGO-Plattform** | Web-basiertes Challenge-Management-System mit Impact-Dashboard | NGOs, Vereine, Stiftungen |
-| **Student-App** | Mobile App mit Challenge-Feed, Gamification und Impact-Portfolio | Studierende (18-28 Jahre) |
+| **Student-App** | Mobile App (ab MVP Basis) mit Challenge-Feed, Gamification, Social Features und Impact-Portfolio | Studierende (18-28 Jahre) |
 | **Sponsored Challenges** | Branded Kampagnen für Unternehmen mit CSR-Fokus | Corporate Partner |
 
 **Wertversprechen:**
@@ -241,7 +241,7 @@ Für **Gesellschaft:**
 | 2.1.2 | Welche langfristigen Unternehmensziele haben Sie sich gesetzt? | Jahr 1: 25-30 NGOs, 2-3k Studenten; Jahr 3: 100+ NGOs, 10k+ Studenten, kostendeckend; Jahr 5: Marktführer DACH, Break-even | ✅ |
 | 2.1.3 | Was sind Ihre Haupterfolgsfaktoren? | 1) User Engagement, 2) NGO-Zufriedenheit, 3) Plattform-Wachstum, 4) Finanzielle Nachhaltigkeit, 5) Task-Qualität | ✅ |
 | 2.1.4 | Mit welcher Strategie wollen Sie diese Ziele erreichen? | Hybrid-Modell: gGmbH + kommerzielle Tochter; Phasenweise Entwicklung von Förderung zu Eigenfinanzierung | ✅ |
-| 2.1.5 | Welches sind die dafür wichtigen Meilensteine? | Q1/26: MVP Basis; Q2/26: MVP Voll; Q4/26: 2k+ User; Q1/27: Erste Sponsored Challenge; 2029: Break-even | ✅ |
+| 2.1.5 | Welches sind die dafür wichtigen Meilensteine? | Q1/26: MVP Basis (inkl. Mobile App); Q2/26: MVP Vollversion (Social Features); Q4/26: 2k+ User + Impact Wrapped; Q1/27: Erste Sponsored Challenge; 2029: Break-even | ✅ |
 | 2.1.6 | Wie sehen die ersten (nächsten) Schritte aus? | Businessplan, EXIST-Antrag, MVP-Entwicklung, Pilot-NGOs gewinnen, Uni-Kooperationen | ✅ |
 | 2.2.1 | Was ist Ihr Geschäft? | Digitale Plattform für Micro-Volunteering, die NGOs mit Studierenden verbindet | ✅ |
 | 2.2.2 | Welche Markt- und Produkt-/Dienstleistungsbereiche decken Sie ab? | Gemeinnütziger Sektor (NGOs), Civic Tech; Produkte: NGO-Plattform, Student-App, Sponsored Challenges | ✅ |
@@ -296,7 +296,7 @@ Unternehmen sind keine primäre Zielgruppe, sondern eine zusätzliche Monetarisi
 ### Bedürfnisse der Zielgruppen
 
 **NGOs – identifizierte Bedürfnisse:**
-- Entlastung bei kleinen, zeitintensiven Aufgaben (Social Media, Recherche, Übersetzungen)
+- Entlastung bei kleinen, zeitintensiven Aufgaben (Social Media, Recherche, Eventbetreuung, usw., ...)
 - Zugang zu flexibler, motivierter Workforce ohne Festanstellung
 - Dokumentierter Impact für Förderanträge und Jahresberichte
 - Nachwuchsgewinnung und Aufbau einer Unterstützer-Pipeline
@@ -357,13 +357,42 @@ Die Gamification-Strategie basiert auf Umfragedaten und priorisiert Elemente mit
 
 | Element | Phase | Funktion | Resonanz (Umfrage) |
 |---------|-------|----------|-------------------|
-| Punkte (XP) | MVP | Pro Challenge verdient | 32% motivierend |
-| Badges/Zertifikate | MVP | Thematische Auszeichnungen für Portfolio | **46% motivierend** |
-| Kleine Belohnungen | MVP | Partner-Rabatte, kleine Prämien | **54% motivierend** |
-| Level-System | Phase 2 | "Starter" bis "Impact Champion" | Langzeit-Engagement |
-| Streaks | Phase 2 | Tägliche/wöchentliche Serien | Regelmäßigkeit |
-| Leaderboards | Phase 2 | Rankings (nur auf Wunsch sichtbar) | 24% motivierend, **44% demotivierend** |
-| Team-Challenges | Phase 2 | Gruppenaufgaben | Community-Bildung |
+| Punkte (XP) | MVP Basis | Pro Challenge verdient | 32% motivierend |
+| Badges/Zertifikate | MVP Basis | Thematische Auszeichnungen für Portfolio | **46% motivierend** |
+| Kleine Belohnungen | MVP Basis | Partner-Rabatte, kleine Prämien | **54% motivierend** |
+| Level-System | MVP Vollversion | "Starter" bis "Impact Champion" | Langzeit-Engagement |
+| Streaks | MVP Vollversion | Tägliche/wöchentliche Serien | Regelmäßigkeit |
+| Multi-Person Challenges | MVP Vollversion | Challenges für 2+ Personen gemeinsam | **62% würden mehr helfen mit Freunden** |
+| Community Feed | MVP Vollversion | Vernetzung, Austausch, Challenge-Partner finden | Erhöht Verweildauer |
+| Leaderboards | MVP Vollversion | Rankings (nur auf Wunsch sichtbar) | 24% motivierend, **44% demotivierend** |
+| **Impact Wrapped** | Q4 2026 | Jährlicher Aktivitätsbericht im Spotify-Wrapped-Stil (erstes Wrapped: Ende 2026) | Retention, Viralität |
+
+**Social Features – Multi-Person Challenges & Community Feed (MVP Vollversion):**
+
+Die sozialen Features adressieren einen validierten Bedarf: **62% der befragten Studierenden würden mehr helfen, wenn sie es mit Freunden tun könnten.** Diese Features erhöhen die Plattform-Attraktivität und verlängern die Verweildauer.
+
+| Feature | Funktion | Nutzen |
+|---------|----------|--------|
+| **Multi-Person Challenges** | Challenges, die für 2+ Personen konzipiert sind (z.B. gemeinsam Flyer verteilen, Team-Recherche, Gruppenaktionen) | Höhere Abschlussrate, gegenseitige Motivation, soziale Bindung |
+| **Community Feed** | Interner Feed im Instagram-/LinkedIn-Stil mit Beiträgen, abgeschlossenen Challenges, Erfolgen | Nutzer connecten sich, finden Challenge-Partner, teilen Erfahrungen |
+| **Challenge-Partner-Matching** | Funktion zum Finden von Mitstreitern für Multi-Person Challenges | Überwindet Barriere „niemand zum Mitmachen" |
+| **Team-Profile** | Freundesgruppen können gemeinsame Impact-Statistiken sehen | Gamification auf Gruppen-Ebene, Wettbewerb zwischen Teams |
+
+> **Strategischer Wert:** Social Features schaffen Lock-in-Effekte und erhöhen die Switching Costs. Nutzer, die Freunde auf der Plattform haben, sind deutlich weniger wechselbereit.
+
+**Impact Wrapped – Jährlicher Aktivitätsbericht (Q4 2026):**
+
+Inspiriert vom Erfolg von „Spotify Wrapped" erhält jeder Nutzer Ende des Jahres einen personalisierten, visuell ansprechenden Bericht über seine Engagement-Aktivitäten:
+
+| Inhalt | Beschreibung |
+|--------|--------------|
+| Gesamt-Impact | Anzahl abgeschlossener Challenges, investierte Zeit, unterstützte NGOs |
+| Top-Kategorien | In welchen Bereichen der Nutzer am aktivsten war (z.B. Umwelt, Soziales, Bildung) |
+| Persönlicher Vergleich | Entwicklung gegenüber dem Vorjahr (ab 2027) |
+| Highlights | Besondere Challenges, verdiente Badges, Meilensteine |
+| Shareable Cards | Grafiken für Social Media (Instagram Stories, LinkedIn, WhatsApp) |
+
+> **Geplantes Datum:** Erstes Impact Wrapped wird Ende 2026 für alle Nutzer ausgerollt. Ziel ist virale Verbreitung durch Teilen auf Social Media.
 
 ### Zusatznutzen
 
@@ -374,8 +403,9 @@ Die Gamification-Strategie basiert auf Umfragedaten und priorisiert Elemente mit
 
 **Für Studierende:**
 - **Career-Boost:** Dokumentiertes Engagement-Portfolio für Bewerbungen
-- **Community:** Vernetzung mit Gleichgesinnten, Team-Challenges
+- **Community & Social Features:** Vernetzung mit Gleichgesinnten über Community Feed, Multi-Person Challenges mit Freunden
 - **Micro-Learning:** Einblicke in verschiedene NGO-Bereiche ohne langfristige Verpflichtung
+- **Impact Wrapped:** Jährlicher personalisierter Aktivitätsbericht (ab Q4 2026) – teilbar auf Social Media für virale Reichweite
 
 **Für Gesellschaft:**
 - Aktivierung ungenutzten Engagement-Potenzials (54% der Studierenden sind nicht aktiv)
@@ -435,25 +465,32 @@ betterplace.org, Deutschlands größte Spendenplattform, hat seine **Zeitspenden
 |-----------|-----------|---------|----------|--------|-------|
 | Micro-Format (5-30 Min) | ✅ | ⚠️ | ❌ | ⚠️ | ❌ |
 | Gamification | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Multi-Person Challenges** | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Community Feed** | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Verifizierung | ✅ | ❌ | ⚠️ | ❌ | ⚠️ |
-| Mobile App | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Mobile App (MVP Basis) | ✅ | ✅ | ✅ | ❌ | ❌ |
 | Sponsored Challenges | ✅ | ❌ | ❌ | ✅ | ❌ |
 | Studierende-Fokus | ✅ | ⚠️ | ❌ | ⚠️ | ❌ |
+| Impact Wrapped | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 **SolvTerra-Alleinstellungsmerkmale (USPs):**
 1. **Erstes Micro-Volunteering** mit explizitem 5-30-Minuten-Fokus in Deutschland
-2. **Integrierte Gamification** (Punkte, Badges, Belohnungen; Leaderboards opt-in)
-3. **Verifizierungssystem** (NGO-Bestätigung im MVP, später erweitert)
-4. **Sponsored Challenges** als perspektivisches Monetarisierungsmodell (Phase 2+)
-5. **Studierende-Fokus** mit Mobile-First-Ansatz
+2. **Integrierte Gamification** (Punkte, Badges, Belohnungen; Leaderboards opt-in; jährliches „Impact Wrapped")
+3. **Multi-Person Challenges** – Challenges, die mit 2+ Personen gemeinsam durchgeführt werden können, erhöhen Attraktivität und Verweildauer auf der Plattform (validiert: 62% würden mehr helfen, wenn sie es mit Freunden tun könnten)
+4. **Community Feed** – Interner Feed zur Vernetzung zwischen Nutzern, ermöglicht Austausch, Teilen von Erfolgen und Finden von Challenge-Partnern
+5. **Verifizierungssystem** (NGO-Bestätigung im MVP, später erweitert)
+6. **Sponsored Challenges** als perspektivisches Monetarisierungsmodell (Phase 2+)
+7. **Studierende-Fokus** mit Mobile-First-Ansatz (Mobile App ab MVP Basis)
 
 **Ehrliche Einschätzung der Differenzierung:**
 
-Die Differenzierung zu letsact basiert primär auf Produktmechanik (Gamification, Micro-Format) und Zielgruppenfokus (Studierende). Diese Merkmale sind **technisch replizierbar**. Der nachhaltige Wettbewerbsvorteil entsteht durch:
+Die Differenzierung zu letsact basiert primär auf Produktmechanik (Gamification, Micro-Format, Social Features) und Zielgruppenfokus (Studierende). Diese Merkmale sind **technisch replizierbar**. Der nachhaltige Wettbewerbsvorteil entsteht durch:
+- **Social Lock-in:** Nutzer mit Freunden auf der Plattform wechseln seltener (Multi-Person Challenges, Community Feed)
 - Schnellen Community-Aufbau vor Wettbewerber-Reaktion
 - Exklusive Hochschulpartnerschaften
 - Akkumulierte Daten (welche Challenges funktionieren)
 - First-Mover-Vorteil im Micro-Segment
+- **Virale Verbreitung:** Impact Wrapped als jährlicher, teilbarer Content
 
 Das Risiko einer Wettbewerber-Imitation wird in Kapitel 8 (Chancen und Risiken) adressiert.
 
@@ -523,26 +560,29 @@ Sponsored Challenges als Monetarisierung sind im deutschen Engagement-Markt nich
 
 | Feature | Beschreibung | Zielgruppe |
 |---------|--------------|------------|
+| **Mobile App** | Native iOS/Android App – primäre Schnittstelle zu Studierenden | Studierende |
 | Challenge-Erstellung | Einfaches Formular für NGOs | NGOs |
 | Challenge-Feed | Liste mit Basis-Filter | Studierende |
-| Basis-Verifizierung | NGO-Bestätigung, Text-Upload | Beide |
+| Basis-Verifizierung | NGO-Bestätigung, Foto-Upload, Text-Upload | Beide |
 | Account-System | Registrierung, Profil | Beide |
 | Punkte-System | XP pro Challenge | Studierende |
+| Badges | Basis-Auszeichnungen für abgeschlossene Challenges | Studierende |
 
 **Phase 2: MVP Vollversion (Q2 2026)**
 
 | Feature | Beschreibung | Zielgruppe |
 |---------|--------------|------------|
-| Mobile App | Native iOS/Android | Studierende |
-| Gamification erweitert | Levels, Badges, Leaderboards | Studierende |
-| Foto-Verifizierung | GPS + Zeitstempel + Upload | Studierende |
-| Impact-Dashboard | Statistiken, Export | NGOs |
-| Team-Challenges | Gruppen-Funktionen | Studierende |
+| Multi-Person Challenges | Challenges für 2+ Personen gemeinsam, erhöht Attraktivität und Verweildauer | Studierende |
+| Community Feed | Interner Feed zur Vernetzung, Austausch, Challenge-Partner finden | Studierende |
+| Gamification erweitert | Levels, Streaks, Leaderboards (opt-in) | Studierende |
+| Foto-Verifizierung erweitert | GPS + Zeitstempel + Upload | Studierende |
+| Impact-Dashboard | Statistiken, Export für Förderanträge | NGOs |
 
-**Phase 3: Monetarisierung (Q4 2026+)**
+**Phase 3: Monetarisierung & Retention (Q4 2026+)**
 
 | Feature | Beschreibung | Zielgruppe |
 |---------|--------------|------------|
+| **Impact Wrapped** | Jährlicher personalisierter Aktivitätsbericht im Spotify-Wrapped-Stil (erstes Wrapped: Ende 2026) | Studierende |
 | Sponsored Challenges | Branded Kampagnen | Corporate |
 | Premium-Tier NGOs | Erweiterte Features | NGOs |
 | Rewards-Integration | Partner-Rabatte | Studierende |
@@ -560,14 +600,18 @@ Sponsored Challenges als Monetarisierung sind im deutschen Engagement-Markt nich
 | 1.000 Challenges abgeschlossen | Verifizierte Completions | Q3 2026 |
 | Erste Sponsored Challenge | Bezahlter Corporate Partner | Q4 2026 |
 | 2.000+ Studierende, 25+ NGOs | Aktive Nutzung | Q4 2026 |
+| **Erstes Impact Wrapped** | Personalisierter Jahresrückblick für alle Nutzer | Q4 2026 |
 
 ### Versionen für Zielgruppen
 
-| Version | Zielgruppe | Plattform | Kernfunktionen |
-|---------|------------|-----------|----------------|
-| **NGO-Dashboard** | NGOs, Vereine | Web (Responsive) | Challenge-Management, Volunteer-Übersicht, Impact-Reports |
-| **Student-App** | Studierende 18-28 | iOS, Android | Challenge-Feed, Gamification, Portfolio, Push-Notifications |
-| **Corporate-Portal** | Unternehmen | Web | Kampagnen-Setup, Branding, Impact-Reporting |
+| Version | Zielgruppe | Plattform | Phase | Kernfunktionen |
+|---------|------------|-----------|-------|----------------|
+| **Student-App** | Studierende 18-28 | iOS, Android | **MVP Basis** | Challenge-Feed, Gamification, Portfolio, Push-Notifications |
+| **NGO-Dashboard** | NGOs, Vereine | Web (Responsive) | MVP Basis | Challenge-Management, Volunteer-Übersicht, Impact-Reports |
+| **Social Features** | Studierende | In Student-App | MVP Vollversion | Multi-Person Challenges, Community Feed, Impact Wrapped (Q4 2026) |
+| **Corporate-Portal** | Unternehmen | Web | Phase 3 | Kampagnen-Setup, Branding, Impact-Reporting |
+
+> **Begründung Mobile-First:** Die Student-App ist die primäre Schnittstelle zu Studierenden und muss daher ab MVP Basis verfügbar sein. Studierende erwarten mobile Erreichbarkeit und nutzen primär Smartphones für Alltagsanwendungen.
 
 ### Zulassung und Regulierung
 
@@ -659,18 +703,18 @@ Konzept → Design → Entwicklung → Testing → Deployment → Feedback → I
 |---|-----------|---------|--------|
 | 3.1.1 | Welche Zielgruppen sprechen Sie an? | NGOs (Kunden, B2B) + Studierende (Nutzer, B2C) als gleichwertige Marktplatz-Seiten; Corporate als ergänzende Einnahme | ✅ |
 | 3.1.2 | Welche Bedürfnisse haben die Zielgruppen? | NGOs: Entlastung, Impact-Nachweis; Studierende: Flexibilität, Anerkennung; Corporate: ROI, Sichtbarkeit | ✅ |
-| 3.1.3 | Welche Funktionen erfüllt Ihr Produkt? | Challenge-Plattform, Gamification (MVP: Punkte+Badges), Verifizierung (MVP: NGO-Bestätigung) | ✅ |
+| 3.1.3 | Welche Funktionen erfüllt Ihr Produkt? | Challenge-Plattform, Mobile App (MVP Basis), Gamification, Social Features (Multi-Person Challenges, Community Feed), Verifizierung, Impact Wrapped | ✅ |
 | 3.1.4 | Was ist noch erforderlich für Nutzenrealisierung? | Hochschul-Partnerschaften, Pilot-NGOs, Förderung, NGO-first Launch-Strategie | ✅ |
 | 3.1.5 | Welcher Zusatznutzen entsteht? | Donor Pipeline, Career-Portfolio, SDG-Beitrag | ✅ |
 | 3.1.6 | Welche Partnerschaften sind erforderlich? | Hochschulen, NGOs, Dachverbände, EXIST | ✅ |
-| 3.1.7 | Welche Konkurrenzprodukte existieren? | letsact (größte App), FlexHero, vostel, youvo – Differenzierung: Micro+Gamification (technisch replizierbar) | ✅ |
+| 3.1.7 | Welche Konkurrenzprodukte existieren? | letsact (größte App), FlexHero, vostel, youvo – Differenzierung: Micro+Gamification+Social Features+Impact Wrapped (technisch replizierbar, aber Social Lock-in schafft nachhaltige Vorteile) | ✅ |
 | 3.2.1 | Wie sieht der Stand der Technik aus? | Web-basierte Marktplätze, wenige Mobile-Apps, keine integrierte Gamification | ✅ |
 | 3.2.2 | Inwiefern ist Ihre Idee innovativ? | Micro-Format + Gamification-Kombination im Volunteering-Sektor neu | ✅ |
 | 3.2.3 | Warum sind vergleichbare Produkte noch nicht am Markt? | Traditioneller Ehrenamts-Fokus, fehlendes Gen Z-Verständnis, Geschäftsmodell-Risiko | ✅ |
 | 3.2.4 | In welchem Entwicklungsstadium befindet sich Ihr Produkt? | Konzeptphase / Pre-MVP (Dez 2025) | ✅ |
-| 3.2.5 | Welche Entwicklungsschritte/Releases planen Sie? | Q1/26: MVP Basis (Web), Q2/26: MVP Vollversion (Mobile), Q4/26: Sponsored Challenges | ✅ |
-| 3.2.6 | Welche Meilensteine sind zu erreichen? | gGmbH-Gründung, EXIST, 500 User, 1.000 Challenges, erste Sponsored Challenge | ✅ |
-| 3.2.7 | Welche Versionen für welche Zielgruppen? | NGO-Dashboard (Web), Student-App (Mobile), Corporate-Portal (Web, Phase 2) | ✅ |
+| 3.2.5 | Welche Entwicklungsschritte/Releases planen Sie? | Q1/26: MVP Basis (Mobile App + Web), Q2/26: MVP Vollversion (Social Features), Q4/26: Sponsored Challenges + Impact Wrapped | ✅ |
+| 3.2.6 | Welche Meilensteine sind zu erreichen? | gGmbH-Gründung, EXIST, 500 User, 1.000 Challenges, erstes Impact Wrapped, erste Sponsored Challenge | ✅ |
+| 3.2.7 | Welche Versionen für welche Zielgruppen? | Student-App (Mobile, MVP Basis), NGO-Dashboard (Web), Social Features (MVP Vollversion), Corporate-Portal (Web, Phase 3) | ✅ |
 | 3.2.8 | Ist Ihr Produkt vom Gesetzgeber zugelassen? | Keine Zulassung erforderlich (Software) | ✅ |
 | 3.2.9 | Besitzen Sie Patente oder Lizenzrechte? | Nein (kein Patent geplant, Fokus auf Netzwerkeffekte + Community) | ✅ |
 | 3.2.10 | Welche Patente/Lizenzen bei der Konkurrenz? | Keine relevanten Patente im Markt | ✅ |
@@ -842,7 +886,7 @@ Konzept → Design → Entwicklung → Testing → Deployment → Feedback → I
 
 | Risiko | Wahrscheinlichkeit | Impact | Mitigation |
 |--------|-------------------|--------|------------|
-| Niedrige User-Retention | MITTEL | HOCH | Gamification, Community-Features |
+| Niedrige User-Retention | MITTEL | HOCH | Gamification, Multi-Person Challenges, Community Feed, Impact Wrapped |
 | NGOs posten keine Tasks (Chicken-Egg) | MITTEL | HOCH | Curated Templates, Onboarding-Support |
 | Wettbewerber kopieren Konzept | MITTEL | MITTEL | First-Mover-Advantage, Community aufbauen |
 | Förderung bleibt aus | NIEDRIG | HOCH | Diversifizierte Förderanträge |
@@ -899,6 +943,7 @@ Konzept → Design → Entwicklung → Testing → Deployment → Feedback → I
 | 1.2 | 07.12.2025 | Repository-Cleanup, Begleitdokumentation verlinkt | Claude/Team |
 | 1.3 | 07.12.2025 | Kapitel 3 vollständig ausgearbeitet (Produkt, Wettbewerb, Entwicklung) | Claude/Team |
 | 1.4 | 07.12.2025 | Kritische Überarbeitung Kapitel 3: Zielgruppen-Hierarchie korrigiert, Umfrage-Limitationen ergänzt, Gamification datenbasiert priorisiert, MVP-Verifizierung reduziert, betterplace.org Status aktualisiert, Differenzierungs-Ehrlichkeit erhöht | Claude/Team |
+| 1.5 | 07.12.2025 | **Strategische Feature-Erweiterungen:** (1) Mobile App in MVP Basis verschoben – primäre Schnittstelle zu Studierenden, (2) Multi-Person Challenges + Community Feed als neue USPs ergänzt – erhöhen Attraktivität und Verweildauer (validiert: 62% wollen mit Freunden helfen), (3) Impact Wrapped (Spotify-Wrapped-Stil) für Q4 2026 integriert, Roadmap und alle Referenzen konsistent aktualisiert | Claude/Team |
 
 ---
 
