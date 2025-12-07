@@ -1,7 +1,7 @@
 # SolvTerra Businessplan - Phase 1
 ## Gründungswettbewerb Dokumentation
 
-**Version:** 1.2
+**Version:** 1.3
 **Stand:** 07. Dezember 2025
 **Zielumfang:** ca. 18 Seiten
 
@@ -25,7 +25,7 @@ Dieses Dokument wird durch folgende Referenzdokumente ergänzt:
 |---------|-------|--------------|--------|-----------|
 | 1 | Executive Summary | 2 Seiten | ⏳ ZULETZT | - |
 | 2 | Unternehmensziele und -profil | 2 Seiten | ✅ FERTIG | HOCH |
-| 3 | Produkt oder Dienstleistung | 4 Seiten | 📋 OFFEN | HOCH |
+| 3 | Produkt oder Dienstleistung | 4 Seiten | ✅ FERTIG | HOCH |
 | 4 | Branche und Markt | 4 Seiten | 📋 OFFEN | HOCH |
 | 5 | Marketing (Absatz und Vertrieb) | 4 Seiten | 📋 OFFEN | MITTEL |
 | 6 | Management und Schlüsselpositionen | 1 Seite | 📋 OFFEN | MITTEL |
@@ -251,60 +251,410 @@ Für **Gesellschaft:**
 # 3. Produkt oder Dienstleistung
 
 **Empfohlener Umfang:** 4 Seiten
-**Status:** 📋 OFFEN
+**Status:** ✅ FERTIG
 
 ---
 
 ## 3.1 Kundenvorteile / Kundennutzen
 
-### Leitfragen und Antworten
+### Zielgruppen
 
-| # | Leitfrage | Antwort | Status |
-|---|-----------|---------|--------|
-| 3.1.1 | **Welche Zielgruppen sprechen Sie an?** | **Primär:** NGOs (alle Größen), **Sekundär:** Studenten (18-28 Jahre) | ✅ |
-| 3.1.2 | **Welche Bedürfnisse haben die Zielgruppen?** | _[ZU DETAILLIEREN]_ | 📋 |
-| 3.1.3 | **Welche Funktionen erfüllt Ihr Produkt in diesem Zusammenhang?** | _[ZU SPEZIFIZIEREN]_ | 📋 |
-| 3.1.4 | **Was ist noch erforderlich, um diesen Nutzen für die Zielgruppen zu realisieren?** | _[ZU ANALYSIEREN]_ | 📋 |
-| 3.1.5 | **Welcher Zusatznutzen entsteht durch Ihr Angebot?** | _[ZU FORMULIEREN]_ | 📋 |
-| 3.1.6 | **Welche Partnerschaften sind zur vollen Realisierung des Nutzens erforderlich?** | _[ZU RECHERCHIEREN]_ | 📋 |
-| 3.1.7 | **Welche Konkurrenzprodukte existieren bereits oder sind in der Entwicklung?** | betterplace.org, vostel.de, youvo.org, GoVolunteer (keine mit Micro-Volunteering-Fokus) | 🔄 |
+SolvTerra bedient einen zweiseitigen Markt mit drei klar definierten Zielgruppen:
 
-### Notizen für Ausarbeitung
+**Primäre Zielgruppe: Gemeinnützige Organisationen (NGOs)**
 
-_[Kapitel wird als nächstes bearbeitet]_
+| Merkmal | Beschreibung |
+|---------|--------------|
+| Anzahl in Deutschland | ~600.000 eingetragene Vereine |
+| Sweet Spot | Organisationen mit 10-500 Mitarbeitern |
+| Geschätztes Potenzial | 15.000-25.000 NGOs mit digitalem Bedarf |
+| Kernproblem | Viele kleine, wichtige Aufgaben bleiben unerledigt, weil traditionelles Volunteering zu aufwendig ist |
+
+**Sekundäre Zielgruppe: Studierende**
+
+| Merkmal | Beschreibung |
+|---------|--------------|
+| Anzahl in Deutschland | ~2,9 Millionen |
+| Kernzielgruppe | 18-28 Jahre, Master-Studierende (70% der Umfrageteilnehmer) |
+| Engagement-Status | 54% derzeit nicht aktiv, 74% wurden durch Zeitaufwand abgehalten |
+| Bekanntheit bestehender Apps | 76% kennen keine Engagement-Plattformen |
+
+**Tertiäre Zielgruppe: Unternehmen mit CSR-Interesse**
+
+| Merkmal | Beschreibung |
+|---------|--------------|
+| Fokus | Unternehmen mit CSR-Budget und Interesse an Jugendmarketing |
+| Budget-Erwartung | 62,5% unter €2.000/Jahr (Umfrage), höhere Budgets bei Großunternehmen |
+| Hauptinteresse | Markensichtbarkeit bei jungen Zielgruppen, messbarer Impact |
+
+### Bedürfnisse der Zielgruppen
+
+**NGOs – identifizierte Bedürfnisse:**
+- Entlastung bei kleinen, zeitintensiven Aufgaben (Social Media, Recherche, Übersetzungen)
+- Zugang zu flexibler, motivierter Workforce ohne Festanstellung
+- Dokumentierter Impact für Förderanträge und Jahresberichte
+- Nachwuchsgewinnung und Aufbau einer Unterstützer-Pipeline
+
+**Studierende – validierte Bedürfnisse (aus Umfrage n=50):**
+
+| Bedürfnis | Validierung |
+|-----------|-------------|
+| Flexibles Engagement ohne Langzeitverpflichtung | 74% wurden durch Zeitaufwand vom Engagement abgehalten |
+| Sinnvolle Nutzung kleiner Zeitfenster | 64% würden 2-3 Micro-Actions pro Woche durchführen |
+| Sichtbarer, verifizierter Impact | 72% wollen Vorher-/Nachher-Daten als Beweis |
+| Soziale Komponente (mit Freunden) | 62% würden mehr helfen, wenn sie es mit Freunden tun könnten |
+| Gamification und Anerkennung | 54% finden kleine Belohnungen motivierend, 46% Badges/Zertifikate |
+
+**Unternehmen – identifizierte Bedürfnisse (aus Umfrage n=8):**
+- Einfaches Onboarding mit wenig Administrationsaufwand (Top-Nennung)
+- Klare Sichtbarkeit und Branding-Möglichkeiten
+- Alignment mit eigenen CSR-Zielen
+- Messbarer ROI und Impact-Reports
+
+### Produktfunktionen und Kundennutzen
+
+**SolvTerra bietet drei integrierte Produkte:**
+
+| Produkt | Kernfunktion | Primärer Nutzen |
+|---------|--------------|-----------------|
+| **NGO-Plattform (Web)** | Challenge-Erstellung, Volunteer-Management, Impact-Dashboard | Effiziente Aufgabenverteilung, dokumentierter Impact |
+| **Student-App (Mobile)** | Challenge-Feed, Gamification, Portfolio | Schnelles, flexibles Engagement mit Anerkennung |
+| **Sponsored Challenges** | Branded CSR-Kampagnen | Markensichtbarkeit + messbarer gesellschaftlicher Beitrag |
+
+**Micro-Challenge-Typen:**
+
+| Kategorie | Beispiele | Dauer |
+|-----------|-----------|-------|
+| **Digital/Remote** | Social Media Content, Übersetzungen, Online-Recherche, Dateneinpflege | 5-30 Min |
+| **Vor Ort** | Flyer verteilen, Kurzumfragen, Event-Support, Fotos erstellen | 15-60 Min |
+
+**Verifizierungssystem (Alleinstellungsmerkmal):**
+
+| Methode | Anwendung | Mechanismus |
+|---------|-----------|-------------|
+| Foto-Verifizierung | Vor-Ort-Challenges | GPS + Zeitstempel + Bildanalyse |
+| Text-Einreichung | Recherche, Übersetzungen | Plagiatsprüfung + Stichproben |
+| Digital-Nachweis | Social Media, Online-Aktionen | Screenshot + Link-Verifizierung |
+| NGO-Bestätigung | Events, persönliche Interaktionen | Manuelle Freigabe durch NGO |
+
+**Gamification-System:**
+
+| Element | Funktion | Nutzerwirkung |
+|---------|----------|---------------|
+| Punkte (XP) | Pro Challenge verdient | Fortschrittsmessung |
+| 10 Level | "Starter" bis "Impact Champion" | Langzeit-Engagement |
+| Badges | Thematische Auszeichnungen ("Bildungsheld", "Umweltschützer") | Sammelmotivation |
+| Leaderboards | Wöchentliche/monatliche Rankings | Wettbewerb (opt-in) |
+| Streaks | Tägliche/wöchentliche Serien | Regelmäßigkeit |
+| Team-Challenges | Gruppenaufgaben | Community-Bildung |
+
+### Zusatznutzen
+
+**Für NGOs:**
+- **Donor Pipeline:** Engagierte Studierende werden zu späteren Spendern und Unterstützern
+- **Qualitätsnachweis:** Verifiziertes Engagement stärkt Glaubwürdigkeit gegenüber Förderern
+- **Digitale Transformation:** Modernisierung der Volunteer-Koordination
+
+**Für Studierende:**
+- **Career-Boost:** Dokumentiertes Engagement-Portfolio für Bewerbungen
+- **Community:** Vernetzung mit Gleichgesinnten, Team-Challenges
+- **Micro-Learning:** Einblicke in verschiedene NGO-Bereiche ohne langfristige Verpflichtung
+
+**Für Gesellschaft:**
+- Aktivierung ungenutzten Engagement-Potenzials (54% der Studierenden sind nicht aktiv)
+- Beitrag zu UN SDGs (insb. SDG 10, 11, 17)
+- Stärkung des Zusammenhalts zwischen Generationen
+
+### Erforderliche Partnerschaften
+
+| Partner-Typ | Zweck | Priorität |
+|-------------|-------|-----------|
+| **Hochschulen** | Zugang zu Studierenden, Legitimität, Gründungszentrum | HOCH |
+| **Pilot-NGOs** | Content für Plattform, Feedback, Case Studies | HOCH |
+| **Dachverbände** (z.B. BAGSO, Paritätischer) | Reichweite zu NGOs, Empfehlungen | MITTEL |
+| **Corporate Partner** | Sponsored Challenges, Monetarisierung | MITTEL (Phase 2) |
+| **Förderinstitutionen** (EXIST, DSEE) | Finanzierung, Netzwerk | HOCH |
+
+### Wettbewerbsanalyse
+
+Der deutsche Markt für digitale Engagement-Plattformen ist fragmentiert (15+ Anbieter), jedoch fokussiert sich **keine Plattform explizit auf Micro-Volunteering mit Gamification und Verifizierung**.
+
+**Direkte Wettbewerber:**
+
+| Wettbewerber | Stärken | Schwächen vs. SolvTerra |
+|--------------|---------|-------------------------|
+| **letsact** (150k Downloads) | Mobile-First, größte App | Keine Gamification, keine Verifizierung, keine Sponsored Challenges |
+| **FlexHero** (160+ Kommunen) | B2G-Netzwerk, lokales Marketing | 90% Präsenz-Projekte, kein Micro-Format, keine Gamification |
+| **vostel.de** (60k Vermittlungen) | Starke Filter, international | Web-only, längere Commitments, keine Gamification |
+| **GoVolunteer** (120k Vermittlungen) | Breites Spektrum, Awards | Kein Micro-Fokus, keine integrierte Gamification |
+
+**Indirekte Wettbewerber:**
+
+| Wettbewerber | Fokus | Abgrenzung SolvTerra |
+|--------------|-------|---------------------|
+| **youvo** | Skill-basiert für Kreative | Zeitintensiv (10-20h), Nische |
+| **The Good Ones** | Fachkräfte-Matching | Professionals, nicht Studierende |
+| **SOPS** | Socialpoints-System | Registrierungsgebühr €5, unklares Rewards-Modell |
+| **Mitwirk-O-Mat** | Quiz-Matching | Einmalige Nutzung, keine direkte Vermittlung |
+
+**Wettbewerbsmatrix:**
+
+| Kriterium | SolvTerra | letsact | FlexHero | vostel | youvo |
+|-----------|-----------|---------|----------|--------|-------|
+| Micro-Format (5-30 Min) | ✅ | ⚠️ | ❌ | ⚠️ | ❌ |
+| Gamification | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Verifizierung | ✅ | ❌ | ⚠️ | ❌ | ⚠️ |
+| Mobile App | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Sponsored Challenges | ✅ | ❌ | ❌ | ✅ | ❌ |
+| Studierende-Fokus | ✅ | ⚠️ | ❌ | ⚠️ | ❌ |
+
+**SolvTerra-Alleinstellungsmerkmale (USPs):**
+1. **Erstes Micro-Volunteering** mit 5-30-Minuten-Fokus in Deutschland
+2. **Integrierte Gamification** (Punkte, Levels, Badges, Leaderboards)
+3. **Multi-Layer-Verifizierung** (Foto, GPS, NGO-Bestätigung)
+4. **Sponsored Challenges** als nachhaltiges Monetarisierungsmodell
+5. **Studierende-Fokus** mit Mobile-First-Ansatz
 
 ---
 
 ## 3.2 Entwicklung Produkt/Dienstleistung
 
-### Leitfragen und Antworten
+### Stand der Technik
 
-| # | Leitfrage | Antwort | Status |
-|---|-----------|---------|--------|
-| 3.2.1 | **Wie sieht der aktuelle Stand der Technik aus?** | _[ZU RECHERCHIEREN]_ | 📋 |
-| 3.2.2 | **Inwiefern ist Ihre Idee innovativ?** | _[ZU FORMULIEREN]_ | 📋 |
-| 3.2.3 | **Warum sind vergleichbare Produkte noch nicht auf dem Markt?** | _[ZU ANALYSIEREN]_ | 📋 |
-| 3.2.4 | **In welchem Entwicklungsstadium befindet sich Ihr Produkt?** | Konzeptphase / Pre-MVP | ✅ |
-| 3.2.5 | **Welche weiteren Entwicklungsschritte/Releases planen Sie?** | Q1/26: MVP Basis, Q2/26: MVP Vollversion | ✅ |
-| 3.2.6 | **Welche wichtigen Meilensteine sind noch zu erreichen?** | _[ZU DEFINIEREN]_ | 📋 |
-| 3.2.7 | **Welche Versionen sind für welche Zielgruppen geplant?** | _[ZU SPEZIFIZIEREN]_ | 📋 |
-| 3.2.8 | **Ist Ihr Produkt vom Gesetzgeber zugelassen?** | Keine spezielle Zulassung erforderlich (Software) | ✅ |
-| 3.2.9 | **Besitzen Sie Patente oder Lizenzrechte?** | Nein (Software-Lösung, kein Patent geplant) | ✅ |
-| 3.2.10 | **Welche Patente/Lizenzen sind im Besitz der Konkurrenz?** | _[ZU RECHERCHIEREN]_ | 📋 |
+Der digitale Engagement-Markt in Deutschland zeigt folgende technische Landschaft:
+
+| Aspekt | Marktstandard | SolvTerra-Ansatz |
+|--------|---------------|------------------|
+| **Plattform-Typ** | Web-basierte Marktplätze | Mobile-First App + Web-Dashboard |
+| **Matching** | Manuelle Suche mit Filtern | Algorithmisches Matching + personalisierter Feed |
+| **Verifizierung** | Keine oder manuell | Automatisiert (Foto, GPS, AI-gestützt) |
+| **Gamification** | Kaum vorhanden | Vollständiges System (Punkte, Levels, Badges) |
+| **Impact-Messung** | Keine oder rudimentär | Integriertes Dashboard mit Export-Funktion |
+
+**Technologie-Reife:**
+- Mobile Apps sind im Volunteering-Bereich noch unterentwickelt (nur letsact, FlexHero haben native Apps)
+- Gamification-Konzepte aus anderen Branchen (Fitness, Education) sind übertragbar
+- Verifizierungstechnologien (GPS, Bildanalyse) sind erprobt und kostengünstig implementierbar
+
+### Innovationsgrad
+
+**SolvTerra ist innovativ in drei Dimensionen:**
+
+**1. Format-Innovation:**
+Das Micro-Volunteering-Format (5-30 Minuten) existiert in Deutschland nicht als dediziertes Angebot. Bestehende Plattformen beginnen bei 1-2 Stunden Mindestengagement. 74% der befragten Studierenden wurden durch genau diese Zeitbarriere vom Engagement abgehalten.
+
+**2. Mechanik-Innovation:**
+Die Kombination aus Gamification und Verifizierung ist im Non-Profit-Sektor neu. Während Fitness-Apps (Strava), Sprachlern-Apps (Duolingo) und Nachhaltigkeits-Apps (JoJo Rewards) diese Mechaniken nutzen, fehlt sie im Volunteering.
+
+**3. Geschäftsmodell-Innovation:**
+Sponsored Challenges als Monetarisierung sind im deutschen Engagement-Markt nicht etabliert. Die meisten Plattformen finanzieren sich durch Förderung, Spenden oder Mitgliedsbeiträge.
+
+### Warum existiert das Produkt noch nicht?
+
+| Faktor | Erklärung |
+|--------|-----------|
+| **Marktfokus** | Bestehende Anbieter entstanden aus dem traditionellen Ehrenamt mit langfristigen Verpflichtungen |
+| **Zielgruppen-Verständnis** | Gen Z-Präferenzen (Flexibilität, Gamification) wurden nicht systematisch adressiert |
+| **Technische Komplexität** | Verifizierung + Gamification + Zweiseitiger Markt erfordert spezifische Expertise |
+| **Geschäftsmodell-Risiko** | Sponsored Challenges erfordern kritische Masse bei beiden Zielgruppen |
+| **Non-Profit-Logik** | Viele Plattformen sind selbst gemeinnützig und innovieren langsamer |
+
+### Entwicklungsstadium
+
+**Aktueller Status:** Konzeptphase / Pre-MVP (Dezember 2025)
+
+| Komponente | Status | Fertigstellung |
+|------------|--------|----------------|
+| Geschäftsmodell | ✅ Validiert (Umfrage n=58) | Dez 2025 |
+| Produktkonzept | ✅ Definiert | Dez 2025 |
+| Technische Architektur | 🔄 In Planung | Jan 2026 |
+| MVP Basis | 📋 Geplant | Q1 2026 |
+| MVP Vollversion | 📋 Geplant | Q2 2026 |
+
+### Entwicklungs-Roadmap
+
+**Phase 1: MVP Basis (Q1 2026)**
+
+| Feature | Beschreibung | Zielgruppe |
+|---------|--------------|------------|
+| Challenge-Erstellung | Einfaches Formular für NGOs | NGOs |
+| Challenge-Feed | Liste mit Basis-Filter | Studierende |
+| Basis-Verifizierung | NGO-Bestätigung, Text-Upload | Beide |
+| Account-System | Registrierung, Profil | Beide |
+| Punkte-System | XP pro Challenge | Studierende |
+
+**Phase 2: MVP Vollversion (Q2 2026)**
+
+| Feature | Beschreibung | Zielgruppe |
+|---------|--------------|------------|
+| Mobile App | Native iOS/Android | Studierende |
+| Gamification erweitert | Levels, Badges, Leaderboards | Studierende |
+| Foto-Verifizierung | GPS + Zeitstempel + Upload | Studierende |
+| Impact-Dashboard | Statistiken, Export | NGOs |
+| Team-Challenges | Gruppen-Funktionen | Studierende |
+
+**Phase 3: Monetarisierung (Q4 2026+)**
+
+| Feature | Beschreibung | Zielgruppe |
+|---------|--------------|------------|
+| Sponsored Challenges | Branded Kampagnen | Corporate |
+| Premium-Tier NGOs | Erweiterte Features | NGOs |
+| Rewards-Integration | Partner-Rabatte | Studierende |
+| API-Zugang | Externe Integration | NGOs, Partner |
+
+### Meilensteine
+
+| Meilenstein | Kriterium | Zieldatum |
+|-------------|-----------|-----------|
+| gGmbH gegründet | Handelsregistereintrag | Q1 2026 |
+| EXIST-Förderung bewilligt | Förderbescheid | Q1 2026 |
+| MVP Basis live | Funktionierende Plattform | Q1 2026 |
+| Erste 10 NGOs aktiv | Challenge-Postings vorhanden | Q2 2026 |
+| Erste 500 Studierende | Aktive Accounts | Q2 2026 |
+| 1.000 Challenges abgeschlossen | Verifizierte Completions | Q3 2026 |
+| Erste Sponsored Challenge | Bezahlter Corporate Partner | Q4 2026 |
+| 2.000+ Studierende, 25+ NGOs | Aktive Nutzung | Q4 2026 |
+
+### Versionen für Zielgruppen
+
+| Version | Zielgruppe | Plattform | Kernfunktionen |
+|---------|------------|-----------|----------------|
+| **NGO-Dashboard** | NGOs, Vereine | Web (Responsive) | Challenge-Management, Volunteer-Übersicht, Impact-Reports |
+| **Student-App** | Studierende 18-28 | iOS, Android | Challenge-Feed, Gamification, Portfolio, Push-Notifications |
+| **Corporate-Portal** | Unternehmen | Web | Kampagnen-Setup, Branding, Impact-Reporting |
+
+### Zulassung und Regulierung
+
+**Keine spezielle Zulassung erforderlich.** Als Software-Plattform unterliegt SolvTerra keinen branchenspezifischen Zulassungsanforderungen.
+
+**Relevante Regulierungen:**
+- DSGVO (Datenschutz) – vollständige Compliance geplant
+- Gemeinnützigkeitsrecht (gGmbH) – steuerliche Abstimmung mit Finanzamt
+- AGB und Nutzungsbedingungen – rechtliche Beratung vorgesehen
+
+### Patente und Lizenzen
+
+**SolvTerra besitzt keine Patente** und plant keine Patentanmeldung. Das Geschäftsmodell basiert nicht auf patentierbarer Technologie, sondern auf:
+- Netzwerkeffekten (kritische Masse)
+- First-Mover-Vorteil
+- Community und Markenaufbau
+- Akkumulierte Daten und Erfahrungswerte
+
+**Wettbewerber-Patente:** Keine relevanten Patente im deutschen Engagement-Plattform-Markt identifiziert. Der Markt ist durch offene Technologien geprägt.
 
 ---
 
 ## 3.3 Fertigung/Erstellung
 
-### Leitfragen und Antworten
+### Entwicklungsprozess
+
+**Agile Software-Entwicklung in 2-Wochen-Sprints:**
+
+```
+Konzept → Design → Entwicklung → Testing → Deployment → Feedback → Iteration
+   ↑______________________________________________________________|
+```
+
+| Phase | Aktivitäten | Verantwortlich |
+|-------|-------------|----------------|
+| **Konzept** | User Stories, Wireframes | CPO (Nico) |
+| **Design** | UI/UX, Prototypen | CPO + Freelancer |
+| **Backend** | API, Datenbank, Verifizierung | CTO (Jiayi) |
+| **Frontend** | Web-Dashboard, Mobile App | CTO + Freelancer |
+| **Testing** | QA, User-Tests, Bug-Fixing | Team |
+| **Deployment** | Cloud-Infrastruktur, Monitoring | CTO |
+
+### Ressourcenbedarf
+
+**Technische Infrastruktur (Jahr 1: €25.000):**
+
+| Kategorie | Kosten/Jahr | Details |
+|-----------|-------------|---------|
+| Cloud-Hosting (AWS/GCP) | €8.000 | Server, Datenbank, Storage |
+| Entwicklungstools | €3.000 | IDEs, CI/CD, Git |
+| Externe Services | €5.000 | Analytics, Push-Notifications, Maps API |
+| Design-Tools | €2.000 | Figma, Prototyping |
+| Sicherheit | €3.000 | SSL, Penetration Testing |
+| Reserve | €4.000 | Unvorhergesehenes |
+
+**Personalressourcen:**
+
+| Rolle | Aufwand (Jahr 1) | Quelle |
+|-------|------------------|--------|
+| Produktentwicklung | ~1 FTE | CPO (Nico), CTO (Jiayi) |
+| Design/UX | 0,3 FTE | Freelancer |
+| Backend-Entwicklung | 0,5 FTE | CTO + Werkstudent |
+| Mobile-Entwicklung | 0,3 FTE | Freelancer |
+
+### Qualitätssicherung
+
+**Mehrstufiges QA-System:**
+
+| Ebene | Maßnahme | Häufigkeit |
+|-------|----------|------------|
+| **Code-Qualität** | Code Reviews, Pair Programming | Jeder Commit |
+| **Automatisierte Tests** | Unit Tests, Integration Tests | Jeder Build |
+| **Manuelle Tests** | Feature-Testing vor Release | Jeder Sprint |
+| **User-Testing** | Beta-Nutzer-Feedback | Monatlich |
+| **Performance** | Load Testing, Monitoring | Vor Major Releases |
+| **Sicherheit** | Dependency Scanning, Security Review | Quartalsweise |
+
+**Qualitätsmetriken:**
+- Code Coverage: Ziel >70%
+- Kritische Bugs in Produktion: Ziel <1/Monat
+- App Store Rating: Ziel >4,0 Sterne
+- API-Uptime: Ziel >99,5%
+
+### Externe Leistungen
+
+| Leistung | Beschreibung | Geschätzte Kosten |
+|----------|--------------|-------------------|
+| **UX/UI Design** | Wireframes, High-Fidelity Designs, Design System | €8.000-12.000 (einmalig) |
+| **Mobile-Entwicklung** | React Native / Flutter App-Entwicklung | €10.000-15.000 (Phase 2) |
+| **Rechtsberatung** | AGB, Datenschutz, gGmbH-Gründung | €3.000-5.000 |
+| **Steuerberatung** | Gemeinnützigkeit, Förderung | €2.000-3.000/Jahr |
+| **Hosting/Cloud** | AWS/GCP Managed Services | €8.000/Jahr |
+| **Marketing** | Logo, Branding, Launch-Kampagne | €5.000-8.000 |
+
+**Make-or-Buy-Entscheidung:**
+
+| Komponente | Entscheidung | Begründung |
+|------------|--------------|------------|
+| Backend-Architektur | MAKE | Kernkompetenz, Differenzierung |
+| Verifizierungssystem | MAKE | Alleinstellungsmerkmal |
+| Mobile App | HYBRID | Framework + Freelancer, später intern |
+| UI/UX Design | BUY | Spezialkompetenz, einmalig |
+| Cloud-Infrastruktur | BUY | Standard, kosteneffizient |
+| Analytics | BUY | Standard (Google Analytics, Mixpanel) |
+
+---
+
+## Leitfragen-Übersicht Kapitel 3
 
 | # | Leitfrage | Antwort | Status |
 |---|-----------|---------|--------|
-| 3.3.1 | **Welchen Fertigungs-/Dienstleistungserstellungsprozess planen Sie?** | _[ZU SPEZIFIZIEREN]_ | 📋 |
-| 3.3.2 | **Welche Mittel benötigen Sie zur Produkt-/Dienstleistungserstellung?** | _[ZU KALKULIEREN]_ | 📋 |
-| 3.3.3 | **Welche Maßnahmen zur Qualitätssicherung sehen Sie vor?** | _[ZU DEFINIEREN]_ | 📋 |
-| 3.3.4 | **Welchen Lageraufbau planen Sie?** | N/A (Software, kein physisches Produkt) | ✅ |
-| 3.3.5 | **Welche Teile und Leistungen kaufen Sie von Dritten zu?** | _[ZU SPEZIFIZIEREN]_ | 📋 |
+| 3.1.1 | Welche Zielgruppen sprechen Sie an? | NGOs (primär), Studierende 18-28 (sekundär), Corporate Partner (tertiär) | ✅ |
+| 3.1.2 | Welche Bedürfnisse haben die Zielgruppen? | NGOs: Entlastung, Impact-Nachweis; Studierende: Flexibilität, Anerkennung; Corporate: ROI, Sichtbarkeit | ✅ |
+| 3.1.3 | Welche Funktionen erfüllt Ihr Produkt? | Challenge-Plattform, Gamification, Verifizierung, Impact-Dashboard | ✅ |
+| 3.1.4 | Was ist noch erforderlich für Nutzenrealisierung? | Hochschul-Partnerschaften, Pilot-NGOs, Förderung | ✅ |
+| 3.1.5 | Welcher Zusatznutzen entsteht? | Donor Pipeline, Career-Portfolio, SDG-Beitrag | ✅ |
+| 3.1.6 | Welche Partnerschaften sind erforderlich? | Hochschulen, NGOs, Dachverbände, EXIST | ✅ |
+| 3.1.7 | Welche Konkurrenzprodukte existieren? | letsact, FlexHero, vostel, youvo – keine mit Micro+Gamification+Verifizierung | ✅ |
+| 3.2.1 | Wie sieht der Stand der Technik aus? | Web-basierte Marktplätze, kaum Mobile, keine Gamification, keine Verifizierung | ✅ |
+| 3.2.2 | Inwiefern ist Ihre Idee innovativ? | Micro-Format, Gamification, Verifizierung, Sponsored Challenges | ✅ |
+| 3.2.3 | Warum sind vergleichbare Produkte noch nicht am Markt? | Traditioneller Ehrenamts-Fokus, fehlendes Gen Z-Verständnis, Geschäftsmodell-Risiko | ✅ |
+| 3.2.4 | In welchem Entwicklungsstadium befindet sich Ihr Produkt? | Konzeptphase / Pre-MVP (Dez 2025) | ✅ |
+| 3.2.5 | Welche Entwicklungsschritte/Releases planen Sie? | Q1/26: MVP Basis, Q2/26: MVP Vollversion, Q4/26: Sponsored Challenges | ✅ |
+| 3.2.6 | Welche Meilensteine sind zu erreichen? | gGmbH-Gründung, EXIST, 500 User, 1.000 Challenges, erste Sponsored Challenge | ✅ |
+| 3.2.7 | Welche Versionen für welche Zielgruppen? | NGO-Dashboard (Web), Student-App (Mobile), Corporate-Portal (Web) | ✅ |
+| 3.2.8 | Ist Ihr Produkt vom Gesetzgeber zugelassen? | Keine Zulassung erforderlich (Software) | ✅ |
+| 3.2.9 | Besitzen Sie Patente oder Lizenzrechte? | Nein (kein Patent geplant, Fokus auf Netzwerkeffekte) | ✅ |
+| 3.2.10 | Welche Patente/Lizenzen bei der Konkurrenz? | Keine relevanten Patente im Markt | ✅ |
+| 3.3.1 | Welchen Erstellungsprozess planen Sie? | Agile Entwicklung in 2-Wochen-Sprints | ✅ |
+| 3.3.2 | Welche Mittel benötigen Sie? | €25.000 Tech/Jahr, 1-2 FTE Entwicklung | ✅ |
+| 3.3.3 | Welche Qualitätssicherungsmaßnahmen? | Code Reviews, automatisierte Tests, User-Testing, Security Reviews | ✅ |
+| 3.3.4 | Welchen Lageraufbau planen Sie? | N/A (Software, kein physisches Produkt) | ✅ |
+| 3.3.5 | Welche Leistungen kaufen Sie zu? | UX/UI Design, Mobile-Entwicklung (teil), Recht, Steuer, Cloud | ✅ |
 
 ---
 
@@ -523,6 +873,7 @@ _[Kapitel wird als nächstes bearbeitet]_
 | 1.0 | 06.12.2025 | Initiale Struktur erstellt | Claude/Team |
 | 1.1 | 06.12.2025 | Kapitel 2 vollständig ausgearbeitet | Claude/Team |
 | 1.2 | 07.12.2025 | Repository-Cleanup, Begleitdokumentation verlinkt | Claude/Team |
+| 1.3 | 07.12.2025 | Kapitel 3 vollständig ausgearbeitet (Produkt, Wettbewerb, Entwicklung) | Claude/Team |
 
 ---
 
