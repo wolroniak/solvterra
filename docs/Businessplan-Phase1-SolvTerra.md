@@ -1,9 +1,21 @@
 # SolvTerra Businessplan - Phase 1
 ## Gründungswettbewerb Dokumentation
 
-**Version:** 1.1
-**Stand:** 06. Dezember 2025
+**Version:** 1.2
+**Stand:** 07. Dezember 2025
 **Zielumfang:** ca. 18 Seiten
+
+---
+
+## Begleitdokumentation
+
+Dieses Dokument wird durch folgende Referenzdokumente ergänzt:
+
+| Dokument | Inhalt | Verwendung |
+|----------|--------|------------|
+| `SolvTerra-Evolution.md` | Ideenentwicklung von ursprünglichem Konzept zum finalen Modell | Hintergrund, Pivot-Begründung |
+| `Research-Archive.md` | Konsolidierte Forschungsergebnisse und Quellenangaben | Marktdaten, Wettbewerb, SDG |
+| `Businessplan-Information-Base.md` | Strukturierte Informationen für Kapitel 3-10 | Direkte Übernahme in Business Plan |
 
 ---
 
@@ -510,7 +522,7 @@ _[Kapitel wird als nächstes bearbeitet]_
 |---------|-------|------------|-------|
 | 1.0 | 06.12.2025 | Initiale Struktur erstellt | Claude/Team |
 | 1.1 | 06.12.2025 | Kapitel 2 vollständig ausgearbeitet | Claude/Team |
-| | | | |
+| 1.2 | 07.12.2025 | Repository-Cleanup, Begleitdokumentation verlinkt | Claude/Team |
 
 ---
 
