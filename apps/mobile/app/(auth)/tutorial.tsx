@@ -1,49 +1,52 @@
 // Tutorial Screen
 // Swipeable introduction to the app features
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { View, StyleSheet, Dimensions, FlatList, Animated } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
 
 const { width } = Dimensions.get('window');
 
-const TUTORIAL_SLIDES = [
-  {
-    id: '1',
-    icon: 'clock-outline',
-    iconColor: Colors.primary[600],
-    title: 'Micro-Volunteering',
-    description: 'Hilf in nur 5-30 Minuten. Perfekt für deinen vollen Stundenplan als Student.',
-  },
-  {
-    id: '2',
-    icon: 'trophy-outline',
-    iconColor: Colors.secondary[500],
-    title: 'Punkte & Badges',
-    description: 'Sammle XP für jede Challenge. Steige Level auf und verdiene einzigartige Badges.',
-  },
-  {
-    id: '3',
-    icon: 'hand-heart-outline',
-    iconColor: Colors.accent[500],
-    title: 'Echte Wirkung',
-    description: 'Unterstütze verifizierte NGOs und sieh, wie dein Beitrag die Welt verändert.',
-  },
+// Slide configuration (non-translated)
+const SLIDE_CONFIG = [
+  { id: '1', icon: 'clock-outline', iconColor: Colors.primary[600], step: 'step1' },
+  { id: '2', icon: 'trophy-outline', iconColor: Colors.secondary[500], step: 'step2' },
+  { id: '3', icon: 'hand-heart-outline', iconColor: Colors.accent[500], step: 'step3' },
 ];
 
+interface TutorialSlide {
+  id: string;
+  icon: string;
+  iconColor: string;
+  title: string;
+  description: string;
+}
+
 export default function TutorialScreen() {
+  const { t } = useTranslation('auth');
   const { completeOnboarding } = useUserStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
 
+  // Build slides with translations
+  const tutorialSlides: TutorialSlide[] = useMemo(() =>
+    SLIDE_CONFIG.map(config => ({
+      id: config.id,
+      icon: config.icon,
+      iconColor: config.iconColor,
+      title: t(`onboarding.tutorialStep.${config.step}.title`),
+      description: t(`onboarding.tutorialStep.${config.step}.description`),
+    })), [t]);
+
   const handleNext = () => {
-    if (currentIndex < TUTORIAL_SLIDES.length - 1) {
+    if (currentIndex < tutorialSlides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -61,7 +64,7 @@ export default function TutorialScreen() {
     router.replace('/(tabs)');
   };
 
-  const renderSlide = ({ item }: { item: typeof TUTORIAL_SLIDES[0] }) => (
+  const renderSlide = ({ item }: { item: TutorialSlide }) => (
     <View style={styles.slide}>
       <View style={[styles.iconCircle, { backgroundColor: `${item.iconColor}15` }]}>
         <MaterialCommunityIcons
@@ -81,7 +84,7 @@ export default function TutorialScreen() {
 
   const renderDots = () => (
     <View style={styles.dotsContainer}>
-      {TUTORIAL_SLIDES.map((_, index) => {
+      {tutorialSlides.map((_, index) => {
         const inputRange = [
           (index - 1) * width,
           index * width,
@@ -133,14 +136,14 @@ export default function TutorialScreen() {
           onPress={handleSkip}
           textColor={Colors.textSecondary}
         >
-          Überspringen
+          {t('onboarding.interestsStep.skip')}
         </Button>
       </View>
 
       {/* Slides */}
       <Animated.FlatList
         ref={flatListRef}
-        data={TUTORIAL_SLIDES}
+        data={tutorialSlides}
         renderItem={renderSlide}
         keyExtractor={item => item.id}
         horizontal
@@ -167,7 +170,9 @@ export default function TutorialScreen() {
           style={styles.button}
           contentStyle={styles.buttonContent}
         >
-          {currentIndex === TUTORIAL_SLIDES.length - 1 ? 'Los geht\'s!' : 'Weiter'}
+          {currentIndex === tutorialSlides.length - 1
+            ? t('onboarding.completeButton')
+            : t('onboarding.interestsStep.continue')}
         </Button>
       </View>
     </SafeAreaView>

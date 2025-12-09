@@ -1,0 +1,53 @@
+{
+  "title": "Profile",
+  "level": "Level",
+  "progress": {
+    "title": "Your progress",
+    "xpLabel": "{{current}} / {{needed}} XP",
+    "nextLevel": "Next level: {{level}}"
+  },
+  "stats": {
+    "challenges": "Challenges",
+    "contributed": "Contributed",
+    "badges": "Badges"
+  },
+  "badges": {
+    "title": "My Badges",
+    "seeAll": "See all",
+    "empty": "No badges earned yet",
+    "earnedOn": "Earned on {{date}}"
+  },
+  "settings": {
+    "title": "Settings",
+    "notifications": "Notifications",
+    "account": "Manage account",
+    "privacy": "Privacy",
+    "help": "Help & FAQ",
+    "language": "Language",
+    "languageGerman": "Deutsch",
+    "languageEnglish": "English"
+  },
+  "logout": "Log out",
+  "version": "SolvTerra v{{version}} (Demo)",
+  "levels": {
+    "starter": "Starter",
+    "helper": "Helper",
+    "supporter": "Supporter",
+    "champion": "Champion",
+    "legend": "Legend"
+  },
+  "badgeNames": {
+    "first-challenge": "First Steps",
+    "five-challenges": "Go-Getter",
+    "ten-challenges": "On a Roll",
+    "twentyfive-challenges": "Champion",
+    "eco-warrior": "Eco Warrior",
+    "social-butterfly": "Social Hero",
+    "knowledge-seeker": "Knowledge Seeker",
+    "health-hero": "Health Hero",
+    "early-bird": "Early Bird",
+    "night-owl": "Night Owl",
+    "five-star": "Five Star",
+    "week-streak": "Week Warrior"
+  }
+}

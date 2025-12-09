@@ -1,0 +1,53 @@
+{
+  "title": "Profil",
+  "level": "Level",
+  "progress": {
+    "title": "Dein Fortschritt",
+    "xpLabel": "{{current}} / {{needed}} XP",
+    "nextLevel": "Nächstes Level: {{level}}"
+  },
+  "stats": {
+    "challenges": "Challenges",
+    "contributed": "Beigetragen",
+    "badges": "Badges"
+  },
+  "badges": {
+    "title": "Meine Badges",
+    "seeAll": "Alle anzeigen",
+    "empty": "Noch keine Badges verdient",
+    "earnedOn": "Verdient am {{date}}"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "notifications": "Benachrichtigungen",
+    "account": "Konto verwalten",
+    "privacy": "Datenschutz",
+    "help": "Hilfe & FAQ",
+    "language": "Sprache",
+    "languageGerman": "Deutsch",
+    "languageEnglish": "English"
+  },
+  "logout": "Abmelden",
+  "version": "SolvTerra v{{version}} (Demo)",
+  "levels": {
+    "starter": "Einsteiger",
+    "helper": "Helfer",
+    "supporter": "Unterstützer",
+    "champion": "Champion",
+    "legend": "Legende"
+  },
+  "badgeNames": {
+    "first-challenge": "Erste Schritte",
+    "five-challenges": "Durchstarter",
+    "ten-challenges": "Auf Kurs",
+    "twentyfive-challenges": "Champion",
+    "eco-warrior": "Öko-Krieger",
+    "social-butterfly": "Sozialheld",
+    "knowledge-seeker": "Wissensdurst",
+    "health-hero": "Gesundheitsheld",
+    "early-bird": "Frühaufsteher",
+    "night-owl": "Nachteule",
+    "five-star": "Fünf Sterne",
+    "week-streak": "Wochenkrieger"
+  }
+}

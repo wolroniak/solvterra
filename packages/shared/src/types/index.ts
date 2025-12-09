@@ -38,8 +38,11 @@ export type UserLevel = 'starter' | 'helper' | 'supporter' | 'champion' | 'legen
 export interface Organization {
   id: string;
   name: string;
+  name_en?: string;           // English translation
   description: string;
+  description_en?: string;    // English translation
   mission?: string;
+  mission_en?: string;        // English translation
   logoUrl: string;
   website?: string;
   contactEmail?: string;
@@ -94,13 +97,17 @@ export type ScheduleType = 'anytime' | 'fixed' | 'range' | 'recurring';
 
 export interface ChallengeLocation {
   name: string;                    // e.g., "Stadtpark Frankfurt"
+  name_en?: string;                // English translation
   address?: string;                // Full address
+  address_en?: string;             // English translation
   coordinates?: {
     lat: number;
     lng: number;
   };
   meetingPoint?: string;           // e.g., "Am Haupteingang"
+  meetingPoint_en?: string;        // English translation
   additionalInfo?: string;         // e.g., "Parkplätze vorhanden"
+  additionalInfo_en?: string;      // English translation
 }
 
 export interface ChallengeSchedule {
@@ -116,10 +123,12 @@ export interface ChallengeSchedule {
 export interface ChallengeContact {
   name: string;                    // Contact person name
   role?: string;                   // e.g., "Ehrenamtskoordinator"
+  role_en?: string;                // English translation
   email?: string;
   phone?: string;
   preferredMethod: 'email' | 'phone' | 'app';
   responseTime?: string;           // e.g., "Innerhalb von 24 Stunden"
+  responseTime_en?: string;        // English translation
 }
 
 // Teammate seeker for matchmaking
@@ -136,8 +145,11 @@ export interface Challenge {
   organizationId: string;
   organization: Organization;
   title: string;
+  title_en?: string;               // English translation
   description: string;
+  description_en?: string;         // English translation
   instructions: string;
+  instructions_en?: string;        // English translation
   category: ChallengeCategory;
   type: ChallengeType;
   durationMinutes: ChallengeDuration;
@@ -161,6 +173,7 @@ export interface Challenge {
   minTeamSize?: number;
   maxTeamSize?: number;
   teamDescription?: string;
+  teamDescription_en?: string;     // English translation
 
   // Solo join for team challenges (matchmaking)
   allowSoloJoin?: boolean;          // Can join without bringing team
@@ -207,10 +220,13 @@ export interface Submission {
 export interface Badge {
   id: string;
   name: string;
+  name_en?: string;              // English translation
   description: string;
+  description_en?: string;       // English translation
   iconName: string; // Icon identifier for the app
   category: 'milestone' | 'category' | 'special' | 'streak';
   criteria: string;
+  criteria_en?: string;          // English translation
   xpBonus?: number;
 }
 
@@ -276,14 +292,18 @@ export interface WeeklyDataPoint {
 export interface ChallengeTemplate {
   id: string;
   name: string;
+  name_en?: string;                    // English translation
   description: string;
+  description_en?: string;             // English translation
   icon: string;
   category: ChallengeCategory;
   type: ChallengeType;
   suggestedDuration: ChallengeDuration;
   suggestedVerification: VerificationMethod;
   defaultDescription: string;
+  defaultDescription_en?: string;      // English translation
   defaultInstructions: string;
+  defaultInstructions_en?: string;     // English translation
 }
 
 // ============================================
@@ -295,7 +315,9 @@ export interface Notification {
   userId: string;
   type: 'submission_approved' | 'submission_rejected' | 'badge_earned' | 'level_up' | 'new_challenge';
   title: string;
+  title_en?: string;             // English translation
   message: string;
+  message_en?: string;           // English translation
   read: boolean;
   data?: Record<string, unknown>;
   createdAt: Date;
@@ -367,8 +389,10 @@ export interface CommunityComment {
 export interface LinkedChallengeInfo {
   id: string;
   title: string;
+  title_en?: string;                   // English translation
   imageUrl?: string;
   organizationName: string;
+  organizationName_en?: string;        // English translation
   category: ChallengeCategory;
   xpReward: number;
   durationMinutes: ChallengeDuration;
@@ -390,7 +414,9 @@ export interface CommunityPost {
 
   // Content
   title?: string;           // For NGO promotions, success stories
+  title_en?: string;        // English translation
   content?: string;         // Post text content
+  content_en?: string;      // English translation
   imageUrl?: string;        // Post image
 
   // Challenge Link (for promotions and success stories)
@@ -404,6 +430,7 @@ export interface CommunityPost {
   // Auto-generated activity fields (backward compatible)
   badgeId?: string;
   badgeName?: string;
+  badgeName_en?: string;    // English translation
   badgeIcon?: string;
   newLevel?: UserLevel;
   teamMemberNames?: string[];
@@ -441,9 +468,11 @@ export interface FeedItem {
   // Content based on type
   challengeId?: string;
   challengeTitle?: string;
+  challengeTitle_en?: string;      // English translation
   challengeImageUrl?: string;
   badgeId?: string;
   badgeName?: string;
+  badgeName_en?: string;           // English translation
   badgeIcon?: string;
   newLevel?: UserLevel;
   teamMemberNames?: string[];
@@ -455,11 +484,11 @@ export interface FeedItem {
 }
 
 // Reaction icons mapping for UI
-export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string; color: string }> = {
-  heart: { emoji: '❤️', label: 'Gefällt mir', color: '#ef4444' },
-  celebrate: { emoji: '🎉', label: 'Feiern', color: '#f59e0b' },
-  inspiring: { emoji: '💪', label: 'Inspirierend', color: '#8b5cf6' },
-  thanks: { emoji: '🙏', label: 'Danke', color: '#06b6d4' },
+export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string; label_en: string; color: string }> = {
+  heart: { emoji: '❤️', label: 'Gefällt mir', label_en: 'Like', color: '#ef4444' },
+  celebrate: { emoji: '🎉', label: 'Feiern', label_en: 'Celebrate', color: '#f59e0b' },
+  inspiring: { emoji: '💪', label: 'Inspirierend', label_en: 'Inspiring', color: '#8b5cf6' },
+  thanks: { emoji: '🙏', label: 'Danke', label_en: 'Thanks', color: '#06b6d4' },
 };
 
 // ============================================

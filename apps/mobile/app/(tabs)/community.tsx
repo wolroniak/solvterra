@@ -7,6 +7,7 @@ import { View, StyleSheet, FlatList, RefreshControl, Pressable } from 'react-nat
 import { Text, Snackbar } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { MOCK_COMMUNITY_POSTS } from '@solvterra/shared';
 import type { CommunityPost, ReactionType } from '@solvterra/shared';
@@ -15,14 +16,16 @@ import CommunityPostCard from '@/components/CommunityPostCard';
 // Filter tabs
 type FilterTab = 'all' | 'promotions' | 'stories' | 'activity';
 
-const FILTER_TABS: { key: FilterTab; label: string; icon: string }[] = [
-  { key: 'all', label: 'Alle', icon: 'home' },
-  { key: 'promotions', label: 'NGOs', icon: 'bullhorn' },
-  { key: 'stories', label: 'Stories', icon: 'star' },
-  { key: 'activity', label: 'Aktivität', icon: 'lightning-bolt' },
-];
+const FILTER_TAB_KEYS: FilterTab[] = ['all', 'promotions', 'stories', 'activity'];
+const FILTER_TAB_ICONS: Record<FilterTab, string> = {
+  all: 'home',
+  promotions: 'bullhorn',
+  stories: 'star',
+  activity: 'lightning-bolt',
+};
 
 export default function CommunityScreen() {
+  const { t } = useTranslation('community');
   const [posts, setPosts] = useState<CommunityPost[]>(MOCK_COMMUNITY_POSTS);
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [refreshing, setRefreshing] = useState(false);
@@ -72,15 +75,15 @@ export default function CommunityScreen() {
       inspiring: '💪',
       thanks: '🙏',
     };
-    setSnackbarMessage(`${reactionEmojis[reactionType]} Reaktion hinzugefügt`);
+    setSnackbarMessage(`${reactionEmojis[reactionType]} ${t('reactions.added')}`);
     setSnackbarVisible(true);
-  }, []);
+  }, [t]);
 
   const handleComment = useCallback((postId: string) => {
     // In a real app, this would open a comment modal
-    setSnackbarMessage('Kommentare - Bald verfügbar!');
+    setSnackbarMessage(t('comments.comingSoon'));
     setSnackbarVisible(true);
-  }, []);
+  }, [t]);
 
   // Filter posts based on active tab
   const filteredPosts = posts.filter(post => {
@@ -105,6 +108,34 @@ export default function CommunityScreen() {
     return b.createdAt.getTime() - a.createdAt.getTime();
   });
 
+  // Get the feed header text based on filter
+  const getFeedHeaderText = () => {
+    switch (activeFilter) {
+      case 'promotions':
+        return t('feedHeader.promotions', { count: sortedPosts.length });
+      case 'stories':
+        return t('feedHeader.stories', { count: sortedPosts.length });
+      case 'activity':
+        return t('feedHeader.activities', { count: sortedPosts.length });
+      default:
+        return t('feedHeader.posts', { count: sortedPosts.length });
+    }
+  };
+
+  // Get empty state text based on filter
+  const getEmptyText = () => {
+    switch (activeFilter) {
+      case 'promotions':
+        return t('empty.promotions');
+      case 'stories':
+        return t('empty.stories');
+      case 'activity':
+        return t('empty.activity');
+      default:
+        return t('empty.subtitle');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
@@ -116,36 +147,36 @@ export default function CommunityScreen() {
             color={Colors.primary[600]}
           />
           <Text variant="headlineSmall" style={styles.title}>
-            Community
+            {t('title')}
           </Text>
         </View>
         <Text variant="bodyMedium" style={styles.subtitle}>
-          Entdecke Challenges, feiere Erfolge, inspiriere andere
+          {t('subtitle')}
         </Text>
 
         {/* Filter Tabs */}
         <View style={styles.filterTabs}>
-          {FILTER_TABS.map(tab => (
+          {FILTER_TAB_KEYS.map(tabKey => (
             <Pressable
-              key={tab.key}
+              key={tabKey}
               style={[
                 styles.filterTab,
-                activeFilter === tab.key && styles.filterTabActive,
+                activeFilter === tabKey && styles.filterTabActive,
               ]}
-              onPress={() => setActiveFilter(tab.key)}
+              onPress={() => setActiveFilter(tabKey)}
             >
               <MaterialCommunityIcons
-                name={tab.icon as any}
+                name={FILTER_TAB_ICONS[tabKey] as any}
                 size={16}
-                color={activeFilter === tab.key ? Colors.primary[600] : Colors.textMuted}
+                color={activeFilter === tabKey ? Colors.primary[600] : Colors.textMuted}
               />
               <Text
                 style={[
                   styles.filterTabText,
-                  activeFilter === tab.key && styles.filterTabTextActive,
+                  activeFilter === tabKey && styles.filterTabTextActive,
                 ]}
               >
-                {tab.label}
+                {t(`filters.${tabKey}`)}
               </Text>
             </Pressable>
           ))}
@@ -180,16 +211,10 @@ export default function CommunityScreen() {
               color={Colors.neutral[300]}
             />
             <Text variant="titleMedium" style={styles.emptyTitle}>
-              Noch keine Posts
+              {t('empty.title')}
             </Text>
             <Text variant="bodyMedium" style={styles.emptyText}>
-              {activeFilter === 'promotions'
-                ? 'Noch keine NGO-Posts in dieser Kategorie'
-                : activeFilter === 'stories'
-                ? 'Noch keine Erfolgsgeschichten geteilt'
-                : activeFilter === 'activity'
-                ? 'Noch keine Aktivitäten zu sehen'
-                : 'Hier erscheinen bald Posts von NGOs und der Community'}
+              {getEmptyText()}
             </Text>
           </View>
         }
@@ -197,13 +222,7 @@ export default function CommunityScreen() {
           sortedPosts.length > 0 ? (
             <View style={styles.feedHeader}>
               <Text style={styles.feedHeaderText}>
-                {activeFilter === 'all'
-                  ? `${sortedPosts.length} Posts`
-                  : activeFilter === 'promotions'
-                  ? `${sortedPosts.length} Challenge-Empfehlungen`
-                  : activeFilter === 'stories'
-                  ? `${sortedPosts.length} Erfolgsgeschichten`
-                  : `${sortedPosts.length} Aktivitäten`}
+                {getFeedHeaderText()}
               </Text>
             </View>
           ) : null
@@ -215,7 +234,7 @@ export default function CommunityScreen() {
         <View style={styles.infoBanner}>
           <MaterialCommunityIcons name="information" size={16} color={Colors.primary[600]} />
           <Text style={styles.infoBannerText}>
-            Erfolgsgeschichten können nur nach verifizierter Challenge-Teilnahme geteilt werden
+            {t('infoBanner.storiesVerified')}
           </Text>
         </View>
       )}

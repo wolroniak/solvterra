@@ -6,8 +6,10 @@ import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
+import LanguageToggle from '@/components/LanguageToggle';
 
 const { width } = Dimensions.get('window');
 
@@ -15,6 +17,7 @@ const { width } = Dimensions.get('window');
 const SolvTerraLogo = require('@/assets/logo.png');
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation('auth');
   const { resetToExistingUser } = useUserStore();
 
   const handleGetStarted = () => {
@@ -29,6 +32,11 @@ export default function WelcomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Language Toggle - top right */}
+      <View style={styles.languageToggleContainer}>
+        <LanguageToggle />
+      </View>
+
       <View style={styles.content}>
         {/* SolvTerra Logo */}
         <View style={styles.logoContainer}>
@@ -41,22 +49,22 @@ export default function WelcomeScreen() {
 
         {/* Subtitle */}
         <Text variant="titleMedium" style={styles.subtitle}>
-          Micro-Volunteering für Studierende
+          {t('welcome.subtitle')}
         </Text>
 
         {/* Features */}
         <View style={styles.features}>
           <FeatureItem
             icon="clock-outline"
-            text="Helfe in nur 5-30 Minuten"
+            text={t('welcome.features.time')}
           />
           <FeatureItem
             icon="trophy-outline"
-            text="Sammle Punkte und Badges"
+            text={t('welcome.features.points')}
           />
           <FeatureItem
             icon="account-group-outline"
-            text="Unterstütze echte NGOs"
+            text={t('welcome.features.support')}
           />
         </View>
       </View>
@@ -70,7 +78,7 @@ export default function WelcomeScreen() {
           contentStyle={styles.buttonContent}
           labelStyle={styles.buttonLabel}
         >
-          Jetzt starten
+          {t('welcome.getStarted')}
         </Button>
 
         <Button
@@ -79,7 +87,7 @@ export default function WelcomeScreen() {
           style={styles.textButton}
           textColor={Colors.textSecondary}
         >
-          Demo-Modus (als bestehender Nutzer)
+          {t('welcome.demoMode')}
         </Button>
       </View>
     </SafeAreaView>
@@ -106,6 +114,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: spacing.lg,
+  },
+  languageToggleContainer: {
+    alignItems: 'flex-end',
+    paddingTop: spacing.sm,
   },
   content: {
     flex: 1,

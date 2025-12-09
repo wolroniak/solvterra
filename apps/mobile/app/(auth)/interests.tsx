@@ -7,22 +7,50 @@ import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
+import { useLanguageStore } from '@/store/languageStore';
+import { CATEGORIES as SHARED_CATEGORIES } from '@solvterra/shared';
 import type { ChallengeCategory } from '@solvterra/shared';
 
-const CATEGORIES: { id: ChallengeCategory; label: string; icon: string; color: string }[] = [
-  { id: 'environment', label: 'Umwelt', icon: 'leaf', color: '#10B981' },
-  { id: 'social', label: 'Soziales', icon: 'hand-heart', color: '#EC4899' },
-  { id: 'education', label: 'Bildung', icon: 'book-open-variant', color: '#3B82F6' },
-  { id: 'health', label: 'Gesundheit', icon: 'heart-pulse', color: '#EF4444' },
-  { id: 'animals', label: 'Tierschutz', icon: 'paw', color: '#F59E0B' },
-  { id: 'culture', label: 'Kultur', icon: 'palette', color: '#8B5CF6' },
-];
+// Map shared categories to Material Community Icons
+const CATEGORY_ICONS: Record<ChallengeCategory, string> = {
+  environment: 'leaf',
+  social: 'hand-heart',
+  education: 'book-open-variant',
+  health: 'heart-pulse',
+  animals: 'paw',
+  culture: 'palette',
+  other: 'dots-horizontal',
+};
+
+// Custom colors for interests screen (more vibrant)
+const CATEGORY_COLORS: Record<ChallengeCategory, string> = {
+  environment: '#10B981',
+  social: '#EC4899',
+  education: '#3B82F6',
+  health: '#EF4444',
+  animals: '#F59E0B',
+  culture: '#8B5CF6',
+  other: '#78756c',
+};
 
 export default function InterestsScreen() {
+  const { t } = useTranslation('auth');
+  const { language } = useLanguageStore();
   const { setInterests } = useUserStore();
   const [selected, setSelected] = useState<ChallengeCategory[]>([]);
+
+  // Get category label based on current language
+  const getCategoryLabel = (categoryId: ChallengeCategory) => {
+    const category = SHARED_CATEGORIES.find(c => c.id === categoryId);
+    if (!category) return categoryId;
+    return language === 'de' ? category.labelDe : category.label;
+  };
+
+  // Filter out 'other' category for onboarding
+  const displayCategories = SHARED_CATEGORIES.filter(c => c.id !== 'other');
 
   const toggleCategory = (id: ChallengeCategory) => {
     setSelected(prev =>
@@ -42,55 +70,67 @@ export default function InterestsScreen() {
     router.push('/(auth)/tutorial');
   };
 
+  // Get selection text based on count
+  const getSelectionText = () => {
+    if (selected.length === 0) {
+      return t('onboarding.interestsStep.minSelection');
+    }
+    return selected.length === 1
+      ? t('onboarding.interestsStep.selectedSingular', { count: selected.length })
+      : t('onboarding.interestsStep.selectedPlural', { count: selected.length });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
           <Text variant="headlineMedium" style={styles.title}>
-            Was interessiert dich?
+            {t('onboarding.interestsStep.title')}
           </Text>
           <Text variant="bodyLarge" style={styles.subtitle}>
-            Wähle Kategorien, die dir wichtig sind. Wir zeigen dir passende Challenges.
+            {t('onboarding.interestsStep.subtitle')}
           </Text>
         </View>
 
         {/* Category Grid */}
         <View style={styles.grid}>
-          {CATEGORIES.map(category => {
+          {displayCategories.map(category => {
             const isSelected = selected.includes(category.id);
+            const color = CATEGORY_COLORS[category.id];
+            const icon = CATEGORY_ICONS[category.id];
             return (
               <Pressable
                 key={category.id}
                 onPress={() => toggleCategory(category.id)}
                 style={[
                   styles.categoryCard,
-                  isSelected && { borderColor: category.color, backgroundColor: `${category.color}10` },
+                  isSelected && { borderColor: color, backgroundColor: `${color}10` },
                 ]}
               >
                 <View
                   style={[
                     styles.iconContainer,
-                    { backgroundColor: `${category.color}20` },
+                    { backgroundColor: `${color}20` },
                   ]}
                 >
                   <MaterialCommunityIcons
-                    name={category.icon as any}
+                    name={icon as any}
                     size={32}
-                    color={category.color}
+                    color={color}
                   />
                 </View>
                 <Text
                   variant="titleMedium"
                   style={[
                     styles.categoryLabel,
-                    isSelected && { color: category.color },
+                    isSelected && { color: color },
                   ]}
                 >
-                  {category.label}
+                  {getCategoryLabel(category.id)}
                 </Text>
                 {isSelected && (
-                  <View style={[styles.checkmark, { backgroundColor: category.color }]}>
+                  <View style={[styles.checkmark, { backgroundColor: color }]}>
                     <MaterialCommunityIcons name="check" size={14} color="#fff" />
                   </View>
                 )}
@@ -101,9 +141,7 @@ export default function InterestsScreen() {
 
         {/* Selection indicator */}
         <Text variant="bodyMedium" style={styles.selectionText}>
-          {selected.length === 0
-            ? 'Wähle mindestens eine Kategorie'
-            : `${selected.length} ${selected.length === 1 ? 'Kategorie' : 'Kategorien'} ausgewählt`}
+          {getSelectionText()}
         </Text>
       </ScrollView>
 
@@ -116,14 +154,14 @@ export default function InterestsScreen() {
           contentStyle={styles.buttonContent}
           disabled={selected.length === 0}
         >
-          Weiter
+          {t('onboarding.interestsStep.continue')}
         </Button>
         <Button
           mode="text"
           onPress={handleSkip}
           textColor={Colors.textSecondary}
         >
-          Überspringen
+          {t('onboarding.interestsStep.skip')}
         </Button>
       </View>
     </SafeAreaView>

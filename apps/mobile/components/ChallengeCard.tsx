@@ -4,7 +4,9 @@
 import { View, StyleSheet, Pressable, Image, Animated } from 'react-native';
 import { Text, Chip, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing, shadows } from '@/constants/theme';
+import { useLanguageStore } from '@/store';
 import { CATEGORIES, type ChallengeCategory } from '@solvterra/shared';
 import type { Challenge } from '@solvterra/shared';
 import { useRef } from 'react';
@@ -14,7 +16,7 @@ interface ChallengeCardProps {
   onPress: () => void;
 }
 
-// Map category IDs to Material Community Icons and German labels
+// Map category IDs to Material Community Icons
 const CATEGORY_ICONS: Record<string, string> = {
   environment: 'leaf',
   social: 'hand-heart',
@@ -39,25 +41,40 @@ const getCategoryConfig = (categoryId: string) => {
   return {
     icon: CATEGORY_ICONS[categoryId] || 'dots-horizontal',
     color: category?.color || Colors.neutral[500],
-    label: category?.labelDe || 'Sonstiges',
   };
 };
 
-// Get duration styling
+// Get duration styling (label will be added via translation)
 const getDurationConfig = (minutes: number) => {
   const colors = DURATION_COLORS[minutes] || DURATION_COLORS[30];
   return {
     colors,
     isQuickWin: minutes <= 10,
-    label: minutes <= 5 ? 'Blitzschnell' : minutes <= 10 ? 'Schnell erledigt' : null,
+    quickLevel: minutes <= 5 ? 'superQuick' : minutes <= 10 ? 'quick' : null,
   };
 };
 
 export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps) {
+  const { t } = useTranslation('challenges');
+  const { language } = useLanguageStore();
   const categoryConfig = getCategoryConfig(challenge.category);
   const durationConfig = getDurationConfig(challenge.durationMinutes);
   const spotsLeft = challenge.maxParticipants - challenge.currentParticipants;
   const isAlmostFull = spotsLeft <= 5;
+
+  // Get category label based on language
+  const getCategoryLabel = () => {
+    const category = CATEGORIES.find(c => c.id === challenge.category);
+    if (!category) return t('categories.other');
+    return language === 'de' ? category.labelDe : category.label;
+  };
+
+  // Get quick win label
+  const getQuickWinLabel = () => {
+    if (durationConfig.quickLevel === 'superQuick') return t('card.superQuick');
+    if (durationConfig.quickLevel === 'quick') return t('card.quick');
+    return null;
+  };
 
   // Animation for press feedback
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -94,10 +111,10 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
             />
 
             {/* Quick Win Badge - prominent for 5-10 min challenges */}
-            {durationConfig.isQuickWin && durationConfig.label && (
+            {durationConfig.isQuickWin && getQuickWinLabel() && (
               <View style={styles.quickWinBadge}>
                 <MaterialCommunityIcons name="lightning-bolt" size={12} color="#fbbf24" />
-                <Text style={styles.quickWinText}>{durationConfig.label}</Text>
+                <Text style={styles.quickWinText}>{getQuickWinLabel()}</Text>
               </View>
             )}
 
@@ -112,7 +129,7 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
                 color={durationConfig.colors.accent}
               />
               <Text style={[styles.durationText, { color: durationConfig.colors.text }]}>
-                {challenge.durationMinutes} Min
+                {t('durations.minutes', { count: challenge.durationMinutes })}
               </Text>
             </View>
 
@@ -123,7 +140,7 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
                 size={14}
                 color="#fff"
               />
-              <Text style={styles.categoryText}>{categoryConfig.label}</Text>
+              <Text style={styles.categoryText}>{getCategoryLabel()}</Text>
             </View>
 
             {/* Team Challenge Badge */}
@@ -131,7 +148,7 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
               <View style={styles.teamBadge}>
                 <MaterialCommunityIcons name="account-group" size={14} color="#fff" />
                 <Text style={styles.teamBadgeText}>
-                  {challenge.minTeamSize}-{challenge.maxTeamSize} Personen
+                  {t('card.teamSize', { min: challenge.minTeamSize, max: challenge.maxTeamSize })}
                 </Text>
               </View>
             )}
@@ -187,7 +204,7 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
                   size={14}
                   color={Colors.secondary[600]}
                 />
-                <Text style={styles.teamFooterText}>Team</Text>
+                <Text style={styles.teamFooterText}>{t('card.team')}</Text>
               </View>
             )}
 
@@ -213,13 +230,13 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
               style={styles.typeChip}
               textStyle={styles.typeChipText}
             >
-              {challenge.type === 'digital' ? 'Digital' : 'Vor Ort'}
+              {challenge.type === 'digital' ? t('filters.digital') : t('filters.onsite')}
             </Chip>
 
             {/* Spots */}
             {isAlmostFull && !challenge.isMultiPerson && (
               <Text style={styles.spotsText}>
-                Nur noch {spotsLeft} Plätze!
+                {t('card.spotsLeft', { count: spotsLeft })}
               </Text>
             )}
           </View>

@@ -7,10 +7,13 @@ import { Text, Button, TextInput, Divider } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
+import LanguageToggle from '@/components/LanguageToggle';
 
 export default function SignUpScreen() {
+  const { t } = useTranslation('auth');
   const { loginWithGoogle, loginWithApple, isLoading } = useUserStore();
 
   const [email, setEmail] = useState('');
@@ -22,15 +25,15 @@ export default function SignUpScreen() {
     const newErrors: typeof errors = {};
 
     if (!email) {
-      newErrors.email = 'E-Mail ist erforderlich';
+      newErrors.email = t('signup.validation.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Ungültige E-Mail-Adresse';
+      newErrors.email = t('signup.validation.emailInvalid');
     }
 
     if (!password) {
-      newErrors.password = 'Passwort ist erforderlich';
+      newErrors.password = t('signup.validation.passwordRequired');
     } else if (password.length < 8) {
-      newErrors.password = 'Mindestens 8 Zeichen';
+      newErrors.password = t('signup.validation.passwordLength');
     }
 
     setErrors(newErrors);
@@ -56,6 +59,11 @@ export default function SignUpScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Language Toggle - top right */}
+      <View style={styles.languageToggleContainer}>
+        <LanguageToggle />
+      </View>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
@@ -67,10 +75,10 @@ export default function SignUpScreen() {
           {/* Header */}
           <View style={styles.header}>
             <Text variant="headlineMedium" style={styles.title}>
-              Konto erstellen
+              {t('signup.title')}
             </Text>
             <Text variant="bodyLarge" style={styles.subtitle}>
-              Werde Teil der SolvTerra Community
+              {t('signup.subtitle')}
             </Text>
           </View>
 
@@ -86,7 +94,7 @@ export default function SignUpScreen() {
               )}
               loading={isLoading}
             >
-              Mit Google fortfahren
+              {t('welcome.continueWithGoogle')}
             </Button>
 
             {Platform.OS === 'ios' && (
@@ -100,7 +108,7 @@ export default function SignUpScreen() {
                 )}
                 loading={isLoading}
               >
-                Mit Apple fortfahren
+                {t('welcome.continueWithApple')}
               </Button>
             )}
           </View>
@@ -109,7 +117,7 @@ export default function SignUpScreen() {
           <View style={styles.dividerContainer}>
             <Divider style={styles.divider} />
             <Text variant="bodySmall" style={styles.dividerText}>
-              oder
+              {t('welcome.orDivider')}
             </Text>
             <Divider style={styles.divider} />
           </View>
@@ -117,7 +125,7 @@ export default function SignUpScreen() {
           {/* Email Form */}
           <View style={styles.form}>
             <TextInput
-              label="E-Mail"
+              label={t('signup.email')}
               value={email}
               onChangeText={setEmail}
               mode="outlined"
@@ -135,7 +143,7 @@ export default function SignUpScreen() {
             )}
 
             <TextInput
-              label="Passwort"
+              label={t('signup.password')}
               value={password}
               onChangeText={setPassword}
               mode="outlined"
@@ -159,7 +167,7 @@ export default function SignUpScreen() {
             )}
 
             <Text variant="bodySmall" style={styles.passwordHint}>
-              Min. 8 Zeichen, 1 Großbuchstabe, 1 Zahl
+              {t('signup.passwordHint')}
             </Text>
 
             <Button
@@ -169,21 +177,21 @@ export default function SignUpScreen() {
               contentStyle={styles.submitButtonContent}
               loading={isLoading}
             >
-              Registrieren
+              {t('signup.signupButton')}
             </Button>
           </View>
 
           {/* Terms */}
           <Text variant="bodySmall" style={styles.terms}>
-            Mit der Registrierung akzeptierst du unsere{' '}
-            <Text style={styles.link}>Nutzungsbedingungen</Text> und{' '}
-            <Text style={styles.link}>Datenschutzerklärung</Text>.
+            {t('signup.termsPrefix')}{' '}
+            <Text style={styles.link}>{t('signup.termsLink')}</Text> {t('signup.termsAnd')}{' '}
+            <Text style={styles.link}>{t('signup.privacyLink')}</Text>.
           </Text>
 
           {/* Login Link */}
           <View style={styles.loginLink}>
             <Text variant="bodyMedium" style={styles.loginText}>
-              Bereits ein Konto?{' '}
+              {t('signup.hasAccount')}{' '}
             </Text>
             <Button
               mode="text"
@@ -193,7 +201,7 @@ export default function SignUpScreen() {
                 router.back();
               }}
             >
-              Anmelden
+              {t('signup.loginLink')}
             </Button>
           </View>
         </ScrollView>
@@ -206,6 +214,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  languageToggleContainer: {
+    alignItems: 'flex-end',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
   },
   scrollContent: {
     padding: spacing.lg,

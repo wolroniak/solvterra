@@ -7,14 +7,21 @@ import { Text, Searchbar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useChallengeStore, useUserStore } from '@/store';
+import { useTranslatedChallenges } from '@/hooks';
 import ChallengeCard from '@/components/ChallengeCard';
 import ChallengeFilters from '@/components/ChallengeFilters';
 
 export default function FeedScreen() {
+  const { t } = useTranslation('challenges');
+  const { t: tCommon } = useTranslation('common');
   const { user } = useUserStore();
   const { challenges, isLoading, loadChallenges } = useChallengeStore();
+
+  // Translate challenges for display
+  const translatedChallenges = useTranslatedChallenges(challenges);
 
   // Load challenges on mount
   useEffect(() => {
@@ -28,9 +35,9 @@ export default function FeedScreen() {
   const [showQuickOnly, setShowQuickOnly] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Filter challenges
+  // Filter challenges (use translated version)
   const filteredChallenges = useMemo(() => {
-    let result = challenges.filter(c => c.status === 'active');
+    let result = translatedChallenges.filter(c => c.status === 'active');
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -65,7 +72,7 @@ export default function FeedScreen() {
     }
 
     return result;
-  }, [challenges, searchQuery, selectedCategory, selectedDuration, selectedType, showQuickOnly]);
+  }, [translatedChallenges, searchQuery, selectedCategory, selectedDuration, selectedType, showQuickOnly]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -79,9 +86,9 @@ export default function FeedScreen() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Guten Morgen';
-    if (hour < 18) return 'Guten Tag';
-    return 'Guten Abend';
+    if (hour < 12) return tCommon('greeting.morning');
+    if (hour < 18) return tCommon('greeting.afternoon');
+    return tCommon('greeting.evening');
   };
 
   return (
@@ -96,7 +103,7 @@ export default function FeedScreen() {
             <View style={styles.subtitleRow}>
               <MaterialCommunityIcons name="clock-fast" size={16} color={Colors.primary[600]} />
               <Text variant="bodyMedium" style={styles.subtitle}>
-                Micro-Volunteering in 5-30 Min
+                {t('discover.tagline')}
               </Text>
             </View>
           </View>
@@ -106,14 +113,9 @@ export default function FeedScreen() {
           </View>
         </View>
 
-        {/* Motivational Tagline */}
-        <View style={styles.taglineContainer}>
-          <Text style={styles.tagline}>Hilf der Welt - schon in 5 Minuten!</Text>
-        </View>
-
         {/* Search */}
         <Searchbar
-          placeholder="Challenges suchen..."
+          placeholder={t('discover.searchPlaceholder')}
           onChangeText={setSearchQuery}
           value={searchQuery}
           style={styles.searchbar}
@@ -159,7 +161,7 @@ export default function FeedScreen() {
               <>
                 <ActivityIndicator size="large" color={Colors.primary[600]} />
                 <Text variant="bodyMedium" style={styles.emptyText}>
-                  Challenges werden geladen...
+                  {tCommon('loading')}
                 </Text>
               </>
             ) : (
@@ -170,10 +172,10 @@ export default function FeedScreen() {
                   color={Colors.neutral[300]}
                 />
                 <Text variant="titleMedium" style={styles.emptyTitle}>
-                  Keine Challenges gefunden
+                  {t('discover.noResults')}
                 </Text>
                 <Text variant="bodyMedium" style={styles.emptyText}>
-                  Versuche andere Filter oder eine andere Suche
+                  {t('discover.tryDifferentFilters')}
                 </Text>
               </>
             )}
@@ -213,19 +215,6 @@ const styles = StyleSheet.create({
   subtitle: {
     color: Colors.primary[600],
     fontWeight: '500',
-  },
-  taglineContainer: {
-    backgroundColor: Colors.primary[50],
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: 12,
-    marginBottom: spacing.md,
-  },
-  tagline: {
-    color: Colors.primary[700],
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   xpBadge: {
     flexDirection: 'row',
