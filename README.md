@@ -55,7 +55,7 @@ SolvTerra is a **two-sided marketplace** connecting NGOs with students through b
 # Prerequisites: Node.js >= 20, pnpm >= 8
 
 # Clone and install
-git clone https://github.com/your-org/solvterra.git
+git clone https://github.com/wolroniak/solvterra.git
 cd solvterra
 pnpm install
 
