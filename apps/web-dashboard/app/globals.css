@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* SolvTerra Brand Colors */
+    /* Primary Background: #ffffff (white) */
+    /* Alternative Background: #eeebe3 (warm cream) */
+    /* Primary Color: #2e6417 (forest green) = HSL(102, 63%, 24%) */
+
+    --background: 0 0% 100%;
+    --foreground: 30 4% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 30 4% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 4% 10%;
+
+    /* Primary - Forest Green #2e6417 */
+    --primary: 102 63% 24%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Teal #14b8a6 */
+    --secondary: 173 58% 39%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Accent - Amber #f59e0b */
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted - Warm cream tones */
+    --muted: 40 23% 93%;
+    --muted-foreground: 33 5% 38%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders - Warm gray */
+    --border: 37 16% 88%;
+    --input: 37 16% 88%;
+    --ring: 102 63% 24%;
+
+    --radius: 0.625rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Headings use Inter */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply font-semibold tracking-tight;
+  }
+}
+
+/* SolvTerra custom utility classes */
+@layer utilities {
+  .bg-cream {
+    background-color: #eeebe3;
+  }
+
+  .text-primary-green {
+    color: #2e6417;
+  }
+
+  .border-primary-green {
+    border-color: #2e6417;
+  }
+}
+
+/* Custom scrollbar - warm tones */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3cb;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a49a;
+}
+
+/* Table styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.data-table th {
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+}
+
+.data-table tbody tr:hover {
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+/* Status badge colors */
+.status-active {
+  @apply bg-primary-100 text-primary-700;
+}
+
+.status-pending {
+  @apply bg-accent-100 text-accent-700;
+}
+
+.status-completed {
+  @apply bg-secondary-100 text-secondary-700;
+}
+
+/* Challenge category badge styles */
+.category-environment {
+  background-color: #e6efe2;
+  color: #2e6417;
+}
+
+.category-social {
+  background-color: #fce7f3;
+  color: #db2777;
+}
+
+.category-education {
+  background-color: #ede9fe;
+  color: #7c3aed;
+}
+
+.category-health {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.category-animals {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+.category-culture {
+  background-color: #cffafe;
+  color: #0891b2;
+}

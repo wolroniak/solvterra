@@ -1,2 +1,5 @@
 .claude
 .bmad
+node_modules
+.expo
+.next
