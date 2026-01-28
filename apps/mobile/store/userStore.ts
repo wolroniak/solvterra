@@ -6,8 +6,8 @@ import { create } from 'zustand';
 import { Alert } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri } from 'expo-auth-session';
-import type { User, UserBadge, ChallengeCategory, UserStats } from '@solvterra/shared';
-import { MOCK_USER, MOCK_NEW_USER, MOCK_USER_STATS, AVAILABLE_BADGES } from '@solvterra/shared';
+import type { User, UserBadge, ChallengeCategory, UserStats, UserLevel } from '@solvterra/shared';
+import { MOCK_USER, MOCK_NEW_USER, MOCK_USER_STATS, AVAILABLE_BADGES, XP_LEVELS } from '@solvterra/shared';
 import { supabase } from '../lib/supabase';
 
 // Required for Google OAuth to work properly
@@ -39,6 +39,7 @@ interface UserState {
 
   // Gamification
   addXp: (amount: number) => void;
+  refreshStats: () => Promise<void>;
   earnBadge: (badgeId: string) => UserBadge | null;
 
   // Saved challenges
@@ -60,45 +61,103 @@ function nameFromEmail(email: string): string {
     .join(' ');
 }
 
-// Ensure a users table entry exists for the authenticated user
-async function ensureUserRecord(authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> }): Promise<void> {
-  const name = (authUser.user_metadata?.full_name as string) ||
-               (authUser.user_metadata?.name as string) ||
-               (authUser.email ? nameFromEmail(authUser.email) : 'New User');
-  const avatarUrl = (authUser.user_metadata?.avatar_url as string) ||
-                    (authUser.user_metadata?.picture as string) ||
-                    null;
-
-  // Upsert: create if not exists, update name/avatar if changed
-  await supabase
-    .from('users')
-    .upsert({
-      id: authUser.id,
-      name,
-      email: authUser.email || '',
-      avatar: avatarUrl,
-    }, { onConflict: 'id' });
+// Derive UserLevel from XP amount using XP_LEVELS thresholds
+function levelFromXp(xp: number): UserLevel {
+  if (xp >= XP_LEVELS.legend) return 'legend';
+  if (xp >= XP_LEVELS.champion) return 'champion';
+  if (xp >= XP_LEVELS.supporter) return 'supporter';
+  if (xp >= XP_LEVELS.helper) return 'helper';
+  return 'starter';
 }
 
-// Create a User object from Supabase auth user
-function createUserFromAuth(authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> }): User {
-  const name = (authUser.user_metadata?.full_name as string) ||
-               (authUser.user_metadata?.name as string) ||
-               (authUser.email ? nameFromEmail(authUser.email) : 'New User');
-  const avatarUrl = (authUser.user_metadata?.avatar_url as string) ||
-                    (authUser.user_metadata?.picture as string) ||
-                    undefined;
+// User data from database (stats + profile)
+interface DbUserData {
+  xp: number;
+  completedChallenges: number;
+  hoursContributed: number;
+  avatarUrl: string | null;
+  name: string | null;
+}
+
+// Ensure a users table entry exists and fetch data from database
+async function ensureUserRecordAndFetchData(authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> }): Promise<DbUserData> {
+  const authName = (authUser.user_metadata?.full_name as string) ||
+                   (authUser.user_metadata?.name as string) ||
+                   null;
+  const authAvatarUrl = (authUser.user_metadata?.avatar_url as string) ||
+                        (authUser.user_metadata?.picture as string) ||
+                        null;
+
+  // First, check if user exists and get current data
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('name, avatar, xp, completed_challenges, hours_contributed')
+    .eq('id', authUser.id)
+    .single();
+
+  if (existingUser) {
+    // User exists - only update name/avatar if auth provides new values AND DB has none
+    const updates: Record<string, string> = {};
+    if (authName && !existingUser.name) {
+      updates.name = authName;
+    }
+    if (authAvatarUrl && !existingUser.avatar) {
+      updates.avatar = authAvatarUrl;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await supabase
+        .from('users')
+        .update(updates)
+        .eq('id', authUser.id);
+    }
+
+    return {
+      xp: existingUser.xp ?? 0,
+      completedChallenges: existingUser.completed_challenges ?? 0,
+      hoursContributed: Number(existingUser.hours_contributed ?? 0),
+      avatarUrl: existingUser.avatar || authAvatarUrl,
+      name: existingUser.name || authName,
+    };
+  }
+
+  // User doesn't exist - create new record
+  const newName = authName || (authUser.email ? nameFromEmail(authUser.email) : 'New User');
+  await supabase
+    .from('users')
+    .insert({
+      id: authUser.id,
+      name: newName,
+      email: authUser.email || '',
+      avatar: authAvatarUrl,
+    });
+
+  return {
+    xp: 0,
+    completedChallenges: 0,
+    hoursContributed: 0,
+    avatarUrl: authAvatarUrl,
+    name: newName,
+  };
+}
+
+// Create a User object from Supabase auth user with data from database
+function createUserFromAuth(
+  authUser: { id: string; email?: string },
+  dbData: DbUserData = { xp: 0, completedChallenges: 0, hoursContributed: 0, avatarUrl: null, name: null }
+): User {
+  const name = dbData.name || (authUser.email ? nameFromEmail(authUser.email) : 'New User');
 
   return {
     id: authUser.id,
     name,
     email: authUser.email || '',
-    avatarUrl,
-    level: 'starter',
-    xpTotal: 0,
+    avatarUrl: dbData.avatarUrl || undefined,
+    level: levelFromXp(dbData.xp),
+    xpTotal: dbData.xp,
     badges: [],
-    completedChallenges: 0,
-    hoursContributed: 0,
+    completedChallenges: dbData.completedChallenges,
+    hoursContributed: dbData.hoursContributed,
     savedChallengeIds: [],
     interests: [],
     createdAt: new Date(),
@@ -119,8 +178,8 @@ export const useUserStore = create<UserState>((set, get) => ({
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        await ensureUserRecord(session.user);
-        const user = createUserFromAuth(session.user);
+        const stats = await ensureUserRecordAndFetchData(session.user);
+        const user = createUserFromAuth(session.user, stats);
         set({
           user,
           isAuthenticated: true,
@@ -151,8 +210,8 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
 
       if (data.user) {
-        await ensureUserRecord(data.user);
-        const user = createUserFromAuth(data.user);
+        const stats = await ensureUserRecordAndFetchData(data.user);
+        const user = createUserFromAuth(data.user, stats);
         set({
           user,
           isAuthenticated: true,
@@ -182,8 +241,8 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
 
       if (data.user) {
-        await ensureUserRecord(data.user);
-        const user = createUserFromAuth(data.user);
+        const stats = await ensureUserRecordAndFetchData(data.user);
+        const user = createUserFromAuth(data.user, stats);
         set({
           user,
           isAuthenticated: true,
@@ -243,8 +302,8 @@ export const useUserStore = create<UserState>((set, get) => ({
             }
 
             if (sessionData.user) {
-              await ensureUserRecord(sessionData.user);
-              const user = createUserFromAuth(sessionData.user);
+              const stats = await ensureUserRecordAndFetchData(sessionData.user);
+              const user = createUserFromAuth(sessionData.user, stats);
               set({
                 user,
                 isAuthenticated: true,
@@ -313,17 +372,53 @@ export const useUserStore = create<UserState>((set, get) => ({
     const { user, stats } = get();
     if (user) {
       const newXp = user.xpTotal + amount;
-      // Determine new level
-      let newLevel = user.level;
-      if (newXp >= 5000) newLevel = 'legend';
-      else if (newXp >= 2000) newLevel = 'champion';
-      else if (newXp >= 500) newLevel = 'supporter';
-      else if (newXp >= 100) newLevel = 'helper';
-      else newLevel = 'starter';
+      const newLevel = levelFromXp(newXp);
 
       set({
         user: { ...user, xpTotal: newXp, level: newLevel },
         stats: stats ? { ...stats, totalXp: newXp, level: newLevel } : null,
+      });
+
+      // Persist to database (fire-and-forget)
+      supabase
+        .from('users')
+        .update({ xp: newXp })
+        .eq('id', user.id)
+        .then(() => {});
+    }
+  },
+
+  // Refresh all stats from database (call after submission approval)
+  refreshStats: async () => {
+    const { user, stats } = get();
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('users')
+      .select('xp, completed_challenges, hours_contributed')
+      .eq('id', user.id)
+      .single();
+
+    if (data) {
+      const newXp = data.xp ?? 0;
+      const newLevel = levelFromXp(newXp);
+      const newCompletedChallenges = data.completed_challenges ?? 0;
+      const newHoursContributed = Number(data.hours_contributed ?? 0);
+      set({
+        user: {
+          ...user,
+          xpTotal: newXp,
+          level: newLevel,
+          completedChallenges: newCompletedChallenges,
+          hoursContributed: newHoursContributed,
+        },
+        stats: stats ? {
+          ...stats,
+          totalXp: newXp,
+          level: newLevel,
+          completedChallenges: newCompletedChallenges,
+          hoursContributed: newHoursContributed,
+        } : null,
       });
     }
   },

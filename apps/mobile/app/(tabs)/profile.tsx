@@ -124,14 +124,15 @@ export default function ProfileScreen() {
         return;
       }
 
-      // Get the public URL
+      // Get the public URL with cache-busting timestamp
       const { data: urlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      const publicUrl = urlData.publicUrl;
+      // Add timestamp to bust cache when image is updated
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
-      // Update users table
+      // Update users table with cache-busted URL
       const { error: updateError } = await supabase
         .from('users')
         .update({ avatar: publicUrl })
@@ -139,6 +140,8 @@ export default function ProfileScreen() {
 
       if (updateError) {
         console.error('Failed to update user avatar in DB:', updateError);
+        Alert.alert('Fehler', 'Avatar konnte nicht gespeichert werden.');
+        return;
       }
 
       // Update local state
@@ -202,7 +205,10 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           <Pressable onPress={handleAvatarPress} style={styles.avatarContainer}>
             <Image
-              source={{ uri: user.avatarUrl }}
+              source={{
+                uri: user.avatarUrl ||
+                     `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}&backgroundColor=b6e3f4`
+              }}
               style={styles.avatar}
             />
             {isUploadingAvatar ? (

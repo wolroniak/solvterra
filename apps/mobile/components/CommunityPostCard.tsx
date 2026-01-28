@@ -294,6 +294,8 @@ export default function CommunityPostCard({ post, currentUserId, onLike, onComme
               <Pressable onPress={() => {
                 if (currentUserId && comment.userId === currentUserId) {
                   router.push('/(tabs)/profile');
+                } else if (comment.organizationId) {
+                  router.push(`/organization/${comment.organizationId}`);
                 } else {
                   router.push(`/user/${comment.userId}`);
                 }

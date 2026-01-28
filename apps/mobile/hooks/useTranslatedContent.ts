@@ -38,21 +38,21 @@ export function useTranslatedChallenge(challenge: Challenge | undefined | null):
     if (language === 'de') return challenge;
 
     const translated = translateEntity(
-      challenge,
-      ['title', 'description', 'instructions', 'teamDescription'],
+      challenge as unknown as Record<string, unknown>,
+      ['title', 'description', 'instructions', 'teamDescription'] as never[],
       language
-    );
+    ) as unknown as Challenge;
 
     // Translate nested objects
     return {
       ...translated,
       organization: translateEntity(
-        translated.organization,
-        ['name', 'description', 'mission'],
+        translated.organization as unknown as Record<string, unknown>,
+        ['name', 'description', 'mission'] as never[],
         language
-      ),
-      location: translateLocation(translated.location, language),
-      contact: translateContact(translated.contact, language),
+      ) as unknown as typeof translated.organization,
+      location: translateLocation(translated.location as Record<string, unknown> | undefined, language),
+      contact: translateContact(translated.contact as Record<string, unknown> | undefined, language),
     } as Challenge;
   }, [challenge, language]);
 }
@@ -67,7 +67,11 @@ export function useTranslatedOrganization(org: Organization | undefined | null):
     if (!org) return undefined;
     if (language === 'de') return org;
 
-    return translateEntity(org, ['name', 'description', 'mission'], language);
+    return translateEntity(
+      org as unknown as Record<string, unknown>,
+      ['name', 'description', 'mission'] as never[],
+      language
+    ) as unknown as Organization;
   }, [org, language]);
 }
 
@@ -81,13 +85,20 @@ export function useTranslatedCommunityPost(post: CommunityPost | undefined | nul
     if (!post) return undefined;
     if (language === 'de') return post;
 
-    const translated = translateEntity(post, ['title', 'content', 'badgeName'], language);
+    const translated = translateEntity(
+      post as unknown as Record<string, unknown>,
+      ['title', 'content', 'badgeName'] as never[],
+      language
+    ) as unknown as CommunityPost;
 
     // Translate linked challenge if present
     if (translated.linkedChallenge) {
       return {
         ...translated,
-        linkedChallenge: translateLinkedChallenge(translated.linkedChallenge, language) as LinkedChallengeInfo,
+        linkedChallenge: translateLinkedChallenge(
+          translated.linkedChallenge as unknown as Record<string, unknown>,
+          language
+        ) as unknown as LinkedChallengeInfo,
       };
     }
 
@@ -107,7 +118,10 @@ export function useTranslatedLinkedChallenge(
     if (!linkedChallenge) return undefined;
     if (language === 'de') return linkedChallenge;
 
-    return translateLinkedChallenge(linkedChallenge, language) as LinkedChallengeInfo;
+    return translateLinkedChallenge(
+      linkedChallenge as unknown as Record<string, unknown>,
+      language
+    ) as unknown as LinkedChallengeInfo;
   }, [linkedChallenge, language]);
 }
 
@@ -122,20 +136,20 @@ export function useTranslatedChallenges(challenges: Challenge[]): Challenge[] {
 
     return challenges.map((challenge) => {
       const translated = translateEntity(
-        challenge,
-        ['title', 'description', 'instructions', 'teamDescription'],
+        challenge as unknown as Record<string, unknown>,
+        ['title', 'description', 'instructions', 'teamDescription'] as never[],
         language
-      );
+      ) as unknown as Challenge;
 
       return {
         ...translated,
         organization: translateEntity(
-          translated.organization,
-          ['name', 'description', 'mission'],
+          translated.organization as unknown as Record<string, unknown>,
+          ['name', 'description', 'mission'] as never[],
           language
-        ),
-        location: translateLocation(translated.location, language),
-        contact: translateContact(translated.contact, language),
+        ) as unknown as typeof translated.organization,
+        location: translateLocation(translated.location as Record<string, unknown> | undefined, language),
+        contact: translateContact(translated.contact as Record<string, unknown> | undefined, language),
       } as Challenge;
     });
   }, [challenges, language]);
@@ -151,12 +165,19 @@ export function useTranslatedCommunityPosts(posts: CommunityPost[]): CommunityPo
     if (language === 'de') return posts;
 
     return posts.map((post) => {
-      const translated = translateEntity(post, ['title', 'content', 'badgeName'], language);
+      const translated = translateEntity(
+        post as unknown as Record<string, unknown>,
+        ['title', 'content', 'badgeName'] as never[],
+        language
+      ) as unknown as CommunityPost;
 
       if (translated.linkedChallenge) {
         return {
           ...translated,
-          linkedChallenge: translateLinkedChallenge(translated.linkedChallenge, language) as LinkedChallengeInfo,
+          linkedChallenge: translateLinkedChallenge(
+            translated.linkedChallenge as unknown as Record<string, unknown>,
+            language
+          ) as unknown as LinkedChallengeInfo,
         };
       }
 

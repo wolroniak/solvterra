@@ -62,18 +62,18 @@ interface DbPost {
 }
 
 // Resolve comment author info: if user is an NGO admin, use org logo + name
-async function resolveCommentAuthors(userIds: string[]): Promise<Record<string, { name: string; avatar: string | null }>> {
+async function resolveCommentAuthors(userIds: string[]): Promise<Record<string, { name: string; avatar: string | null; organizationId?: string }>> {
   if (userIds.length === 0) return {};
 
   // Fetch user info
   const { data: usersData } = await supabase.from('users').select('id, name, avatar').in('id', userIds);
-  const userMap: Record<string, { name: string; avatar: string | null }> = {};
-  (usersData || []).forEach(u => { userMap[u.id] = u; });
+  const userMap: Record<string, { name: string; avatar: string | null; organizationId?: string }> = {};
+  (usersData || []).forEach(u => { userMap[u.id] = { name: u.name, avatar: u.avatar }; });
 
   // Check which users are NGO admins
   const { data: ngoAdmins } = await supabase
     .from('ngo_admins')
-    .select('user_id, organizations(name, logo)')
+    .select('user_id, organization_id, organizations(name, logo)')
     .in('user_id', userIds);
 
   // Override with org info for NGO admins
@@ -82,6 +82,7 @@ async function resolveCommentAuthors(userIds: string[]): Promise<Record<string, 
       userMap[admin.user_id] = {
         name: admin.organizations.name,
         avatar: admin.organizations.logo,
+        organizationId: admin.organization_id,
       };
     }
   });
@@ -327,6 +328,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
       userId: c.user_id,
       userName: userMap[c.user_id]?.name || 'Unbekannt',
       userAvatarUrl: userMap[c.user_id]?.avatar || undefined,
+      organizationId: userMap[c.user_id]?.organizationId,
       content: c.content,
       createdAt: new Date(c.created_at),
     }));
@@ -549,6 +551,7 @@ async function enrichPostsWithCounts(rows: DbPost[], userId?: string | null): Pr
         userId: c.user_id,
         userName: commentUserMap[c.user_id]?.name || 'Unbekannt',
         userAvatarUrl: commentUserMap[c.user_id]?.avatar || undefined,
+        organizationId: commentUserMap[c.user_id]?.organizationId,
         content: c.content,
         createdAt: new Date(c.created_at),
       });

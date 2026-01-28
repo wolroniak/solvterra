@@ -49,12 +49,14 @@ export default function CommentSheet({ visible, postId, onClose }: CommentSheetP
   const inputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList>(null);
 
-  const handleCommentAvatarPress = useCallback((userId: string) => {
+  const handleCommentAvatarPress = useCallback((comment: CommunityComment) => {
     onClose();
-    if (user && userId === user.id) {
+    if (user && comment.userId === user.id) {
       router.push('/(tabs)/profile');
+    } else if (comment.organizationId) {
+      router.push(`/organization/${comment.organizationId}`);
     } else {
-      router.push(`/user/${userId}`);
+      router.push(`/user/${comment.userId}`);
     }
   }, [user, router, onClose]);
 
@@ -81,7 +83,7 @@ export default function CommentSheet({ visible, postId, onClose }: CommentSheetP
 
   const renderComment = ({ item }: { item: CommunityComment }) => (
     <View style={styles.commentRow}>
-      <Pressable onPress={() => handleCommentAvatarPress(item.userId)}>
+      <Pressable onPress={() => handleCommentAvatarPress(item)}>
         <Image
           source={{ uri: item.userAvatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${item.userName}` }}
           style={styles.commentAvatar}

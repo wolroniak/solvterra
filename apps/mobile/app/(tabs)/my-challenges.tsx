@@ -5,10 +5,11 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, StyleSheet, FlatList, Pressable, Image, SectionList, Alert } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, spacing } from '@/constants/theme';
-import { useChallengeStore, useCommunityStore } from '@/store';
+import { useChallengeStore, useCommunityStore, useUserStore } from '@/store';
 import { MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
 import type { Submission, Challenge, CommunityPost } from '@solvterra/shared';
 import CreatePostModal from '@/components/CreatePostModal';
@@ -84,10 +85,19 @@ const getTimelineLabel = (challenge: Challenge, submission: Submission): { text:
 };
 
 export default function MyChallengesScreen() {
-  const { submissions, challenges, getActiveCount, updateProof } = useChallengeStore();
+  const { submissions, challenges, getActiveCount, updateProof, loadChallenges } = useChallengeStore();
   const { getPostBySubmissionId, deletePost } = useCommunityStore();
+  const { refreshStats } = useUserStore();
   const [activeTab, setActiveTab] = useState<TabValue>('active');
   const activeCount = getActiveCount();
+
+  // Reload challenges and submissions when screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      loadChallenges();
+      refreshStats();
+    }, [loadChallenges, refreshStats])
+  );
 
   // Post management state
   const [showPostModal, setShowPostModal] = useState(false);

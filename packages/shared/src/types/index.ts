@@ -389,6 +389,7 @@ export interface CommunityComment {
   userName: string;
   userAvatarUrl?: string;
   userLevel?: UserLevel;
+  organizationId?: string;  // Set when comment author is an NGO admin
   content: string;
   createdAt: Date;
 }
@@ -454,6 +455,32 @@ export interface CommunityPost {
   isHighlighted?: boolean;  // NGO can highlight important posts
   isPinned?: boolean;       // Pinned to top
 
+  createdAt: Date;
+}
+
+// Feed Item - simplified view for activity feeds
+export type FeedItemType =
+  | 'challenge_completed'
+  | 'badge_earned'
+  | 'level_up'
+  | 'team_challenge'
+  | 'streak_achieved';
+
+export interface FeedItem {
+  id: string;
+  type: FeedItemType;
+  userName: string;
+  userAvatarUrl?: string;
+  userLevel: UserLevel;
+  challengeTitle?: string;
+  challengeImageUrl?: string;
+  badgeName?: string;
+  badgeIcon?: string;
+  newLevel?: UserLevel;
+  teamMemberNames?: string[];
+  streakDays?: number;
+  likesCount: number;
+  isLiked: boolean;
   createdAt: Date;
 }
 

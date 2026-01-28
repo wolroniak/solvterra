@@ -101,20 +101,22 @@ function mapDbOrganization(row: DbOrganization): Organization {
     website: row.website || undefined,
     contactEmail: row.contact_email || undefined,
     verified: row.is_verified,
+    verificationStatus: row.is_verified ? 'verified' : 'pending',
     ratingAvg: 4.5,
     ratingCount: 0,
-    category: row.category || 'social',
+    category: (row.category || 'social') as ChallengeCategory,
     createdAt: new Date(row.created_at),
   };
 }
 
 function mapDbChallenge(row: DbChallenge): Challenge {
-  const org = row.organizations ? mapDbOrganization(row.organizations) : {
+  const org: Organization = row.organizations ? mapDbOrganization(row.organizations) : {
     id: row.organization_id,
     name: 'Unknown Organization',
     description: '',
     logoUrl: '',
     verified: false,
+    verificationStatus: 'pending',
     ratingAvg: 0,
     ratingCount: 0,
     category: 'social',
@@ -200,7 +202,7 @@ interface ChallengeState {
 
   // Challenge actions
   selectChallenge: (challenge: Challenge) => void;
-  acceptChallenge: (challengeId: string) => Promise<Submission>;
+  acceptChallenge: (challengeId: string) => Promise<Submission | undefined>;
   cancelChallenge: (submissionId: string) => Promise<void>;
 
   // Submission actions
@@ -269,7 +271,7 @@ export const useChallengeStore = create<ChallengeState>((set, get) => ({
         return mapDbSubmission(sub, {
           id: sub.challenge_id,
           organizationId: '',
-          organization: { id: '', name: '', description: '', logoUrl: '', verified: false, ratingAvg: 0, ratingCount: 0, category: 'social', createdAt: new Date() },
+          organization: { id: '', name: '', description: '', logoUrl: '', verified: false, verificationStatus: 'pending', ratingAvg: 0, ratingCount: 0, category: 'social', createdAt: new Date() },
           title: 'Challenge',
           description: '',
           instructions: '',

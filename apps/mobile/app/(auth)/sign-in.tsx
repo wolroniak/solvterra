@@ -1,5 +1,5 @@
-// Sign Up Screen
-// User registration with email or social login
+// Sign In Screen
+// User login with email or social login
 
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
@@ -11,11 +11,10 @@ import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
 import LanguageToggle from '@/components/LanguageToggle';
-import OnboardingProgress from '@/components/OnboardingProgress';
 
-export default function SignUpScreen() {
+export default function SignInScreen() {
   const { t } = useTranslation('auth');
-  const { signUp, loginWithGoogle, isLoading, isAuthenticated } = useUserStore();
+  const { login, loginWithGoogle, isLoading, isAuthenticated } = useUserStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,38 +32,42 @@ export default function SignUpScreen() {
 
     if (!password) {
       newErrors.password = t('signup.validation.passwordRequired');
-    } else if (password.length < 8) {
-      newErrors.password = t('signup.validation.passwordLength');
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleEmailSignUp = async () => {
+  const handleEmailLogin = async () => {
     if (!validateForm()) return;
-    await signUp(email, password);
+    await login(email, password);
     // Navigation happens after successful auth - check in useEffect
   };
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleLogin = async () => {
     await loginWithGoogle();
     // Navigation happens after successful auth - check in useEffect
   };
 
-  // Navigate to interests after successful authentication
+  // Navigate to main app after successful authentication
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/(auth)/interests');
+      router.replace('/(tabs)');
     }
   }, [isAuthenticated]);
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with Progress and Language Toggle */}
+      {/* Header with Language Toggle */}
       <View style={styles.topBar}>
-        <View style={{ width: 60 }} />
-        <OnboardingProgress currentStep={2} totalSteps={4} />
+        <Button
+          mode="text"
+          onPress={() => router.back()}
+          icon="arrow-left"
+          textColor={Colors.textSecondary}
+        >
+          {t('signup.loginLink')}
+        </Button>
         <View style={styles.languageToggleContainer}>
           <LanguageToggle />
         </View>
@@ -81,10 +84,10 @@ export default function SignUpScreen() {
           {/* Header */}
           <View style={styles.header}>
             <Text variant="headlineMedium" style={styles.title}>
-              {t('signup.title')}
+              {t('login.title')}
             </Text>
             <Text variant="bodyLarge" style={styles.subtitle}>
-              {t('signup.subtitle')}
+              {t('welcome.subtitle')}
             </Text>
           </View>
 
@@ -92,7 +95,7 @@ export default function SignUpScreen() {
           <View style={styles.socialButtons}>
             <Button
               mode="outlined"
-              onPress={handleGoogleSignUp}
+              onPress={handleGoogleLogin}
               style={styles.socialButton}
               contentStyle={styles.socialButtonContent}
               icon={() => (
@@ -117,7 +120,7 @@ export default function SignUpScreen() {
           {/* Email Form */}
           <View style={styles.form}>
             <TextInput
-              label={t('signup.email')}
+              label={t('login.email')}
               value={email}
               onChangeText={setEmail}
               mode="outlined"
@@ -135,13 +138,13 @@ export default function SignUpScreen() {
             )}
 
             <TextInput
-              label={t('signup.password')}
+              label={t('login.password')}
               value={password}
               onChangeText={setPassword}
               mode="outlined"
               secureTextEntry={!showPassword}
               autoCapitalize="none"
-              autoComplete="password-new"
+              autoComplete="password"
               error={!!errors.password}
               style={styles.input}
               outlineStyle={styles.inputOutline}
@@ -158,39 +161,29 @@ export default function SignUpScreen() {
               </Text>
             )}
 
-            <Text variant="bodySmall" style={styles.passwordHint}>
-              {t('signup.passwordHint')}
-            </Text>
-
             <Button
               mode="contained"
-              onPress={handleEmailSignUp}
+              onPress={handleEmailLogin}
               style={styles.submitButton}
               contentStyle={styles.submitButtonContent}
               loading={isLoading}
+              disabled={isLoading}
             >
-              {t('signup.signupButton')}
+              {t('login.loginButton')}
             </Button>
           </View>
 
-          {/* Terms */}
-          <Text variant="bodySmall" style={styles.terms}>
-            {t('signup.termsPrefix')}{' '}
-            <Text style={styles.link}>{t('signup.termsLink')}</Text> {t('signup.termsAnd')}{' '}
-            <Text style={styles.link}>{t('signup.privacyLink')}</Text>.
-          </Text>
-
-          {/* Login Link */}
-          <View style={styles.loginLink}>
-            <Text variant="bodyMedium" style={styles.loginText}>
-              {t('signup.hasAccount')}{' '}
+          {/* Sign Up Link */}
+          <View style={styles.signupLink}>
+            <Text variant="bodyMedium" style={styles.signupText}>
+              {t('login.noAccount')}{' '}
             </Text>
             <Button
               mode="text"
               compact
-              onPress={() => router.push('/(auth)/sign-in')}
+              onPress={() => router.push('/(auth)/sign-up')}
             >
-              {t('signup.loginLink')}
+              {t('login.signupLink')}
             </Button>
           </View>
         </ScrollView>
@@ -208,12 +201,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.sm,
     paddingTop: spacing.sm,
   },
   languageToggleContainer: {
     width: 60,
     alignItems: 'flex-end',
+    paddingRight: spacing.md,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -266,10 +260,6 @@ const styles = StyleSheet.create({
     color: Colors.error,
     marginTop: -spacing.sm,
   },
-  passwordHint: {
-    color: Colors.textMuted,
-    marginTop: -spacing.xs,
-  },
   submitButton: {
     borderRadius: 12,
     marginTop: spacing.md,
@@ -277,22 +267,13 @@ const styles = StyleSheet.create({
   submitButtonContent: {
     paddingVertical: spacing.sm,
   },
-  terms: {
-    color: Colors.textMuted,
-    textAlign: 'center',
-    marginTop: spacing.xl,
-    lineHeight: 20,
-  },
-  link: {
-    color: Colors.primary[600],
-  },
-  loginLink: {
+  signupLink: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.lg,
+    marginTop: spacing.xl,
   },
-  loginText: {
+  signupText: {
     color: Colors.textSecondary,
   },
 });

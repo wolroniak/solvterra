@@ -114,7 +114,7 @@ export default function FeedCard({ item, onLike, onCongratulate }: FeedCardProps
     ]).start();
 
     setLiked(!liked);
-    setLikesCount(prev => liked ? prev - 1 : prev + 1);
+    setLikesCount((prev: number) => liked ? prev - 1 : prev + 1);
     onLike(item.id);
   };
 

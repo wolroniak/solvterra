@@ -81,20 +81,48 @@ export default function PostDetailScreen() {
       userHasLiked = (count || 0) > 0;
     }
 
-    // Fetch comment previews
+    // Fetch comment previews (no FK join — FK points to auth.users, not public.users)
     const { data: recentComments } = await supabase
       .from('community_comments')
-      .select('*, users(id, name, avatar)')
+      .select('id, post_id, user_id, content, created_at')
       .eq('post_id', id)
       .order('created_at', { ascending: false })
       .limit(2);
+
+    // Resolve user/org info for comment authors
+    const commentUserIds = Array.from(new Set((recentComments || []).map(c => c.user_id)));
+    const commentUserMap: Record<string, { name: string; avatar: string | null; organizationId?: string }> = {};
+
+    if (commentUserIds.length > 0) {
+      // Fetch user info
+      const { data: usersData } = await supabase.from('users').select('id, name, avatar').in('id', commentUserIds);
+      (usersData || []).forEach(u => { commentUserMap[u.id] = { name: u.name, avatar: u.avatar }; });
+
+      // Check which users are NGO admins
+      const { data: ngoAdmins } = await supabase
+        .from('ngo_admins')
+        .select('user_id, organization_id, organizations(name, logo)')
+        .in('user_id', commentUserIds);
+
+      // Override with org info for NGO admins
+      (ngoAdmins || []).forEach((admin: any) => {
+        if (admin.organizations) {
+          commentUserMap[admin.user_id] = {
+            name: admin.organizations.name,
+            avatar: admin.organizations.logo,
+            organizationId: admin.organization_id,
+          };
+        }
+      });
+    }
 
     const commentPreviews = (recentComments || []).reverse().map(c => ({
       id: c.id,
       postId: c.post_id,
       userId: c.user_id,
-      userName: c.users?.name || 'Unbekannt',
-      userAvatarUrl: c.users?.avatar || undefined,
+      userName: commentUserMap[c.user_id]?.name || 'Unbekannt',
+      userAvatarUrl: commentUserMap[c.user_id]?.avatar || undefined,
+      organizationId: commentUserMap[c.user_id]?.organizationId,
       content: c.content,
       createdAt: new Date(c.created_at),
     }));

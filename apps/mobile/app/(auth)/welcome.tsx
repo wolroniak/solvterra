@@ -9,8 +9,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
-import { useUserStore } from '@/store';
-import { supabase } from '@/lib/supabase';
 import LanguageToggle from '@/components/LanguageToggle';
 import OnboardingProgress from '@/components/OnboardingProgress';
 
@@ -21,7 +19,6 @@ const SolvTerraLogo = require('@/assets/logo.png');
 
 export default function WelcomeScreen() {
   const { t } = useTranslation('auth');
-  const { login } = useUserStore();
 
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -57,14 +54,12 @@ export default function WelcomeScreen() {
     )).start();
   }, []);
 
-  const handleGetStarted = () => {
+  const handleSignUp = () => {
     router.push('/(auth)/sign-up');
   };
 
-  // Demo shortcut: Login with demo student account via Supabase
-  const handleDemoLogin = async () => {
-    await login('max.mustermann@stud.tu-darmstadt.de', 'Test1234');
-    router.replace('/(tabs)');
+  const handleLogin = () => {
+    router.push('/(auth)/sign-in');
   };
 
   return (
@@ -130,21 +125,22 @@ export default function WelcomeScreen() {
       <View style={styles.buttons}>
         <Button
           mode="contained"
-          onPress={handleGetStarted}
+          onPress={handleSignUp}
           style={styles.primaryButton}
           contentStyle={styles.buttonContent}
           labelStyle={styles.buttonLabel}
         >
-          {t('welcome.getStarted')}
+          {t('welcome.signupButton')}
         </Button>
 
         <Button
-          mode="text"
-          onPress={handleDemoLogin}
-          style={styles.textButton}
-          textColor={Colors.textSecondary}
+          mode="outlined"
+          onPress={handleLogin}
+          style={styles.secondaryButton}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.secondaryButtonLabel}
         >
-          {t('welcome.demoMode')}
+          {t('welcome.loginButton')}
         </Button>
       </View>
     </SafeAreaView>
@@ -224,6 +220,10 @@ const styles = StyleSheet.create({
   primaryButton: {
     borderRadius: 12,
   },
+  secondaryButton: {
+    borderRadius: 12,
+    borderColor: Colors.primary[600],
+  },
   buttonContent: {
     paddingVertical: spacing.sm,
   },
@@ -231,7 +231,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  textButton: {
-    marginTop: spacing.xs,
+  secondaryButtonLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary[600],
   },
 });
