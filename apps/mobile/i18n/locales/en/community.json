@@ -3,6 +3,7 @@
   "subtitle": "Discover challenges, celebrate success, inspire others",
   "filters": {
     "all": "All",
+    "organizations": "Organizations",
     "promotions": "NGOs",
     "stories": "Stories",
     "activity": "Activity"
@@ -43,6 +44,7 @@
   "empty": {
     "title": "No posts yet",
     "subtitle": "Posts from NGOs and the community will appear here soon",
+    "organizations": "No posts from organizations yet",
     "promotions": "No NGO posts in this category yet",
     "stories": "No success stories shared yet",
     "activity": "No activities to see yet"

@@ -24,6 +24,7 @@ interface DbPost {
   submission_id: string | null;
   challenge_id: string | null;
   type: string;
+  title: string | null;
   content: string | null;
   image_url: string | null;
   is_highlighted: boolean;
@@ -60,17 +61,32 @@ interface DbPost {
   };
 }
 
-interface DbComment {
-  id: string;
-  post_id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  users?: {
-    id: string;
-    name: string;
-    avatar: string | null;
-  };
+// Resolve comment author info: if user is an NGO admin, use org logo + name
+async function resolveCommentAuthors(userIds: string[]): Promise<Record<string, { name: string; avatar: string | null }>> {
+  if (userIds.length === 0) return {};
+
+  // Fetch user info
+  const { data: usersData } = await supabase.from('users').select('id, name, avatar').in('id', userIds);
+  const userMap: Record<string, { name: string; avatar: string | null }> = {};
+  (usersData || []).forEach(u => { userMap[u.id] = u; });
+
+  // Check which users are NGO admins
+  const { data: ngoAdmins } = await supabase
+    .from('ngo_admins')
+    .select('user_id, organizations(name, logo)')
+    .in('user_id', userIds);
+
+  // Override with org info for NGO admins
+  (ngoAdmins || []).forEach((admin: any) => {
+    if (admin.organizations) {
+      userMap[admin.user_id] = {
+        name: admin.organizations.name,
+        avatar: admin.organizations.logo,
+      };
+    }
+  });
+
+  return userMap;
 }
 
 // Map DB row to CommunityPost
@@ -90,6 +106,7 @@ function mapDbPost(row: DbPost, likesCount: number, userHasLiked: boolean, comme
     authorLevel: 'helper' as UserLevel, // TODO: fetch real level
     organizationId: org ? row.organization_id! : undefined,
     organizationLogoUrl: org ? (org.logo || undefined) : undefined,
+    title: row.title || undefined,
     content: row.content || undefined,
     imageUrl: row.image_url || submission?.proof_url || undefined,
     linkedChallengeId: row.challenge_id || undefined,
@@ -110,18 +127,6 @@ function mapDbPost(row: DbPost, likesCount: number, userHasLiked: boolean, comme
     commentsCount,
     isHighlighted: row.is_highlighted,
     isPinned: row.is_pinned,
-    createdAt: new Date(row.created_at),
-  };
-}
-
-function mapDbComment(row: DbComment): CommunityComment {
-  return {
-    id: row.id,
-    postId: row.post_id,
-    userId: row.user_id,
-    userName: row.users?.name || 'Unbekannt',
-    userAvatarUrl: row.users?.avatar || undefined,
-    content: row.content,
     createdAt: new Date(row.created_at),
   };
 }
@@ -173,6 +178,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
     const { data, error } = await supabase
       .from('community_posts')
       .select('*, users(*), organizations(id, name, logo), challenges(*, organizations(name)), submissions(id, xp_earned, proof_url)')
+      .eq('status', 'published')
       .order('is_pinned', { ascending: false })
       .order('is_highlighted', { ascending: false })
       .order('created_at', { ascending: false })
@@ -206,6 +212,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
     const { data, error } = await supabase
       .from('community_posts')
       .select('*, users(*), organizations(id, name, logo), challenges(*, organizations(name)), submissions(id, xp_earned, proof_url)')
+      .eq('status', 'published')
       .order('is_pinned', { ascending: false })
       .order('is_highlighted', { ascending: false })
       .order('created_at', { ascending: false })
@@ -297,9 +304,10 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
   loadComments: async (postId: string) => {
     set({ isLoadingComments: true, comments: [] });
 
+    // Fetch comments without FK join (FK points to auth.users, not public.users)
     const { data, error } = await supabase
       .from('community_comments')
-      .select('*, users(id, name, avatar)')
+      .select('id, post_id, user_id, content, created_at')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
 
@@ -309,10 +317,21 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
       return;
     }
 
-    set({
-      comments: (data || []).map(mapDbComment),
-      isLoadingComments: false,
-    });
+    // Resolve user/org info for comment authors
+    const userIds = [...new Set((data || []).map(c => c.user_id))];
+    const userMap = await resolveCommentAuthors(userIds);
+
+    const comments: CommunityComment[] = (data || []).map(c => ({
+      id: c.id,
+      postId: c.post_id,
+      userId: c.user_id,
+      userName: userMap[c.user_id]?.name || 'Unbekannt',
+      userAvatarUrl: userMap[c.user_id]?.avatar || undefined,
+      content: c.content,
+      createdAt: new Date(c.created_at),
+    }));
+
+    set({ comments, isLoadingComments: false });
   },
 
   addComment: async (postId: string, content: string) => {
@@ -484,11 +503,16 @@ async function enrichPostsWithCounts(rows: DbPost[], userId?: string | null): Pr
     .in('post_id', postIds);
 
   // Batch fetch 2 most recent comments per post for inline previews
+  // (no FK join — FK points to auth.users, not public.users)
   const { data: recentComments } = await supabase
     .from('community_comments')
-    .select('*, users(id, name, avatar)')
+    .select('id, post_id, user_id, content, created_at')
     .in('post_id', postIds)
     .order('created_at', { ascending: false });
+
+  // Resolve user/org info for comment authors
+  const commentUserIds = [...new Set((recentComments || []).map(c => c.user_id))];
+  const commentUserMap = await resolveCommentAuthors(commentUserIds);
 
   // Batch fetch user's likes
   let userLikes: Set<string> = new Set();
@@ -519,7 +543,15 @@ async function enrichPostsWithCounts(rows: DbPost[], userId?: string | null): Pr
       commentPreviewMap[c.post_id] = [];
     }
     if (commentPreviewMap[c.post_id].length < 2) {
-      commentPreviewMap[c.post_id].push(mapDbComment(c));
+      commentPreviewMap[c.post_id].push({
+        id: c.id,
+        postId: c.post_id,
+        userId: c.user_id,
+        userName: commentUserMap[c.user_id]?.name || 'Unbekannt',
+        userAvatarUrl: commentUserMap[c.user_id]?.avatar || undefined,
+        content: c.content,
+        createdAt: new Date(c.created_at),
+      });
     }
   });
   // Reverse so oldest of the 2 shows first

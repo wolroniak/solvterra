@@ -22,7 +22,7 @@ import CreatePostModal from '@/components/CreatePostModal';
 import { supabase } from '@/lib/supabase';
 import type { CommunityPost } from '@solvterra/shared';
 
-type FilterType = 'all' | 'stories' | 'activity';
+type FilterType = 'all' | 'organizations' | 'stories' | 'activity';
 
 export default function CommunityScreen() {
   const { t } = useTranslation('community');
@@ -121,6 +121,7 @@ export default function CommunityScreen() {
   // Filter posts
   const filteredPosts = posts.filter(post => {
     if (activeFilter === 'all') return true;
+    if (activeFilter === 'organizations') return post.authorType === 'organization';
     if (activeFilter === 'stories') return post.type === 'success_story';
     if (activeFilter === 'activity') {
       return ['challenge_completed', 'badge_earned', 'level_up', 'streak_achieved'].includes(post.type);
@@ -153,6 +154,7 @@ export default function CommunityScreen() {
       <View style={styles.filterRow}>
         {([
           { key: 'all', label: t('filters.all') },
+          { key: 'organizations', label: t('filters.organizations') },
           { key: 'stories', label: t('filters.stories') },
           { key: 'activity', label: t('filters.activity') },
         ] as const).map(filter => (
@@ -199,11 +201,13 @@ export default function CommunityScreen() {
         />
         <Text style={styles.emptyTitle}>{t('empty.title')}</Text>
         <Text style={styles.emptySubtitle}>
-          {activeFilter === 'stories'
-            ? t('empty.stories')
-            : activeFilter === 'activity'
-              ? t('empty.activity')
-              : t('empty.subtitle')}
+          {activeFilter === 'organizations'
+            ? t('empty.organizations')
+            : activeFilter === 'stories'
+              ? t('empty.stories')
+              : activeFilter === 'activity'
+                ? t('empty.activity')
+                : t('empty.subtitle')}
         </Text>
       </View>
     );

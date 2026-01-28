@@ -1,10 +1,12 @@
 'use client';
 
 import { useAuthStore } from '@/store';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, Clock, XCircle, CheckCircle } from 'lucide-react';
 
 export function VerificationBanner() {
   const { organization } = useAuthStore();
+  const { t } = useTranslation('admin');
 
   if (!organization) return null;
 
@@ -18,10 +20,10 @@ export function VerificationBanner() {
           <Clock className="w-5 h-5 text-amber-600 shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-amber-800">
-              Verifizierung ausstehend
+              {t('verification_banner.pendingTitle')}
             </p>
             <p className="text-xs text-amber-700">
-              Deine Organisation wird geprueft. Du kannst Challenges vorbereiten, aber noch nicht veroeffentlichen.
+              {t('verification_banner.pendingDescription')}
             </p>
           </div>
         </div>
@@ -36,10 +38,10 @@ export function VerificationBanner() {
           <XCircle className="w-5 h-5 text-red-600 shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800">
-              Verifizierung abgelehnt
+              {t('verification_banner.rejectedTitle')}
             </p>
             <p className="text-xs text-red-700">
-              {organization.rejectionReason || 'Bitte kontaktiere uns fuer weitere Informationen.'}
+              {organization.rejectionReason || t('verification_banner.rejectedDefault')}
             </p>
           </div>
         </div>
@@ -94,6 +96,7 @@ export function PublishButton({
 }) {
   const canPublish = useCanPublish();
   const { organization } = useAuthStore();
+  const { t } = useTranslation('admin');
 
   const isDisabled = disabled || !canPublish;
 
@@ -109,8 +112,8 @@ export function PublishButton({
       {!canPublish && (
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
           {organization?.verificationStatus === 'pending'
-            ? 'Warte auf Verifizierung'
-            : 'Organisation nicht verifiziert'}
+            ? t('verification_banner.tooltipPending')
+            : t('verification_banner.tooltipNotVerified')}
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AdminHeader } from '@/components/admin/admin-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,20 +48,6 @@ interface SupportTicket {
   };
 }
 
-const TICKET_TYPE_LABELS: Record<string, string> = {
-  appeal: 'Einspruch',
-  support: 'Support',
-  feedback: 'Feedback',
-  other: 'Sonstiges',
-};
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  open: { label: 'Offen', color: 'bg-blue-500/20 text-blue-300', icon: Clock },
-  in_progress: { label: 'In Bearbeitung', color: 'bg-amber-500/20 text-amber-300', icon: RefreshCw },
-  resolved: { label: 'Beantwortet', color: 'bg-green-500/20 text-green-300', icon: CheckCircle },
-  closed: { label: 'Geschlossen', color: 'bg-slate-500/20 text-slate-300', icon: XCircle },
-};
-
 function TicketSkeleton() {
   return (
     <Card className="border-slate-700 bg-slate-800">
@@ -80,6 +67,21 @@ function TicketSkeleton() {
 
 export default function AdminTicketsPage() {
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const { t } = useTranslation('admin');
+
+  const TICKET_TYPE_LABELS: Record<string, string> = {
+    appeal: t('tickets.ticketTypes.appeal'),
+    support: t('tickets.ticketTypes.support'),
+    feedback: t('tickets.ticketTypes.feedback'),
+    other: t('tickets.ticketTypes.other'),
+  };
+
+  const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
+    open: { label: t('tickets.status.open'), color: 'bg-blue-500/20 text-blue-300', icon: Clock },
+    in_progress: { label: t('tickets.status.inProgress'), color: 'bg-amber-500/20 text-amber-300', icon: RefreshCw },
+    resolved: { label: t('tickets.status.resolved'), color: 'bg-green-500/20 text-green-300', icon: CheckCircle },
+    closed: { label: t('tickets.status.closed'), color: 'bg-slate-500/20 text-slate-300', icon: XCircle },
+  };
 
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,8 +109,8 @@ export default function AdminTicketsPage() {
     if (error) {
       console.error('Failed to load tickets:', error);
       addNotification({
-        title: 'Fehler',
-        description: 'Tickets konnten nicht geladen werden',
+        title: t('tickets.notifications.errorTitle'),
+        description: t('tickets.notifications.loadError'),
         type: 'error',
       });
     } else {
@@ -131,14 +133,14 @@ export default function AdminTicketsPage() {
     if (error) {
       console.error('Failed to respond to ticket:', error);
       addNotification({
-        title: 'Fehler',
-        description: 'Antwort konnte nicht gesendet werden',
+        title: t('tickets.notifications.errorTitle'),
+        description: t('tickets.notifications.respondError'),
         type: 'error',
       });
     } else {
       addNotification({
-        title: 'Antwort gesendet',
-        description: 'Das Ticket wurde beantwortet',
+        title: t('tickets.notifications.respondSuccess'),
+        description: t('tickets.notifications.respondSuccessDescription'),
         type: 'success',
       });
       setSelectedTicket(null);
@@ -159,8 +161,8 @@ export default function AdminTicketsPage() {
   return (
     <div className="flex flex-col">
       <AdminHeader
-        title="Support Tickets"
-        description={`${openCount} offene Anfragen`}
+        title={t('tickets.title')}
+        description={t('tickets.description', { count: openCount })}
         action={
           <Button
             variant="outline"
@@ -169,7 +171,7 @@ export default function AdminTicketsPage() {
             className="border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Aktualisieren
+            {t('tickets.refresh')}
           </Button>
         }
       />
@@ -189,10 +191,10 @@ export default function AdminTicketsPage() {
                   : 'border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'
               }
             >
-              {f === 'all' && 'Alle'}
-              {f === 'open' && `Offen (${tickets.filter((t) => t.status === 'open').length})`}
-              {f === 'in_progress' && 'In Bearbeitung'}
-              {f === 'resolved' && 'Beantwortet'}
+              {f === 'all' && t('tickets.filterAll')}
+              {f === 'open' && t('tickets.filterOpen', { count: tickets.filter((t) => t.status === 'open').length })}
+              {f === 'in_progress' && t('tickets.filterInProgress')}
+              {f === 'resolved' && t('tickets.filterResolved')}
             </Button>
           ))}
         </div>
@@ -208,11 +210,11 @@ export default function AdminTicketsPage() {
           <Card className="border-slate-700 bg-slate-800">
             <CardContent className="flex flex-col items-center justify-center py-12 text-slate-400">
               <MessageSquare className="h-12 w-12 mb-4 text-slate-600" />
-              <p className="text-lg font-medium text-white">Keine Tickets</p>
+              <p className="text-lg font-medium text-white">{t('tickets.noTickets')}</p>
               <p className="text-sm">
                 {filter === 'open'
-                  ? 'Keine offenen Tickets vorhanden'
-                  : 'Keine Tickets in dieser Kategorie'}
+                  ? t('tickets.noTicketsOpen')
+                  : t('tickets.noTicketsCategory')}
               </p>
             </CardContent>
           </Card>
@@ -260,7 +262,7 @@ export default function AdminTicketsPage() {
 
                         <div className="flex items-center gap-3 text-xs text-slate-400 mb-2">
                           <span className="font-medium text-slate-300">
-                            {ticket.organization?.name || 'Unbekannt'}
+                            {ticket.organization?.name || t('tickets.unknown')}
                           </span>
                           <Badge
                             variant="outline"
@@ -295,8 +297,10 @@ export default function AdminTicketsPage() {
           <DialogHeader>
             <DialogTitle className="text-white">{selectedTicket?.subject}</DialogTitle>
             <DialogDescription className="text-slate-400">
-              von {selectedTicket?.organization?.name} am{' '}
-              {selectedTicket && formatDate(new Date(selectedTicket.created_at))}
+              {selectedTicket && t('tickets.dialog.from', {
+                name: selectedTicket.organization?.name,
+                date: formatDate(new Date(selectedTicket.created_at)),
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
@@ -328,7 +332,7 @@ export default function AdminTicketsPage() {
               {/* Ticket Message */}
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Nachricht
+                  {t('tickets.dialog.messageLabel')}
                 </label>
                 <p className="text-sm text-slate-300 bg-slate-700 p-3 rounded-lg whitespace-pre-wrap">
                   {selectedTicket?.message}
@@ -338,12 +342,12 @@ export default function AdminTicketsPage() {
               {/* Response */}
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Ihre Antwort
+                  {t('tickets.dialog.responseLabel')}
                 </label>
                 <textarea
                   value={response}
                   onChange={(e) => setResponse(e.target.value)}
-                  placeholder="Antwort verfassen..."
+                  placeholder={t('tickets.dialog.responsePlaceholder')}
                   className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                   rows={4}
                 />
@@ -352,16 +356,16 @@ export default function AdminTicketsPage() {
               {/* Status */}
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Neuer Status
+                  {t('tickets.dialog.statusLabel')}
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as typeof newStatus)}
                   className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
-                  <option value="resolved">Beantwortet</option>
-                  <option value="in_progress">In Bearbeitung</option>
-                  <option value="closed">Geschlossen</option>
+                  <option value="resolved">{t('tickets.dialog.statusResolved')}</option>
+                  <option value="in_progress">{t('tickets.dialog.statusInProgress')}</option>
+                  <option value="closed">{t('tickets.dialog.statusClosed')}</option>
                 </select>
               </div>
             </div>
@@ -372,7 +376,7 @@ export default function AdminTicketsPage() {
               onClick={() => setSelectedTicket(null)}
               className="border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
             >
-              Abbrechen
+              {t('tickets.dialog.cancel')}
             </Button>
             <Button
               onClick={handleRespond}
@@ -384,7 +388,7 @@ export default function AdminTicketsPage() {
               ) : (
                 <Send className="h-4 w-4 mr-2" />
               )}
-              Antwort senden
+              {t('tickets.dialog.send')}
             </Button>
           </DialogFooter>
         </DialogContent>

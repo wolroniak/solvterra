@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { AdminHeader } from '@/components/admin/admin-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,6 +75,7 @@ function StatCard({
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation('admin');
 
   useEffect(() => {
     async function loadStats() {
@@ -151,17 +153,19 @@ export default function AdminDashboardPage() {
     loadStats();
   }, []);
 
+  const pendingCount = stats?.pendingOrganizations || 0;
+
   return (
     <div className="flex flex-col">
       <AdminHeader
-        title="Dashboard"
-        description="Uebersicht ueber die SolvTerra Plattform"
+        title={t('dashboard.title')}
+        description={t('dashboard.description')}
       />
 
       <div className="p-6 space-y-6">
         {/* Organizations Section */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Organisationen</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{t('dashboard.organizations')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {loading ? (
               <>
@@ -173,30 +177,30 @@ export default function AdminDashboardPage() {
             ) : (
               <>
                 <StatCard
-                  title="Gesamt"
+                  title={t('dashboard.stats.total')}
                   value={stats?.totalOrganizations || 0}
-                  description="Registrierte NGOs"
+                  description={t('dashboard.stats.registeredNgos')}
                   icon={Building2}
                   iconColor="text-indigo-400"
                 />
                 <StatCard
-                  title="Verifiziert"
+                  title={t('dashboard.stats.verified')}
                   value={stats?.verifiedOrganizations || 0}
-                  description="Aktive NGOs"
+                  description={t('dashboard.stats.activeNgos')}
                   icon={CheckCircle}
                   iconColor="text-green-400"
                 />
                 <StatCard
-                  title="Ausstehend"
+                  title={t('dashboard.stats.pending')}
                   value={stats?.pendingOrganizations || 0}
-                  description="Warten auf Pruefung"
+                  description={t('dashboard.stats.awaitingReview')}
                   icon={Clock}
                   iconColor="text-amber-400"
                 />
                 <StatCard
-                  title="Abgelehnt"
+                  title={t('dashboard.stats.rejected')}
                   value={stats?.rejectedOrganizations || 0}
-                  description="Nicht zugelassen"
+                  description={t('dashboard.stats.notApproved')}
                   icon={XCircle}
                   iconColor="text-red-400"
                 />
@@ -207,7 +211,7 @@ export default function AdminDashboardPage() {
 
         {/* Activity Section */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Aktivitaet</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{t('dashboard.activity')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {loading ? (
               <>
@@ -219,30 +223,30 @@ export default function AdminDashboardPage() {
             ) : (
               <>
                 <StatCard
-                  title="Challenges"
+                  title={t('dashboard.stats.challenges')}
                   value={stats?.totalChallenges || 0}
-                  description="Erstellte Aufgaben"
+                  description={t('dashboard.stats.createdTasks')}
                   icon={Trophy}
                   iconColor="text-purple-400"
                 />
                 <StatCard
-                  title="Aktive Challenges"
+                  title={t('dashboard.stats.activeChallenges')}
                   value={stats?.activeChallenges || 0}
-                  description="Aktuell verfuegbar"
+                  description={t('dashboard.stats.currentlyAvailable')}
                   icon={TrendingUp}
                   iconColor="text-teal-400"
                 />
                 <StatCard
-                  title="Einreichungen"
+                  title={t('dashboard.stats.submissions')}
                   value={stats?.totalSubmissions || 0}
-                  description="Bearbeitete Aufgaben"
+                  description={t('dashboard.stats.processedTasks')}
                   icon={Award}
                   iconColor="text-orange-400"
                 />
                 <StatCard
-                  title="Nutzer"
+                  title={t('dashboard.stats.users')}
                   value={stats?.totalUsers || 0}
-                  description="Registrierte Studenten"
+                  description={t('dashboard.stats.registeredStudents')}
                   icon={Users}
                   iconColor="text-cyan-400"
                 />
@@ -253,7 +257,7 @@ export default function AdminDashboardPage() {
 
         {/* Quick Actions or Info */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Schnellzugriff</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{t('dashboard.quickAccess')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Card className="border-slate-700 bg-slate-800">
               <CardContent className="p-6">
@@ -263,10 +267,10 @@ export default function AdminDashboardPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-white">
-                      {stats?.pendingOrganizations || 0} ausstehende Verifizierung{(stats?.pendingOrganizations || 0) !== 1 ? 'en' : ''}
+                      {t(pendingCount !== 1 ? 'dashboard.pendingVerifications_plural' : 'dashboard.pendingVerifications', { count: pendingCount })}
                     </h3>
                     <p className="text-sm text-slate-400">
-                      Neue Organisationen warten auf Pruefung
+                      {t('dashboard.newOrgsAwaitingReview')}
                     </p>
                   </div>
                 </div>
@@ -280,9 +284,9 @@ export default function AdminDashboardPage() {
                     <CheckCircle className="h-6 w-6 text-green-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Plattform Status</h3>
+                    <h3 className="font-semibold text-white">{t('dashboard.platformStatus')}</h3>
                     <p className="text-sm text-slate-400">
-                      Alle Systeme funktionieren normal
+                      {t('dashboard.allSystemsNormal')}
                     </p>
                   </div>
                 </div>

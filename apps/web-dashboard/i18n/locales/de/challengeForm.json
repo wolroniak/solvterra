@@ -1,0 +1,118 @@
+{
+  "location": {
+    "title": "Ort & Treffpunkt",
+    "nameLabel": "Ortsname *",
+    "namePlaceholder": "z.B. Stadtpark Frankfurt, Tierheim Darmstadt",
+    "nameHint": "Der Name wird den Teilnehmern prominent angezeigt",
+    "addressLabel": "Vollständige Adresse",
+    "addressPlaceholder": "z.B. Musterstraße 123, 60123 Frankfurt am Main",
+    "meetingPointLabel": "Treffpunkt",
+    "meetingPointPlaceholder": "z.B. Am Haupteingang, Parkplatz B, Hintereingang",
+    "meetingPointHint": "Präzise Angabe, wo sich die Teilnehmer treffen sollen",
+    "additionalInfoLabel": "Zusätzliche Informationen",
+    "additionalInfoPlaceholder": "z.B. Parkplätze vorhanden, bequeme Kleidung tragen, Ausrüstung wird gestellt",
+    "latitudeLabel": "Breitengrad (optional)",
+    "latitudePlaceholder": "z.B. 50.1109",
+    "longitudeLabel": "Längengrad (optional)",
+    "longitudePlaceholder": "z.B. 8.6821",
+    "coordinatesHint": "GPS-Koordinaten ermöglichen die Kartenanzeige in der App"
+  },
+  "schedule": {
+    "title": "Zeitplan",
+    "availabilityLabel": "Zeitliche Verfügbarkeit",
+    "types": {
+      "anytime": {
+        "label": "Jederzeit",
+        "description": "Teilnehmer können die Challenge jederzeit erledigen"
+      },
+      "fixed": {
+        "label": "Fester Termin",
+        "description": "Einmaliger Termin an einem bestimmten Tag und Uhrzeit"
+      },
+      "range": {
+        "label": "Zeitraum",
+        "description": "Challenge kann innerhalb eines Zeitraums erledigt werden"
+      },
+      "recurring": {
+        "label": "Wiederkehrend",
+        "description": "Regelmäßige Zeitfenster (z.B. Mo-Fr 9-17 Uhr)"
+      }
+    },
+    "startTime": "Startzeit *",
+    "endTime": "Endzeit *",
+    "fixedHint": "Die Challenge findet an diesem festen Termin statt",
+    "startDate": "Startdatum *",
+    "endDate": "Enddatum *",
+    "submissionDeadline": "Deadline für Einreichungen",
+    "submissionDeadlineHint": "Bis wann müssen Einreichungen eingereicht werden?",
+    "flexibleScheduling": "Flexible Zeiteinteilung (Teilnehmer wählen selbst innerhalb des Zeitraums)",
+    "timeSlotsLabel": "Zeitfenster *",
+    "timeSlotPlaceholder": "z.B. Mo, Mi, Fr: 9-12 Uhr",
+    "timeSlotExamples": "Beispiele: \"Mo-Fr: 9-17 Uhr\", \"Sa: 10-14 Uhr\", \"Täglich: 15-18 Uhr\"",
+    "deadlineOptional": "Deadline (optional)",
+    "deadlineHint": "Bis wann ist die Challenge insgesamt verfügbar?",
+    "anytimeMessage": "Diese Challenge kann jederzeit erledigt werden. Die Teilnehmer haben keine zeitlichen Einschränkungen und können flexibel teilnehmen."
+  },
+  "contact": {
+    "title": "Kontaktperson",
+    "description": "Diese Informationen werden Teilnehmern angezeigt, damit sie bei Fragen Kontakt aufnehmen können.",
+    "nameLabel": "Name *",
+    "namePlaceholder": "z.B. Max Mustermann",
+    "roleLabel": "Rolle / Position",
+    "rolePlaceholder": "z.B. Ehrenamtskoordinator",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "kontakt@beispiel.de",
+    "phoneLabel": "Telefon",
+    "phonePlaceholder": "+49 123 4567890",
+    "preferredMethodLabel": "Bevorzugte Kontaktmethode *",
+    "methods": {
+      "email": {
+        "label": "E-Mail",
+        "description": "Bevorzugt per E-Mail kontaktiert werden"
+      },
+      "phone": {
+        "label": "Telefon",
+        "description": "Bevorzugt per Telefon kontaktiert werden"
+      },
+      "app": {
+        "label": "In-App",
+        "description": "Bevorzugt über die SolvTerra App kontaktiert werden"
+      }
+    },
+    "responseTimeLabel": "Erwartete Antwortzeit",
+    "responseTimePlaceholder": "Bitte auswählen...",
+    "responseTimes": {
+      "immediate": "Sofort während Öffnungszeiten",
+      "twoHours": "Innerhalb von 2 Stunden",
+      "oneDay": "Innerhalb von 24 Stunden",
+      "twoDays": "Innerhalb von 48 Stunden",
+      "automatic": "Automatische Bestätigung"
+    },
+    "responseTimeHint": "Hilft Teilnehmern, realistische Erwartungen zu haben"
+  },
+  "tags": {
+    "title": "Tags",
+    "currentLabel": "Aktuelle Tags",
+    "emptyState": "Noch keine Tags hinzugefügt",
+    "addLabel": "Neuen Tag hinzufügen",
+    "addPlaceholder": "z.B. teamwork, natur, recycling",
+    "suggestionsLabel": "Vorschläge",
+    "hint": "Tags helfen Studenten, passende Challenges zu finden. Verwende relevante Schlüsselwörter."
+  },
+  "team": {
+    "title": "Team-Challenge",
+    "enabled": "Aktiviert",
+    "toggleLabel": "Dies ist eine Team-Challenge",
+    "toggleHint": "Teilnehmer müssen ein Team bilden, um diese Challenge zu absolvieren. Studien zeigen: 62% würden mehr helfen, wenn sie es mit Freunden tun könnten!",
+    "minSizeLabel": "Minimale Teamgröße *",
+    "maxSizeLabel": "Maximale Teamgröße *",
+    "personsOption": "{{count}} Personen",
+    "descriptionLabel": "Team-Beschreibung",
+    "descriptionPlaceholder": "z.B. Lade Freunde ein oder finde neue Teammitglieder über unsere Matching-Funktion!",
+    "descriptionHint": "Motivierender Text, der Teilnehmern erklärt, warum ein Team besser ist",
+    "soloJoinLabel": "Einzelanmeldung erlauben (Matchmaking)",
+    "soloJoinHint": "Teilnehmer ohne Team können sich alleine anmelden und werden mit anderen Interessenten verbunden. Das erhöht die Teilnahme deutlich!",
+    "infoTitle": "Team-Challenges in der App",
+    "infoText": "In der mobilen App sehen Teilnehmer eine Liste von Personen, die ebenfalls nach Teammitgliedern suchen. Sie können direkt Kontakt aufnehmen und gemeinsam teilnehmen."
+  }
+}

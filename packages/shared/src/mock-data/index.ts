@@ -1,6 +1,8 @@
 // SolvTerra Mock Data
-// Realistic demo data for presentation purposes
-// Based on PRD personas and business plan scenarios
+// @deprecated - This mock data is no longer used in production.
+// Both apps now use Supabase with seed data (supabase/seed.sql).
+// Mock IDs (e.g. 'challenge-1') do NOT match seed UUIDs.
+// Kept for reference and offline testing only.
 
 import type {
   Organization,

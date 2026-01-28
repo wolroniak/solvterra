@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import { AlertCircle, Shield, Loader2 } from 'lucide-react';
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, isLoading, checkSession } = useAdminAuthStore();
+  const { t } = useTranslation('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -38,7 +40,7 @@ export default function AdminLoginPage() {
     if (result.success) {
       router.push('/admin');
     } else {
-      setError(result.error || 'Anmeldung fehlgeschlagen');
+      setError(result.error || t('login.loginFailed'));
     }
 
     setIsSubmitting(false);
@@ -74,9 +76,9 @@ export default function AdminLoginPage() {
               Admin
             </Badge>
           </div>
-          <CardTitle className="text-2xl text-white">Admin Portal</CardTitle>
+          <CardTitle className="text-2xl text-white">{t('login.title')}</CardTitle>
           <CardDescription className="text-slate-400">
-            Nur fuer SolvTerra-Mitarbeiter
+            {t('login.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -90,12 +92,12 @@ export default function AdminLoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-slate-300">
-                E-Mail
+                {t('login.email')}
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@solvterra.com"
+                placeholder={t('login.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -106,12 +108,12 @@ export default function AdminLoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-slate-300">
-                Passwort
+                {t('login.password')}
               </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Passwort eingeben"
+                placeholder={t('login.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -128,19 +130,19 @@ export default function AdminLoginPage() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Wird angemeldet...
+                  {t('login.submitting')}
                 </>
               ) : (
-                'Anmelden'
+                t('login.submit')
               )}
             </Button>
           </form>
 
           <div className="mt-6 pt-4 border-t border-slate-700 text-center">
             <p className="text-xs text-slate-500">
-              Bist du eine NGO?{' '}
+              {t('login.ngoPrompt')}{' '}
               <a href="/login" className="text-indigo-400 hover:underline">
-                Zum NGO-Login
+                {t('login.ngoLogin')}
               </a>
             </p>
           </div>

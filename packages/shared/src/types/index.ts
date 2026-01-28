@@ -23,7 +23,6 @@ export type VerificationMethod = 'photo' | 'text' | 'ngo_confirmation';
 export type ChallengeStatus = 'draft' | 'active' | 'completed' | 'archived';
 
 export type SubmissionStatus =
-  | 'accepted'
   | 'in_progress'
   | 'submitted'
   | 'approved'

@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Support",
+    "description": "Contact us or view your requests"
+  },
+  "ticketTypes": {
+    "appeal": "Appeal",
+    "support": "Support Request",
+    "feedback": "Feedback",
+    "other": "Other"
+  },
+  "status": {
+    "open": "Open",
+    "inProgress": "In Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "rejection": {
+    "title": "Verification Rejected",
+    "defaultMessage": "Your organization has been rejected. You can file an appeal.",
+    "fileAppeal": "File an Appeal",
+    "appealSubject": "Appeal Against Rejection"
+  },
+  "tickets": {
+    "title": "Your Tickets",
+    "empty": "No Tickets",
+    "emptyDescription": "You have not submitted any support requests yet",
+    "createdAt": "created on {{date}}",
+    "response": "Response"
+  },
+  "newTicket": {
+    "button": "New Ticket",
+    "title": "Create New Ticket",
+    "description": "Describe your issue and we will get back to you as soon as possible.",
+    "typeLabel": "Ticket Type *",
+    "typeSupport": "Support Request",
+    "typeAppeal": "Appeal (Verification)",
+    "typeFeedback": "Feedback",
+    "typeOther": "Other",
+    "subjectLabel": "Subject *",
+    "subjectPlaceholder": "Brief summary of your issue",
+    "messageLabel": "Message *",
+    "messagePlaceholder": "Describe your issue in detail...",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "viewTicket": {
+    "createdAt": "Created on {{date}}",
+    "statusLabel": "Status",
+    "yourMessage": "Your Message",
+    "supportResponse": "Support Response",
+    "respondedAt": "Responded on {{date}}",
+    "close": "Close"
+  },
+  "notifications": {
+    "errorTitle": "Error",
+    "loadError": "Failed to load tickets",
+    "createError": "Failed to create ticket",
+    "createSuccess": "Ticket Created",
+    "createSuccessDescription": "Your ticket has been submitted successfully"
+  }
+}

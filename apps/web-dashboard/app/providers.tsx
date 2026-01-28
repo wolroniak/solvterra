@@ -2,9 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { useChallengeStore, useSubmissionStore, useAuthStore } from '@/store';
 import { useNotificationStore } from '@/components/ui/toast-notifications';
+import '@/i18n';
 
 interface SubmissionPayload {
   challenge_id?: string;
@@ -25,12 +27,12 @@ async function getStudentName(userId: string): Promise<string> {
     .select('name')
     .eq('id', userId)
     .single();
-  return data?.name || 'Ein Student';
+  return data?.name || null;
 }
 
-function getChallengeTitle(challengeId: string): string {
+function getChallengeTitle(challengeId: string): string | null {
   const challenges = useChallengeStore.getState().challenges;
-  return challenges.find(c => c.id === challengeId)?.title || 'eine Aufgabe';
+  return challenges.find(c => c.id === challengeId)?.title || null;
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -39,6 +41,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const loadChallenges = useChallengeStore((s) => s.loadChallenges);
   const loadSubmissions = useSubmissionStore((s) => s.loadSubmissions);
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading, checkSession, organizationId, refreshOrganization } = useAuthStore();
   const initialLoadDone = useRef(false);
 
@@ -85,11 +88,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         loadSubmissions();
         if (initialLoadDone.current) {
           const sub = payload.new as SubmissionPayload;
-          const studentName = sub.user_id ? await getStudentName(sub.user_id) : 'Ein Student';
-          const challengeTitle = sub.challenge_id ? getChallengeTitle(sub.challenge_id) : 'eine Aufgabe';
+          const studentName = sub.user_id ? await getStudentName(sub.user_id) : null;
+          const challengeTitle = sub.challenge_id ? getChallengeTitle(sub.challenge_id) : null;
           addNotification({
-            title: `${studentName} nimmt teil`,
-            description: `Neue Teilnahme an "${challengeTitle}"`,
+            title: t('notifications.studentParticipates', { name: studentName || t('notifications.aStudent') }),
+            description: t('notifications.newParticipation', { challenge: challengeTitle || t('notifications.aTask') }),
             type: 'info',
           });
         }
@@ -102,11 +105,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         loadSubmissions();
         const sub = payload.new as SubmissionPayload;
         if (initialLoadDone.current && sub.status === 'submitted') {
-          const studentName = sub.user_id ? await getStudentName(sub.user_id) : 'Ein Student';
-          const challengeTitle = sub.challenge_id ? getChallengeTitle(sub.challenge_id) : 'eine Aufgabe';
+          const studentName = sub.user_id ? await getStudentName(sub.user_id) : null;
+          const challengeTitle = sub.challenge_id ? getChallengeTitle(sub.challenge_id) : null;
           addNotification({
-            title: `Beweis von ${studentName}`,
-            description: `Nachweis für "${challengeTitle}" eingereicht`,
+            title: t('notifications.proofFrom', { name: studentName || t('notifications.aStudent') }),
+            description: t('notifications.proofSubmitted', { challenge: challengeTitle || t('notifications.aTask') }),
             type: 'info',
           });
         }
@@ -122,14 +125,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }, (payload) => {
         const oldParticipants = (payload.old as { current_participants?: number })?.current_participants ?? 0;
         const newParticipants = (payload.new as { current_participants?: number })?.current_participants ?? 0;
-        const challengeTitle = (payload.new as { title?: string })?.title || 'eine Aufgabe';
+        const challengeTitle = (payload.new as { title?: string })?.title || t('notifications.aTask');
 
         loadChallenges();
 
         if (initialLoadDone.current && newParticipants > oldParticipants) {
           addNotification({
-            title: 'Neuer Teilnehmer',
-            description: `Jemand hat "${challengeTitle}" angenommen`,
+            title: t('notifications.newParticipant'),
+            description: t('notifications.someoneTookChallenge', { challenge: challengeTitle }),
             type: 'success',
           });
         }
@@ -163,14 +166,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
           if (org.verification_status === 'verified') {
             addNotification({
-              title: 'Verifizierung erfolgreich!',
-              description: 'Deine Organisation wurde verifiziert. Du kannst jetzt Challenges veroeffentlichen.',
+              title: t('notifications.verificationSuccess'),
+              description: t('notifications.verificationSuccessDesc'),
               type: 'success',
             });
           } else if (org.verification_status === 'rejected') {
             addNotification({
-              title: 'Verifizierung abgelehnt',
-              description: org.rejection_reason || 'Bitte kontaktiere uns fuer weitere Informationen.',
+              title: t('notifications.verificationRejected'),
+              description: org.rejection_reason || t('notifications.verificationRejectedDesc'),
               type: 'error',
             });
           }

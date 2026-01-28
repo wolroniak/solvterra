@@ -1,0 +1,49 @@
+{
+  "page": {
+    "title": "Statistiken",
+    "description": "Analyse deiner Challenge-Performance und Wirkung"
+  },
+  "summary": {
+    "totalParticipants": "Gesamte Teilnehmer",
+    "participantsGrowth": "+18% zum Vormonat",
+    "volunteerHours": "Freiwilligenstunden",
+    "workDaysDonated": "≈ 8.6 Arbeitstage gespendet",
+    "approvalRate": "Genehmigungsrate",
+    "approvalRateStat": "{{approved}} von {{total}} Einreichungen",
+    "activeChallenges": "Aktive Challenges",
+    "draftsCount": "{{count}} im Entwurf"
+  },
+  "charts": {
+    "monthlyTrend": "Monatlicher Trend",
+    "participants": "Teilnehmer",
+    "submissions": "Einreichungen",
+    "challengesByCategory": "Challenges nach Kategorie",
+    "submissionStatus": "Einreichungsstatus",
+    "durationDistribution": "Zeitaufwand Verteilung",
+    "weeklyActivity": "Wochenaktivität",
+    "challenges": "Challenges",
+    "approved": "Genehmigt"
+  },
+  "statusLabels": {
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt",
+    "pending": "Ausstehend"
+  },
+  "durationLabels": {
+    "5min": "5 Min",
+    "10min": "10 Min",
+    "15min": "15 Min",
+    "30min": "30 Min"
+  },
+  "topChallenges": {
+    "title": "Top Challenges nach Teilnahme"
+  },
+  "categories": {
+    "environment": "Umwelt",
+    "social": "Soziales",
+    "education": "Bildung",
+    "health": "Gesundheit",
+    "animals": "Tierschutz",
+    "culture": "Kultur"
+  }
+}

@@ -30,6 +30,7 @@ import {
   UserPlus,
   ExternalLink,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,15 +38,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar } from '@/components/ui/avatar';
 import { useChallengeStore, useSubmissionStore } from '@/store';
-import { CATEGORY_LABELS, LEVEL_LABELS } from '@/lib/mock-data';
+import { LEVEL_LABELS } from '@/lib/mock-data';
 import { formatDate, cn } from '@/lib/utils';
-
-const STATUS_BADGES: Record<string, { variant: 'default' | 'success' | 'warning' | 'info' | 'outline'; label: string }> = {
-  draft: { variant: 'outline', label: 'Entwurf' },
-  active: { variant: 'success', label: 'Aktiv' },
-  paused: { variant: 'warning', label: 'Pausiert' },
-  completed: { variant: 'info', label: 'Abgeschlossen' },
-};
 
 const VERIFICATION_ICONS: Record<string, typeof Camera> = {
   photo: Camera,
@@ -53,26 +47,21 @@ const VERIFICATION_ICONS: Record<string, typeof Camera> = {
   ngo_confirmation: UserCheck,
 };
 
-const VERIFICATION_LABELS: Record<string, string> = {
-  photo: 'Foto hochladen',
-  text: 'Text einreichen',
-  ngo_confirmation: 'NGO Bestätigung',
+const SCHEDULE_TYPE_ICONS: Record<string, typeof Calendar> = {
+  anytime: Infinity,
+  fixed: CalendarDays,
+  range: Calendar,
+  recurring: Repeat,
 };
 
-const SCHEDULE_TYPE_LABELS: Record<string, { label: string; icon: typeof Calendar }> = {
-  anytime: { label: 'Jederzeit', icon: Infinity },
-  fixed: { label: 'Fester Termin', icon: CalendarDays },
-  range: { label: 'Zeitraum', icon: Calendar },
-  recurring: { label: 'Wiederkehrend', icon: Repeat },
-};
-
-const CONTACT_METHOD_LABELS: Record<string, { label: string; icon: typeof Mail }> = {
-  email: { label: 'E-Mail', icon: Mail },
-  phone: { label: 'Telefon', icon: Phone },
-  app: { label: 'In-App', icon: MessageSquare },
+const CONTACT_METHOD_ICONS: Record<string, typeof Mail> = {
+  email: Mail,
+  phone: Phone,
+  app: MessageSquare,
 };
 
 export default function ChallengeDetailPage() {
+  const { t } = useTranslation('challenges');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -82,17 +71,24 @@ export default function ChallengeDetailPage() {
 
   const challenge = challenges.find((c) => c.id === id);
 
+  const STATUS_BADGES: Record<string, { variant: 'default' | 'success' | 'warning' | 'info' | 'outline'; labelKey: string }> = {
+    draft: { variant: 'outline', labelKey: 'status.draft' },
+    active: { variant: 'success', labelKey: 'status.active' },
+    paused: { variant: 'warning', labelKey: 'status.paused' },
+    completed: { variant: 'info', labelKey: 'status.completed' },
+  };
+
   if (!challenge) {
     return (
       <div className="flex flex-col">
         <Header
-          title="Challenge nicht gefunden"
-          description="Die angeforderte Challenge existiert nicht"
+          title={t('detail.notFoundTitle')}
+          description={t('detail.notFoundDescription')}
           action={
             <Link href="/challenges">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Zurück
+                {t('actions.back', { ns: 'common' })}
               </Button>
             </Link>
           }
@@ -100,8 +96,8 @@ export default function ChallengeDetailPage() {
         <div className="p-6">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">
-              <p className="text-lg font-medium">Challenge nicht gefunden</p>
-              <p className="text-sm">Die Challenge mit ID "{id}" existiert nicht.</p>
+              <p className="text-lg font-medium">{t('detail.notFoundMessage')}</p>
+              <p className="text-sm">{t('detail.notFoundDetail', { id })}</p>
             </CardContent>
           </Card>
         </div>
@@ -119,44 +115,44 @@ export default function ChallengeDetailPage() {
   const approvedSubmissions = challengeSubmissions.filter((s) => s.status === 'approved');
 
   const handleDelete = () => {
-    if (confirm('Möchtest du diese Challenge wirklich löschen?')) {
+    if (confirm(t('detail.confirmDelete'))) {
       deleteChallenge(challenge.id);
       router.push('/challenges');
     }
   };
 
-  const scheduleInfo = SCHEDULE_TYPE_LABELS[challenge.schedule?.type || 'anytime'];
-  const ScheduleIcon = scheduleInfo.icon;
+  const scheduleType = challenge.schedule?.type || 'anytime';
+  const ScheduleIcon = SCHEDULE_TYPE_ICONS[scheduleType] || Calendar;
 
   return (
     <div className="flex flex-col">
       <Header
         title={challenge.title}
-        description={`${CATEGORY_LABELS[challenge.category]} · ${challenge.duration} Minuten`}
+        description={t('detail.descriptionSubtitle', { category: t(`categories.${challenge.category}`), duration: challenge.duration })}
         action={
           <div className="flex items-center gap-2">
             <Link href="/challenges">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Zurück
+                {t('actions.back', { ns: 'common' })}
               </Button>
             </Link>
             <Link href={`/challenges/${challenge.id}/edit`}>
               <Button variant="outline">
                 <Edit className="h-4 w-4 mr-2" />
-                Bearbeiten
+                {t('detail.edit')}
               </Button>
             </Link>
             {challenge.status === 'draft' && (
               <Button onClick={() => publishChallenge(challenge.id)}>
                 <Play className="h-4 w-4 mr-2" />
-                Veröffentlichen
+                {t('detail.publish')}
               </Button>
             )}
             {challenge.status === 'active' && (
               <Button variant="outline" onClick={() => pauseChallenge(challenge.id)}>
                 <Pause className="h-4 w-4 mr-2" />
-                Pausieren
+                {t('detail.pause')}
               </Button>
             )}
           </div>
@@ -176,14 +172,14 @@ export default function ChallengeDetailPage() {
               />
               {/* Badges */}
               <div className="p-4 flex flex-wrap gap-2">
-                <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
-                <Badge variant="outline">{CATEGORY_LABELS[challenge.category]}</Badge>
+                <Badge variant={statusBadge.variant}>{t(statusBadge.labelKey)}</Badge>
+                <Badge variant="outline">{t(`categories.${challenge.category}`)}</Badge>
                 <Badge variant="outline">
-                  {challenge.type === 'digital' ? 'Digital' : 'Vor Ort'}
+                  {challenge.type === 'digital' ? t('detail.digital') : t('detail.onsite')}
                 </Badge>
                 {challenge.isMultiPerson && (
                   <Badge variant="success">
-                    Team ({challenge.minTeamSize}-{challenge.maxTeamSize})
+                    {t('detail.teamBadge', { min: challenge.minTeamSize, max: challenge.maxTeamSize })}
                   </Badge>
                 )}
                 {challenge.tags?.slice(0, 3).map((tag) => (
@@ -198,7 +194,7 @@ export default function ChallengeDetailPage() {
             {/* Description */}
             <Card>
               <CardHeader>
-                <CardTitle>Beschreibung</CardTitle>
+                <CardTitle>{t('detail.description')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-600 whitespace-pre-wrap">{challenge.description}</p>
@@ -208,7 +204,7 @@ export default function ChallengeDetailPage() {
             {/* Instructions */}
             <Card>
               <CardHeader>
-                <CardTitle>Anleitung</CardTitle>
+                <CardTitle>{t('detail.instructions')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-slate-600 whitespace-pre-wrap">{challenge.instructions}</p>
@@ -221,7 +217,7 @@ export default function ChallengeDetailPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-primary-500" />
-                    Ort & Treffpunkt
+                    {t('detail.locationTitle')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -243,7 +239,7 @@ export default function ChallengeDetailPage() {
                         <Navigation className="h-5 w-5 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-slate-700">Treffpunkt</p>
+                        <p className="text-sm font-medium text-slate-700">{t('detail.meetingPoint')}</p>
                         <p className="text-sm text-slate-500">{challenge.location.meetingPoint}</p>
                       </div>
                     </div>
@@ -263,7 +259,7 @@ export default function ChallengeDetailPage() {
                       className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700"
                     >
                       <ExternalLink className="h-4 w-4" />
-                      Auf Google Maps öffnen
+                      {t('detail.openGoogleMaps')}
                     </a>
                   )}
                 </CardContent>
@@ -276,7 +272,7 @@ export default function ChallengeDetailPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <User className="h-5 w-5 text-primary-500" />
-                    Kontaktperson
+                    {t('detail.contactPerson')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -312,12 +308,12 @@ export default function ChallengeDetailPage() {
                     {challenge.contact.preferredMethod && (
                       <span className="flex items-center gap-1 text-slate-500">
                         {(() => {
-                          const method = CONTACT_METHOD_LABELS[challenge.contact.preferredMethod];
-                          const Icon = method?.icon || Mail;
+                          const Icon = CONTACT_METHOD_ICONS[challenge.contact.preferredMethod] || Mail;
+                          const methodLabel = t(`contact.${challenge.contact.preferredMethod}`);
                           return (
                             <>
                               <Icon className="h-4 w-4" />
-                              Bevorzugt: {method?.label || 'E-Mail'}
+                              {t('detail.preferred', { method: methodLabel })}
                             </>
                           );
                         })()}
@@ -340,21 +336,21 @@ export default function ChallengeDetailPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-primary-500" />
-                    Team-Challenge
+                    {t('detail.teamChallenge')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-slate-50 rounded-lg">
-                      <p className="text-sm text-slate-500">Teamgröße</p>
+                      <p className="text-sm text-slate-500">{t('detail.teamSize')}</p>
                       <p className="text-lg font-semibold text-slate-900">
-                        {challenge.minTeamSize} - {challenge.maxTeamSize} Personen
+                        {t('detail.teamSizeValue', { min: challenge.minTeamSize, max: challenge.maxTeamSize })}
                       </p>
                     </div>
                     <div className="p-3 bg-slate-50 rounded-lg">
-                      <p className="text-sm text-slate-500">Matchmaking</p>
+                      <p className="text-sm text-slate-500">{t('detail.matchmaking')}</p>
                       <p className="text-lg font-semibold text-slate-900">
-                        {challenge.allowSoloJoin ? 'Aktiviert' : 'Nicht verfügbar'}
+                        {challenge.allowSoloJoin ? t('detail.matchmakingActive') : t('detail.matchmakingInactive')}
                       </p>
                     </div>
                   </div>
@@ -369,7 +365,7 @@ export default function ChallengeDetailPage() {
                     <div>
                       <p className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-1">
                         <UserPlus className="h-4 w-4" />
-                        Suchen Teammitglieder ({challenge.teammateSeekers.length})
+                        {t('detail.lookingForTeammates', { count: challenge.teammateSeekers.length })}
                       </p>
                       <div className="space-y-2">
                         {challenge.teammateSeekers.slice(0, 3).map((seeker) => (
@@ -400,11 +396,11 @@ export default function ChallengeDetailPage() {
             {/* Recent Submissions */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Einreichungen</CardTitle>
+                <CardTitle>{t('detail.submissions')}</CardTitle>
                 {challengeSubmissions.length > 0 && (
                   <Link href="/submissions">
                     <Button variant="ghost" size="sm">
-                      Alle anzeigen
+                      {t('detail.showAll')}
                     </Button>
                   </Link>
                 )}
@@ -413,7 +409,7 @@ export default function ChallengeDetailPage() {
                 {challengeSubmissions.length === 0 ? (
                   <div className="text-center py-8 text-slate-500">
                     <Users className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                    <p>Noch keine Einreichungen</p>
+                    <p>{t('detail.noSubmissions')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -446,10 +442,10 @@ export default function ChallengeDetailPage() {
                           }
                         >
                           {submission.status === 'approved'
-                            ? 'Genehmigt'
+                            ? t('detail.submissionApproved')
                             : submission.status === 'rejected'
-                            ? 'Abgelehnt'
-                            : 'Ausstehend'}
+                            ? t('detail.submissionRejected')
+                            : t('detail.submissionPending')}
                         </Badge>
                       </Link>
                     ))}
@@ -464,29 +460,29 @@ export default function ChallengeDetailPage() {
             {/* Status Card */}
             <Card>
               <CardHeader>
-                <CardTitle>Status</CardTitle>
+                <CardTitle>{t('detail.statusTitle')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Status</span>
-                  <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
+                  <span className="text-slate-600">{t('detail.statusLabel')}</span>
+                  <Badge variant={statusBadge.variant}>{t(statusBadge.labelKey)}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Kategorie</span>
-                  <Badge variant="outline">{CATEGORY_LABELS[challenge.category]}</Badge>
+                  <span className="text-slate-600">{t('detail.categoryLabel')}</span>
+                  <Badge variant="outline">{t(`categories.${challenge.category}`)}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Art</span>
+                  <span className="text-slate-600">{t('detail.typeLabel')}</span>
                   <div className="flex items-center gap-1 text-slate-900">
                     {challenge.type === 'digital' ? (
                       <>
                         <Laptop className="h-4 w-4" />
-                        <span>Digital</span>
+                        <span>{t('detail.digital')}</span>
                       </>
                     ) : (
                       <>
                         <MapPin className="h-4 w-4" />
-                        <span>Vor Ort</span>
+                        <span>{t('detail.onsite')}</span>
                       </>
                     )}
                   </div>
@@ -497,14 +493,14 @@ export default function ChallengeDetailPage() {
             {/* Stats Card */}
             <Card>
               <CardHeader>
-                <CardTitle>Statistiken</CardTitle>
+                <CardTitle>{t('detail.statistics')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-slate-600 flex items-center gap-2">
                       <Users className="h-4 w-4" />
-                      Teilnehmer
+                      {t('detail.participants')}
                     </span>
                     <span className="font-medium">
                       {challenge.currentParticipants}/{challenge.maxParticipants}
@@ -516,15 +512,15 @@ export default function ChallengeDetailPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600 flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    Dauer
+                    {t('detail.duration')}
                   </span>
-                  <span className="font-medium">{challenge.duration} Min</span>
+                  <span className="font-medium">{t('durationMinutes', { count: challenge.duration })}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600 flex items-center gap-2">
                     <Star className="h-4 w-4 text-amber-500" />
-                    XP Belohnung
+                    {t('detail.xpReward')}
                   </span>
                   <span className="font-medium">{challenge.xpReward} XP</span>
                 </div>
@@ -532,10 +528,10 @@ export default function ChallengeDetailPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-600 flex items-center gap-2">
                     <VerificationIcon className="h-4 w-4" />
-                    Nachweis
+                    {t('detail.verification')}
                   </span>
                   <span className="font-medium">
-                    {VERIFICATION_LABELS[challenge.verificationMethod]}
+                    {t(`verification.${challenge.verificationMethod}`)}
                   </span>
                 </div>
               </CardContent>
@@ -546,26 +542,26 @@ export default function ChallengeDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ScheduleIcon className="h-5 w-5 text-primary-500" />
-                  Zeitplan
+                  {t('detail.scheduleTitle')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Typ</span>
-                  <Badge variant="outline">{scheduleInfo.label}</Badge>
+                  <span className="text-slate-600">{t('detail.scheduleType')}</span>
+                  <Badge variant="outline">{t(`schedule.${scheduleType}`)}</Badge>
                 </div>
 
                 {challenge.schedule?.type === 'fixed' && challenge.schedule.startDate && (
                   <>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-600">Datum</span>
+                      <span className="text-slate-600">{t('detail.scheduleDate')}</span>
                       <span className="text-sm font-medium">
                         {formatDate(challenge.schedule.startDate)}
                       </span>
                     </div>
                     {challenge.schedule.endDate && (
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Ende</span>
+                        <span className="text-slate-600">{t('detail.scheduleEnd')}</span>
                         <span className="text-sm">
                           {new Date(challenge.schedule.endDate).toLocaleTimeString('de-DE', {
                             hour: '2-digit',
@@ -581,20 +577,20 @@ export default function ChallengeDetailPage() {
                   <>
                     {challenge.schedule.startDate && (
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Start</span>
+                        <span className="text-slate-600">{t('detail.scheduleStart')}</span>
                         <span className="text-sm">{formatDate(challenge.schedule.startDate)}</span>
                       </div>
                     )}
                     {challenge.schedule.endDate && (
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Ende</span>
+                        <span className="text-slate-600">{t('detail.scheduleEnd')}</span>
                         <span className="text-sm">{formatDate(challenge.schedule.endDate)}</span>
                       </div>
                     )}
                     {challenge.schedule.isFlexible !== undefined && (
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-600">Flexibel</span>
-                        <span className="text-sm">{challenge.schedule.isFlexible ? 'Ja' : 'Nein'}</span>
+                        <span className="text-slate-600">{t('detail.scheduleFlexible')}</span>
+                        <span className="text-sm">{challenge.schedule.isFlexible ? t('detail.scheduleFlexibleYes') : t('detail.scheduleFlexibleNo')}</span>
                       </div>
                     )}
                   </>
@@ -602,7 +598,7 @@ export default function ChallengeDetailPage() {
 
                 {challenge.schedule?.type === 'recurring' && challenge.schedule.timeSlots && (
                   <div>
-                    <span className="text-slate-600 text-sm">Zeitfenster:</span>
+                    <span className="text-slate-600 text-sm">{t('detail.scheduleTimeSlots')}</span>
                     <div className="mt-1 space-y-1">
                       {challenge.schedule.timeSlots.map((slot, i) => (
                         <p key={i} className="text-sm font-medium bg-slate-50 px-2 py-1 rounded">
@@ -615,7 +611,7 @@ export default function ChallengeDetailPage() {
 
                 {challenge.schedule?.deadline && (
                   <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-slate-600">Deadline</span>
+                    <span className="text-slate-600">{t('detail.scheduleDeadline')}</span>
                     <span className="text-sm font-medium text-red-600">
                       {formatDate(challenge.schedule.deadline)}
                     </span>
@@ -625,7 +621,7 @@ export default function ChallengeDetailPage() {
                 <div className="flex items-center justify-between pt-2 border-t">
                   <span className="text-slate-600 flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    Erstellt
+                    {t('detail.created')}
                   </span>
                   <span className="text-sm">{formatDate(challenge.createdAt)}</span>
                 </div>
@@ -633,7 +629,7 @@ export default function ChallengeDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
-                      Veröffentlicht
+                      {t('detail.published')}
                     </span>
                     <span className="text-sm">{formatDate(challenge.publishedAt)}</span>
                   </div>
@@ -644,19 +640,19 @@ export default function ChallengeDetailPage() {
             {/* Submissions Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Einreichungen</CardTitle>
+                <CardTitle>{t('detail.submissions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
-                  <span className="text-amber-700">Ausstehend</span>
+                  <span className="text-amber-700">{t('detail.submissionsPending')}</span>
                   <span className="font-bold text-amber-700">{pendingSubmissions.length}</span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <span className="text-green-700">Genehmigt</span>
+                  <span className="text-green-700">{t('detail.submissionsApproved')}</span>
                   <span className="font-bold text-green-700">{approvedSubmissions.length}</span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="text-slate-700">Gesamt</span>
+                  <span className="text-slate-700">{t('detail.submissionsTotal')}</span>
                   <span className="font-bold text-slate-700">{challengeSubmissions.length}</span>
                 </div>
               </CardContent>
@@ -665,7 +661,7 @@ export default function ChallengeDetailPage() {
             {/* Danger Zone */}
             <Card className="border-red-200">
               <CardHeader>
-                <CardTitle className="text-red-600">Gefahrenzone</CardTitle>
+                <CardTitle className="text-red-600">{t('detail.dangerZone')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Button
@@ -674,7 +670,7 @@ export default function ChallengeDetailPage() {
                   onClick={handleDelete}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Challenge löschen
+                  {t('detail.deleteChallenge')}
                 </Button>
               </CardContent>
             </Card>

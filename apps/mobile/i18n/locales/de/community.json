@@ -3,6 +3,7 @@
   "subtitle": "Entdecke Challenges, feiere Erfolge, inspiriere andere",
   "filters": {
     "all": "Alle",
+    "organizations": "Organisationen",
     "promotions": "NGOs",
     "stories": "Stories",
     "activity": "Aktivität"
@@ -43,6 +44,7 @@
   "empty": {
     "title": "Noch keine Posts",
     "subtitle": "Hier erscheinen bald Posts von NGOs und der Community",
+    "organizations": "Noch keine Posts von Organisationen",
     "promotions": "Noch keine NGO-Posts in dieser Kategorie",
     "stories": "Noch keine Erfolgsgeschichten geteilt",
     "activity": "Noch keine Aktivitäten zu sehen"

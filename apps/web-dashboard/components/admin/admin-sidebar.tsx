@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   ShieldCheck,
@@ -13,15 +14,16 @@ import { cn } from '@/lib/utils';
 import { useAdminAuthStore } from '@/store/adminStore';
 import { Badge } from '@/components/ui/badge';
 
-const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'NGO Verifizierung', href: '/admin/verifications', icon: ShieldCheck },
-  { name: 'Support Tickets', href: '/admin/tickets', icon: MessageSquare },
-];
-
 export function AdminSidebar() {
   const pathname = usePathname();
   const { admin, logout } = useAdminAuthStore();
+  const { t } = useTranslation('admin');
+
+  const navigation = [
+    { name: t('sidebar.dashboard'), href: '/admin', icon: LayoutDashboard },
+    { name: t('sidebar.verification'), href: '/admin/verifications', icon: ShieldCheck },
+    { name: t('sidebar.tickets'), href: '/admin/tickets', icon: MessageSquare },
+  ];
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-slate-700 bg-slate-800">
@@ -68,7 +70,7 @@ export function AdminSidebar() {
             (item.href !== '/admin' && pathname.startsWith(item.href));
           return (
             <Link
-              key={item.name}
+              key={item.href}
               href={item.href}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
@@ -91,7 +93,7 @@ export function AdminSidebar() {
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
         >
           <LogOut className="h-5 w-5" />
-          Abmelden
+          {t('sidebar.logout')}
         </button>
       </div>
     </div>

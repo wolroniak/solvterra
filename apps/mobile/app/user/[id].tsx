@@ -18,19 +18,20 @@ import { Colors, spacing } from '@/constants/theme';
 import { useCommunityStore } from '@/store';
 import { supabase } from '@/lib/supabase';
 import type { CommunityPost, UserLevel } from '@solvterra/shared';
+import { XP_LEVELS } from '@solvterra/shared';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_GAP = 2;
 const GRID_COLUMNS = 3;
 const TILE_SIZE = (SCREEN_WIDTH - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
 
-const LEVELS = [
-  { level: 1, key: 'starter', minXp: 0, maxXp: 100 },
-  { level: 2, key: 'helper', minXp: 100, maxXp: 300 },
-  { level: 3, key: 'supporter', minXp: 300, maxXp: 600 },
-  { level: 4, key: 'champion', minXp: 600, maxXp: 1000 },
-  { level: 5, key: 'legend', minXp: 1000, maxXp: 2000 },
-];
+const LEVEL_KEYS = Object.keys(XP_LEVELS) as (keyof typeof XP_LEVELS)[];
+const LEVELS = LEVEL_KEYS.map((key, i) => ({
+  level: i + 1,
+  key,
+  minXp: XP_LEVELS[key],
+  maxXp: LEVEL_KEYS[i + 1] ? XP_LEVELS[LEVEL_KEYS[i + 1]] : XP_LEVELS[key] * 2,
+}));
 
 const LEVEL_NAMES: Record<string, string> = {
   starter: 'Starter',

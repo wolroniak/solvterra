@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, Infinity, CalendarDays, Repeat, X, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,34 +12,15 @@ interface ScheduleSectionProps {
   onChange: (schedule: Partial<ChallengeSchedule>) => void;
 }
 
-const SCHEDULE_TYPES: { value: ScheduleType; label: string; icon: typeof Calendar; description: string }[] = [
-  {
-    value: 'anytime',
-    label: 'Jederzeit',
-    icon: Infinity,
-    description: 'Teilnehmer können die Challenge jederzeit erledigen',
-  },
-  {
-    value: 'fixed',
-    label: 'Fester Termin',
-    icon: CalendarDays,
-    description: 'Einmaliger Termin an einem bestimmten Tag und Uhrzeit',
-  },
-  {
-    value: 'range',
-    label: 'Zeitraum',
-    icon: Calendar,
-    description: 'Challenge kann innerhalb eines Zeitraums erledigt werden',
-  },
-  {
-    value: 'recurring',
-    label: 'Wiederkehrend',
-    icon: Repeat,
-    description: 'Regelmäßige Zeitfenster (z.B. Mo-Fr 9-17 Uhr)',
-  },
+const SCHEDULE_TYPE_CONFIGS: { value: ScheduleType; icon: typeof Calendar; translationKey: string }[] = [
+  { value: 'anytime', icon: Infinity, translationKey: 'anytime' },
+  { value: 'fixed', icon: CalendarDays, translationKey: 'fixed' },
+  { value: 'range', icon: Calendar, translationKey: 'range' },
+  { value: 'recurring', icon: Repeat, translationKey: 'recurring' },
 ];
 
 export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
+  const { t } = useTranslation('challengeForm');
   const [newTimeSlot, setNewTimeSlot] = useState('');
 
   const scheduleType = schedule.type || 'anytime';
@@ -107,17 +89,17 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="h-5 w-5 text-primary-500" />
-          Zeitplan
+          {t('schedule.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Schedule Type Selection */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            Zeitliche Verfügbarkeit
+            {t('schedule.availabilityLabel')}
           </label>
           <div className="grid grid-cols-2 gap-3">
-            {SCHEDULE_TYPES.map((type) => (
+            {SCHEDULE_TYPE_CONFIGS.map((type) => (
               <button
                 key={type.value}
                 type="button"
@@ -132,8 +114,8 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
                   scheduleType === type.value ? 'text-primary-600' : 'text-slate-400'
                 }`} />
                 <div>
-                  <span className="text-sm font-medium block">{type.label}</span>
-                  <span className="text-xs text-slate-500">{type.description}</span>
+                  <span className="text-sm font-medium block">{t(`schedule.types.${type.translationKey}.label`)}</span>
+                  <span className="text-xs text-slate-500">{t(`schedule.types.${type.translationKey}.description`)}</span>
                 </div>
               </button>
             ))}
@@ -146,7 +128,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Startzeit *
+                  {t('schedule.startTime')}
                 </label>
                 <input
                   type="datetime-local"
@@ -159,7 +141,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Endzeit *
+                  {t('schedule.endTime')}
                 </label>
                 <input
                   type="datetime-local"
@@ -172,7 +154,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
               </div>
             </div>
             <p className="text-xs text-slate-500">
-              Die Challenge findet an diesem festen Termin statt
+              {t('schedule.fixedHint')}
             </p>
           </div>
         )}
@@ -183,7 +165,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Startdatum *
+                  {t('schedule.startDate')}
                 </label>
                 <input
                   type="date"
@@ -196,7 +178,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Enddatum *
+                  {t('schedule.endDate')}
                 </label>
                 <input
                   type="date"
@@ -215,7 +197,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Deadline für Einreichungen
+                {t('schedule.submissionDeadline')}
               </label>
               <input
                 type="date"
@@ -226,7 +208,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <p className="text-xs text-slate-500 mt-1">
-                Bis wann müssen Einreichungen eingereicht werden?
+                {t('schedule.submissionDeadlineHint')}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -238,7 +220,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
                 className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500"
               />
               <label htmlFor="isFlexible" className="text-sm text-slate-700">
-                Flexible Zeiteinteilung (Teilnehmer wählen selbst innerhalb des Zeitraums)
+                {t('schedule.flexibleScheduling')}
               </label>
             </div>
           </div>
@@ -249,7 +231,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
           <div className="space-y-4 p-4 bg-slate-50 rounded-lg">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Zeitfenster *
+                {t('schedule.timeSlotsLabel')}
               </label>
               <div className="space-y-2 mb-3">
                 {(schedule.timeSlots || []).map((slot, index) => (
@@ -273,7 +255,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
                   type="text"
                   value={newTimeSlot}
                   onChange={(e) => setNewTimeSlot(e.target.value)}
-                  placeholder="z.B. Mo, Mi, Fr: 9-12 Uhr"
+                  placeholder={t('schedule.timeSlotPlaceholder')}
                   className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -287,12 +269,12 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
                 </Button>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Beispiele: "Mo-Fr: 9-17 Uhr", "Sa: 10-14 Uhr", "Täglich: 15-18 Uhr"
+                {t('schedule.timeSlotExamples')}
               </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Deadline (optional)
+                {t('schedule.deadlineOptional')}
               </label>
               <input
                 type="date"
@@ -303,7 +285,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <p className="text-xs text-slate-500 mt-1">
-                Bis wann ist die Challenge insgesamt verfügbar?
+                {t('schedule.deadlineHint')}
               </p>
             </div>
           </div>
@@ -313,8 +295,7 @@ export function ScheduleSection({ schedule, onChange }: ScheduleSectionProps) {
         {scheduleType === 'anytime' && (
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-700">
-              Diese Challenge kann jederzeit erledigt werden. Die Teilnehmer haben keine
-              zeitlichen Einschränkungen und können flexibel teilnehmen.
+              {t('schedule.anytimeMessage')}
             </p>
           </div>
         )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,20 +43,6 @@ interface SupportTicket {
   created_at: string;
 }
 
-const TICKET_TYPE_LABELS: Record<string, string> = {
-  appeal: 'Einspruch',
-  support: 'Support-Anfrage',
-  feedback: 'Feedback',
-  other: 'Sonstiges',
-};
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  open: { label: 'Offen', color: 'bg-blue-100 text-blue-800', icon: Clock },
-  in_progress: { label: 'In Bearbeitung', color: 'bg-amber-100 text-amber-800', icon: RefreshCw },
-  resolved: { label: 'Beantwortet', color: 'bg-green-100 text-green-800', icon: CheckCircle },
-  closed: { label: 'Geschlossen', color: 'bg-slate-100 text-slate-800', icon: XCircle },
-};
-
 function TicketSkeleton() {
   return (
     <Card>
@@ -76,6 +63,21 @@ function TicketSkeleton() {
 export default function SupportPage() {
   const { organization } = useAuthStore();
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const { t } = useTranslation('support');
+
+  const TICKET_TYPE_LABELS: Record<string, string> = {
+    appeal: t('ticketTypes.appeal'),
+    support: t('ticketTypes.support'),
+    feedback: t('ticketTypes.feedback'),
+    other: t('ticketTypes.other'),
+  };
+
+  const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
+    open: { label: t('status.open'), color: 'bg-blue-100 text-blue-800', icon: Clock },
+    in_progress: { label: t('status.inProgress'), color: 'bg-amber-100 text-amber-800', icon: RefreshCw },
+    resolved: { label: t('status.resolved'), color: 'bg-green-100 text-green-800', icon: CheckCircle },
+    closed: { label: t('status.closed'), color: 'bg-slate-100 text-slate-800', icon: XCircle },
+  };
 
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,8 +102,8 @@ export default function SupportPage() {
     if (error) {
       console.error('Failed to load tickets:', error);
       addNotification({
-        title: 'Fehler',
-        description: 'Tickets konnten nicht geladen werden',
+        title: t('notifications.errorTitle'),
+        description: t('notifications.loadError'),
         type: 'error',
       });
     } else {
@@ -124,14 +126,14 @@ export default function SupportPage() {
     if (error) {
       console.error('Failed to create ticket:', error);
       addNotification({
-        title: 'Fehler',
-        description: 'Ticket konnte nicht erstellt werden',
+        title: t('notifications.errorTitle'),
+        description: t('notifications.createError'),
         type: 'error',
       });
     } else {
       addNotification({
-        title: 'Ticket erstellt',
-        description: 'Ihr Ticket wurde erfolgreich eingereicht',
+        title: t('notifications.createSuccess'),
+        description: t('notifications.createSuccessDescription'),
         type: 'success',
       });
       setDialogOpen(false);
@@ -159,12 +161,12 @@ export default function SupportPage() {
   return (
     <div className="flex flex-col">
       <Header
-        title="Support"
-        description="Kontaktieren Sie uns oder sehen Sie Ihre Anfragen ein"
+        title={t('page.title')}
+        description={t('page.description')}
         action={
           <Button onClick={openNewTicketDialog}>
             <Plus className="h-4 w-4 mr-2" />
-            Neues Ticket
+            {t('newTicket.button')}
           </Button>
         }
       />
@@ -179,10 +181,10 @@ export default function SupportPage() {
                   <AlertCircle className="h-5 w-5 text-amber-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-amber-900">Verifizierung abgelehnt</h3>
+                  <h3 className="font-semibold text-amber-900">{t('rejection.title')}</h3>
                   <p className="text-sm text-amber-700 mt-1">
                     {organization?.rejectionReason ||
-                      'Ihre Organisation wurde leider abgelehnt. Sie koennen einen Einspruch einreichen.'}
+                      t('rejection.defaultMessage')}
                   </p>
                   <Button
                     className="mt-3"
@@ -190,13 +192,13 @@ export default function SupportPage() {
                     size="sm"
                     onClick={() => {
                       setTicketType('appeal');
-                      setSubject('Einspruch gegen Ablehnung');
+                      setSubject(t('rejection.appealSubject'));
                       setMessage('');
                       setDialogOpen(true);
                     }}
                   >
                     <MessageSquare className="h-4 w-4 mr-2" />
-                    Einspruch einreichen
+                    {t('rejection.fileAppeal')}
                   </Button>
                 </div>
               </div>
@@ -206,7 +208,7 @@ export default function SupportPage() {
 
         {/* Tickets List */}
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">Ihre Tickets</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('tickets.title')}</h2>
 
           {loading ? (
             <div className="space-y-3">
@@ -217,8 +219,8 @@ export default function SupportPage() {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">
                 <MessageSquare className="h-12 w-12 mb-4 text-slate-300" />
-                <p className="text-lg font-medium text-slate-900">Keine Tickets</p>
-                <p className="text-sm">Sie haben noch keine Support-Anfragen gestellt</p>
+                <p className="text-lg font-medium text-slate-900">{t('tickets.empty')}</p>
+                <p className="text-sm">{t('tickets.emptyDescription')}</p>
               </CardContent>
             </Card>
           ) : (
@@ -249,12 +251,12 @@ export default function SupportPage() {
                             <Badge variant="outline" className="text-xs">
                               {TICKET_TYPE_LABELS[ticket.type]}
                             </Badge>
-                            <span>erstellt am {formatDate(new Date(ticket.created_at))}</span>
+                            <span>{t('tickets.createdAt', { date: formatDate(new Date(ticket.created_at)) })}</span>
                           </div>
                           <p className="text-sm text-slate-600 line-clamp-2">{ticket.message}</p>
                           {ticket.admin_response && (
                             <div className="mt-2 p-2 bg-green-50 border border-green-100 rounded text-sm text-green-800">
-                              <span className="font-medium">Antwort:</span> {ticket.admin_response}
+                              <span className="font-medium">{t('tickets.response')}:</span> {ticket.admin_response}
                             </div>
                           )}
                         </div>
@@ -272,48 +274,48 @@ export default function SupportPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent onClose={() => setDialogOpen(false)}>
           <DialogHeader>
-            <DialogTitle>Neues Ticket erstellen</DialogTitle>
+            <DialogTitle>{t('newTicket.title')}</DialogTitle>
             <DialogDescription>
-              Beschreiben Sie Ihr Anliegen und wir melden uns schnellstmoeglich zurueck.
+              {t('newTicket.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Ticket-Typ *
+                  {t('newTicket.typeLabel')}
                 </label>
                 <select
                   value={ticketType}
                   onChange={(e) => setTicketType(e.target.value as SupportTicket['type'])}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
-                  <option value="support">Support-Anfrage</option>
-                  <option value="appeal">Einspruch (Verifizierung)</option>
-                  <option value="feedback">Feedback</option>
-                  <option value="other">Sonstiges</option>
+                  <option value="support">{t('newTicket.typeSupport')}</option>
+                  <option value="appeal">{t('newTicket.typeAppeal')}</option>
+                  <option value="feedback">{t('newTicket.typeFeedback')}</option>
+                  <option value="other">{t('newTicket.typeOther')}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Betreff *
+                  {t('newTicket.subjectLabel')}
                 </label>
                 <Input
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  placeholder="Kurze Zusammenfassung Ihres Anliegens"
+                  placeholder={t('newTicket.subjectPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Nachricht *
+                  {t('newTicket.messageLabel')}
                 </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Beschreiben Sie Ihr Anliegen im Detail..."
+                  placeholder={t('newTicket.messagePlaceholder')}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                   rows={5}
                 />
@@ -322,7 +324,7 @@ export default function SupportPage() {
           </DialogBody>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Abbrechen
+              {t('newTicket.cancel')}
             </Button>
             <Button
               onClick={handleSubmit}
@@ -333,7 +335,7 @@ export default function SupportPage() {
               ) : (
                 <Send className="h-4 w-4 mr-2" />
               )}
-              Absenden
+              {t('newTicket.submit')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -348,14 +350,14 @@ export default function SupportPage() {
               <Badge variant="outline" className="mr-2">
                 {viewTicket && TICKET_TYPE_LABELS[viewTicket.type]}
               </Badge>
-              Erstellt am {viewTicket && formatDate(new Date(viewTicket.created_at))}
+              {viewTicket && t('viewTicket.createdAt', { date: formatDate(new Date(viewTicket.created_at)) })}
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Status
+                  {t('viewTicket.statusLabel')}
                 </label>
                 {viewTicket && (
                   <Badge className={STATUS_CONFIG[viewTicket.status].color}>
@@ -366,7 +368,7 @@ export default function SupportPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Ihre Nachricht
+                  {t('viewTicket.yourMessage')}
                 </label>
                 <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
                   {viewTicket?.message}
@@ -376,14 +378,14 @@ export default function SupportPage() {
               {viewTicket?.admin_response && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Antwort vom Support
+                    {t('viewTicket.supportResponse')}
                   </label>
                   <p className="text-sm text-slate-600 bg-green-50 border border-green-100 p-3 rounded-lg">
                     {viewTicket.admin_response}
                   </p>
                   {viewTicket.responded_at && (
                     <p className="text-xs text-slate-500 mt-1">
-                      Beantwortet am {formatDate(new Date(viewTicket.responded_at))}
+                      {t('viewTicket.respondedAt', { date: formatDate(new Date(viewTicket.responded_at)) })}
                     </p>
                   )}
                 </div>
@@ -392,7 +394,7 @@ export default function SupportPage() {
           </DialogBody>
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewTicket(null)}>
-              Schliessen
+              {t('viewTicket.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tag, X, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ const SUGGESTED_TAGS = [
 ];
 
 export function TagsSection({ tags, onChange }: TagsSectionProps) {
+  const { t } = useTranslation('challengeForm');
   const [newTag, setNewTag] = useState('');
 
   const addTag = () => {
@@ -57,18 +59,18 @@ export function TagsSection({ tags, onChange }: TagsSectionProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Tag className="h-5 w-5 text-primary-500" />
-          Tags
+          {t('tags.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Current Tags */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
-            Aktuelle Tags
+            {t('tags.currentLabel')}
           </label>
           <div className="flex flex-wrap gap-2 min-h-[40px] p-3 bg-slate-50 rounded-lg">
             {tags.length === 0 ? (
-              <span className="text-sm text-slate-400">Noch keine Tags hinzugefügt</span>
+              <span className="text-sm text-slate-400">{t('tags.emptyState')}</span>
             ) : (
               tags.map((tag) => (
                 <Badge
@@ -93,14 +95,14 @@ export function TagsSection({ tags, onChange }: TagsSectionProps) {
         {/* Add New Tag */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            Neuen Tag hinzufügen
+            {t('tags.addLabel')}
           </label>
           <div className="flex gap-2">
             <input
               type="text"
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
-              placeholder="z.B. teamwork, natur, recycling"
+              placeholder={t('tags.addPlaceholder')}
               className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -119,7 +121,7 @@ export function TagsSection({ tags, onChange }: TagsSectionProps) {
         {availableSuggestions.length > 0 && (
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Vorschläge
+              {t('tags.suggestionsLabel')}
             </label>
             <div className="flex flex-wrap gap-2">
               {availableSuggestions.slice(0, 10).map((tag) => (
@@ -137,8 +139,7 @@ export function TagsSection({ tags, onChange }: TagsSectionProps) {
         )}
 
         <p className="text-xs text-slate-500">
-          Tags helfen Studenten, passende Challenges zu finden. Verwende relevante
-          Schlüsselwörter.
+          {t('tags.hint')}
         </p>
       </CardContent>
     </Card>

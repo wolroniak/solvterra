@@ -1,0 +1,37 @@
+{
+  "page": {
+    "title": "Einstellungen",
+    "description": "Verwalte dein Organisationsprofil und Einstellungen"
+  },
+  "profile": {
+    "title": "Organisationsprofil",
+    "description": "Diese Informationen werden Studenten in der App angezeigt",
+    "changeLogo": "Logo ändern",
+    "logoHint": "JPG, PNG oder SVG. Max 1MB.",
+    "name": "Organisationsname",
+    "descriptionLabel": "Beschreibung",
+    "descriptionHint": "Kurze Beschreibung eurer Mission und Arbeit",
+    "contactEmail": "Kontakt-E-Mail",
+    "website": "Website"
+  },
+  "verification": {
+    "title": "Verifizierungsstatus",
+    "verified": "Verifizierte Organisation",
+    "verifiedDescription": "Deine Organisation wurde vom SolvTerra Team überprüft",
+    "badge": "Verifiziert"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "description": "Wähle, worüber du informiert werden möchtest",
+    "newSubmissions": "Neue Einreichungen",
+    "newSubmissionsDescription": "Benachrichtigung bei neuen Einreichungen zur Überprüfung",
+    "challengeCapacity": "Challenge-Kapazität",
+    "challengeCapacityDescription": "Warnung wenn eine Challenge fast voll ist",
+    "weeklyReport": "Wöchentlicher Report",
+    "weeklyReportDescription": "Zusammenfassung der Wochenaktivitäten per E-Mail"
+  },
+  "save": {
+    "saved": "Gespeichert!",
+    "saveChanges": "Änderungen speichern"
+  }
+}

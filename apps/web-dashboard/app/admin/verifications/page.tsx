@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { AdminHeader } from '@/components/admin/admin-header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -84,6 +85,7 @@ export default function AdminVerificationsPage() {
   const [selectedOrg, setSelectedOrg] = useState<PendingOrganization | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const { t } = useTranslation('admin');
 
   const loadPendingOrganizations = useCallback(async () => {
     setLoading(true);
@@ -96,15 +98,15 @@ export default function AdminVerificationsPage() {
     if (error) {
       console.error('Failed to load pending organizations:', error);
       addNotification({
-        title: 'Fehler beim Laden',
-        description: 'Organisationen konnten nicht geladen werden',
+        title: t('verifications.notifications.loadErrorTitle'),
+        description: t('verifications.notifications.loadError'),
         type: 'error',
       });
     } else {
       setOrganizations(data || []);
     }
     setLoading(false);
-  }, [addNotification]);
+  }, [addNotification, t]);
 
   useEffect(() => {
     loadPendingOrganizations();
@@ -120,14 +122,14 @@ export default function AdminVerificationsPage() {
     if (error) {
       console.error('Failed to verify organization:', error);
       addNotification({
-        title: 'Fehler',
-        description: 'Organisation konnte nicht verifiziert werden',
+        title: t('verifications.notifications.errorTitle'),
+        description: t('verifications.notifications.verifyError'),
         type: 'error',
       });
     } else {
       addNotification({
-        title: 'Erfolgreich verifiziert',
-        description: `${org.name} wurde erfolgreich verifiziert`,
+        title: t('verifications.notifications.verifySuccess'),
+        description: t('verifications.notifications.verifySuccessDescription', { name: org.name }),
         type: 'success',
       });
       setOrganizations((prev) => prev.filter((o) => o.id !== org.id));
@@ -155,14 +157,14 @@ export default function AdminVerificationsPage() {
     if (error) {
       console.error('Failed to reject organization:', error);
       addNotification({
-        title: 'Fehler',
-        description: 'Organisation konnte nicht abgelehnt werden',
+        title: t('verifications.notifications.errorTitle'),
+        description: t('verifications.notifications.rejectError'),
         type: 'error',
       });
     } else {
       addNotification({
-        title: 'Abgelehnt',
-        description: `${selectedOrg.name} wurde abgelehnt`,
+        title: t('verifications.notifications.rejectSuccess'),
+        description: t('verifications.notifications.rejectSuccessDescription', { name: selectedOrg.name }),
         type: 'info',
       });
       setOrganizations((prev) => prev.filter((o) => o.id !== selectedOrg.id));
@@ -177,8 +179,8 @@ export default function AdminVerificationsPage() {
   return (
     <div className="flex flex-col">
       <AdminHeader
-        title="NGO Verifizierung"
-        description="Pruefe und verifiziere neue Organisationen"
+        title={t('verifications.title')}
+        description={t('verifications.description')}
         action={
           <Button
             variant="outline"
@@ -187,7 +189,7 @@ export default function AdminVerificationsPage() {
             className="border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Aktualisieren
+            {t('verifications.refresh')}
           </Button>
         }
       />
@@ -199,15 +201,15 @@ export default function AdminVerificationsPage() {
           <Card className="border-slate-700 bg-slate-800">
             <CardContent className="flex flex-col items-center justify-center py-12 text-slate-400">
               <CheckCircle className="h-12 w-12 mb-4 text-green-500" />
-              <p className="text-lg font-medium text-white">Keine ausstehenden Verifizierungen</p>
-              <p className="text-sm">Alle Organisationen wurden geprueft</p>
+              <p className="text-lg font-medium text-white">{t('verifications.noPending')}</p>
+              <p className="text-sm">{t('verifications.allReviewed')}</p>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <AlertCircle className="h-4 w-4" />
-              <span>{organizations.length} Organisation{organizations.length !== 1 ? 'en' : ''} warte{organizations.length === 1 ? 't' : 'n'} auf Verifizierung</span>
+              <span>{t(organizations.length === 1 ? 'verifications.waitingCount_one' : 'verifications.waitingCount_other', { count: organizations.length })}</span>
             </div>
 
             {organizations.map((org) => (
@@ -274,7 +276,7 @@ export default function AdminVerificationsPage() {
                         )}
                         <div className="flex items-center gap-1.5">
                           <Calendar className="h-4 w-4" />
-                          <span>Registriert am {formatDate(new Date(org.created_at))}</span>
+                          <span>{t('verifications.registeredOn', { date: formatDate(new Date(org.created_at)) })}</span>
                         </div>
                       </div>
                     </div>
@@ -287,7 +289,7 @@ export default function AdminVerificationsPage() {
                         disabled={actionLoading === org.id}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
-                        Ablehnen
+                        {t('verifications.reject')}
                       </Button>
                       <Button
                         className="bg-green-600 hover:bg-green-700"
@@ -299,7 +301,7 @@ export default function AdminVerificationsPage() {
                         ) : (
                           <CheckCircle className="h-4 w-4 mr-2" />
                         )}
-                        Verifizieren
+                        {t('verifications.verify')}
                       </Button>
                     </div>
                   </div>
@@ -316,9 +318,9 @@ export default function AdminVerificationsPage() {
           className="bg-slate-800 border border-slate-700"
         >
           <DialogHeader>
-            <DialogTitle className="text-white">Organisation ablehnen</DialogTitle>
+            <DialogTitle className="text-white">{t('verifications.rejectDialog.title')}</DialogTitle>
             <DialogDescription className="text-slate-400">
-              Bitte gib einen Grund fuer die Ablehnung an. Dieser wird der Organisation mitgeteilt.
+              {t('verifications.rejectDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
@@ -343,17 +345,17 @@ export default function AdminVerificationsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Ablehnungsgrund *
+                  {t('verifications.rejectDialog.reasonLabel')}
                 </label>
                 <textarea
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="z.B. Fehlende Nachweise, unvollstaendige Angaben..."
+                  placeholder={t('verifications.rejectDialog.reasonPlaceholder')}
                   className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                   rows={4}
                 />
                 <p className="text-xs text-slate-500 mt-1">
-                  Der Grund wird der Organisation angezeigt, damit sie das Problem beheben kann.
+                  {t('verifications.rejectDialog.reasonHint')}
                 </p>
               </div>
             </div>
@@ -364,7 +366,7 @@ export default function AdminVerificationsPage() {
               onClick={() => setRejectDialogOpen(false)}
               className="border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
             >
-              Abbrechen
+              {t('verifications.rejectDialog.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -376,7 +378,7 @@ export default function AdminVerificationsPage() {
               ) : (
                 <XCircle className="h-4 w-4 mr-2" />
               )}
-              Ablehnen
+              {t('verifications.rejectDialog.confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

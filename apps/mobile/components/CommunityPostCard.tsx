@@ -57,10 +57,12 @@ export default function CommunityPostCard({ post, currentUserId, onLike, onComme
   const handleAvatarPress = useCallback(() => {
     if (isOwnPost) {
       router.push('/(tabs)/profile');
+    } else if (post.authorType === 'organization' && post.organizationId) {
+      router.push(`/organization/${post.organizationId}`);
     } else {
       router.push(`/user/${post.authorId}`);
     }
-  }, [isOwnPost, post.authorId, router]);
+  }, [isOwnPost, post.authorId, post.authorType, post.organizationId, router]);
 
   // Double-tap detection for like
   const handleImagePress = useCallback(() => {
@@ -143,7 +145,7 @@ export default function CommunityPostCard({ post, currentUserId, onLike, onComme
 
   // Build author sub-label
   const getAuthorSubLabel = (): string | null => {
-    if (isOrgPost) return null;
+    if (isOrgPost) return post.title || null;
     if (post.linkedChallenge?.organizationName) {
       return `half ${post.linkedChallenge.organizationName}`;
     }

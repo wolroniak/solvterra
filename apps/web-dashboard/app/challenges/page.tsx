@@ -12,23 +12,16 @@ import {
   Pause,
   Play,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useChallengeStore } from '@/store';
-import { CATEGORY_LABELS, STATUS_LABELS } from '@/lib/mock-data';
 import { useCanPublish, useCanCreateChallenges } from '@/components/verification-banner';
 import { formatDate, cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-
-const STATUS_BADGES: Record<string, { variant: 'default' | 'success' | 'warning' | 'info' | 'outline'; label: string }> = {
-  draft: { variant: 'outline', label: 'Entwurf' },
-  active: { variant: 'success', label: 'Aktiv' },
-  paused: { variant: 'warning', label: 'Pausiert' },
-  completed: { variant: 'info', label: 'Abgeschlossen' },
-};
 
 function ChallengesSkeleton() {
   return (
@@ -59,6 +52,7 @@ function ChallengesSkeleton() {
 }
 
 export default function ChallengesPage() {
+  const { t } = useTranslation('challenges');
   const { challenges, loading, deleteChallenge, publishChallenge, pauseChallenge } = useChallengeStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -81,24 +75,31 @@ export default function ChallengesPage() {
     paused: challenges.filter((c) => c.status === 'paused').length,
   };
 
+  const STATUS_BADGES: Record<string, { variant: 'default' | 'success' | 'warning' | 'info' | 'outline'; labelKey: string }> = {
+    draft: { variant: 'outline', labelKey: 'status.draft' },
+    active: { variant: 'success', labelKey: 'status.active' },
+    paused: { variant: 'warning', labelKey: 'status.paused' },
+    completed: { variant: 'info', labelKey: 'status.completed' },
+  };
+
   const NewChallengeButton = () => (
     <div className="relative group">
       {canCreate ? (
         <Link href="/challenges/new">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
-            Neue Challenge
+            {t('list.newChallenge')}
           </Button>
         </Link>
       ) : (
         <Button disabled className="opacity-50 cursor-not-allowed">
           <Plus className="h-4 w-4 mr-2" />
-          Neue Challenge
+          {t('list.newChallenge')}
         </Button>
       )}
       {!canCreate && (
         <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-          Organisation wurde abgelehnt
+          {t('list.organizationRejected')}
           <div className="absolute top-full right-4 border-4 border-transparent border-t-slate-900" />
         </div>
       )}
@@ -109,8 +110,8 @@ export default function ChallengesPage() {
     return (
       <div className="flex flex-col">
         <Header
-          title="Challenges"
-          description="Verwalte deine Micro-Volunteering Challenges"
+          title={t('list.title')}
+          description={t('list.description')}
           action={<NewChallengeButton />}
         />
         <ChallengesSkeleton />
@@ -121,8 +122,8 @@ export default function ChallengesPage() {
   return (
     <div className="flex flex-col">
       <Header
-        title="Challenges"
-        description="Verwalte deine Micro-Volunteering Challenges"
+        title={t('list.title')}
+        description={t('list.description')}
         action={<NewChallengeButton />}
       />
 
@@ -133,7 +134,7 @@ export default function ChallengesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Challenges suchen..."
+              placeholder={t('list.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -142,10 +143,10 @@ export default function ChallengesPage() {
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
-              <TabsTrigger value="all">Alle ({counts.all})</TabsTrigger>
-              <TabsTrigger value="active">Aktiv ({counts.active})</TabsTrigger>
-              <TabsTrigger value="draft">Entwürfe ({counts.draft})</TabsTrigger>
-              <TabsTrigger value="paused">Pausiert ({counts.paused})</TabsTrigger>
+              <TabsTrigger value="all">{t('list.tabAll', { count: counts.all })}</TabsTrigger>
+              <TabsTrigger value="active">{t('list.tabActive', { count: counts.active })}</TabsTrigger>
+              <TabsTrigger value="draft">{t('list.tabDrafts', { count: counts.draft })}</TabsTrigger>
+              <TabsTrigger value="paused">{t('list.tabPaused', { count: counts.paused })}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -155,8 +156,8 @@ export default function ChallengesPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">
               <Search className="h-12 w-12 mb-4 text-slate-300" />
-              <p className="text-lg font-medium">Keine Challenges gefunden</p>
-              <p className="text-sm">Versuche einen anderen Suchbegriff oder Filter</p>
+              <p className="text-lg font-medium">{t('list.noResults')}</p>
+              <p className="text-sm">{t('list.noResultsHint')}</p>
             </CardContent>
           </Card>
         ) : (
@@ -165,12 +166,12 @@ export default function ChallengesPage() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Challenge</th>
-                    <th>Kategorie</th>
-                    <th>Dauer</th>
-                    <th>Teilnehmer</th>
-                    <th>Status</th>
-                    <th>Erstellt</th>
+                    <th>{t('list.tableChallenge')}</th>
+                    <th>{t('list.tableCategory')}</th>
+                    <th>{t('list.tableDuration')}</th>
+                    <th>{t('list.tableParticipants')}</th>
+                    <th>{t('list.tableStatus')}</th>
+                    <th>{t('list.tableCreated')}</th>
                     <th className="w-12"></th>
                   </tr>
                 </thead>
@@ -201,10 +202,10 @@ export default function ChallengesPage() {
                         </td>
                         <td>
                           <Badge variant="outline">
-                            {CATEGORY_LABELS[challenge.category]}
+                            {t(`categories.${challenge.category}`)}
                           </Badge>
                         </td>
-                        <td>{challenge.duration} Min</td>
+                        <td>{t('list.durationMinutes', { count: challenge.duration })}</td>
                         <td>
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -220,7 +221,7 @@ export default function ChallengesPage() {
                         </td>
                         <td>
                           <Badge variant={statusBadge.variant}>
-                            {statusBadge.label}
+                            {t(statusBadge.labelKey)}
                           </Badge>
                         </td>
                         <td className="text-slate-500">
@@ -251,7 +252,7 @@ export default function ChallengesPage() {
                                 </Button>
                                 {!canPublish && (
                                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                                    Warte auf Verifizierung
+                                    {t('list.waitingForVerification')}
                                   </div>
                                 )}
                               </div>

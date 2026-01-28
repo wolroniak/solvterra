@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation('auth');
   const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +30,7 @@ export default function LoginPage() {
       // Redirect admins to admin panel, NGOs to dashboard
       router.push(result.isAdmin ? '/admin' : '/');
     } else {
-      setError(result.error || 'Anmeldung fehlgeschlagen');
+      setError(result.error || t('login.loginFailed'));
     }
 
     setIsLoading(false);
@@ -48,9 +50,9 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <CardTitle className="text-2xl">NGO Dashboard</CardTitle>
+          <CardTitle className="text-2xl">{t('login.title')}</CardTitle>
           <CardDescription>
-            Melde dich an, um deine Challenges zu verwalten
+            {t('login.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -64,12 +66,12 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-slate-700">
-                E-Mail
+                {t('login.emailLabel')}
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@organisation.de"
+                placeholder={t('login.emailPlaceholder')}
                 value={email}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 required
@@ -79,12 +81,12 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-slate-700">
-                Passwort
+                {t('login.passwordLabel')}
               </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Passwort eingeben"
+                placeholder={t('login.passwordPlaceholder')}
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 required
@@ -97,20 +99,20 @@ export default function LoginPage() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Wird angemeldet...' : 'Anmelden'}
+              {isLoading ? t('login.submitLoading') : t('login.submit')}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-500">
-            <p>Demo-Zugangsdaten:</p>
+            <p>{t('login.demoCredentials')}</p>
             <p className="font-mono text-xs mt-1">kontakt@tafel-rheinmain.de / Test1234</p>
           </div>
 
           <div className="mt-4 pt-4 border-t text-center">
             <p className="text-sm text-slate-600">
-              Noch kein Account?{' '}
+              {t('login.noAccount')}{' '}
               <a href="/register" className="text-primary hover:underline font-medium">
-                NGO registrieren
+                {t('login.registerNgo')}
               </a>
             </p>
           </div>

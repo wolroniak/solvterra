@@ -9,13 +9,12 @@ function showError(title: string) {
   });
 }
 import {
-  MOCK_COMMUNITY_POSTS,
-  MOCK_COMMUNITY_STATS,
   type Organization,
   type Challenge,
   type Submission,
   type DashboardStats,
   type CommunityPost,
+  type CommunityComment,
   type CommunityStats,
 } from '@/lib/mock-data';
 
@@ -669,43 +668,271 @@ export const useSubmissionStore = create<SubmissionState>((set) => ({
 }));
 
 // ============================================
-// Community Store (mock data - unchanged)
+// Community Store (Supabase-backed)
 // ============================================
+
+interface DbCommunityPost {
+  id: string;
+  user_id: string | null;
+  organization_id: string | null;
+  submission_id: string | null;
+  challenge_id: string | null;
+  type: string;
+  title: string | null;
+  content: string | null;
+  image_url: string | null;
+  is_highlighted: boolean;
+  is_pinned: boolean;
+  status: string | null;
+  published_at: string | null;
+  created_at: string;
+  organizations?: { id: string; name: string; logo: string | null };
+  challenges?: {
+    id: string;
+    title: string;
+    image_url: string | null;
+    xp_reward: number;
+    duration_minutes: number;
+    category: string;
+  };
+}
+
+function mapDbCommunityPost(
+  row: DbCommunityPost,
+  likesCount: number,
+  commentsCount: number,
+  userHasLiked: boolean = false,
+): CommunityPost {
+  const org = row.organizations;
+
+  return {
+    id: row.id,
+    type: row.type as CommunityPost['type'],
+    authorType: row.organization_id ? 'organization' : 'user',
+    authorId: row.organization_id || row.user_id || '',
+    authorName: org?.name || '',
+    authorAvatarUrl: org?.logo || undefined,
+    organizationId: row.organization_id || undefined,
+    organizationLogoUrl: org?.logo || undefined,
+    title: row.title || undefined,
+    content: row.content || undefined,
+    imageUrl: row.image_url || undefined,
+    linkedChallengeId: row.challenge_id || undefined,
+    linkedChallenge: row.challenges ? {
+      id: row.challenges.id,
+      title: row.challenges.title,
+      imageUrl: row.challenges.image_url || undefined,
+      category: row.challenges.category as 'environment' | 'social' | 'education' | 'health' | 'animals' | 'culture',
+      xpReward: row.challenges.xp_reward,
+      durationMinutes: row.challenges.duration_minutes as 5 | 10 | 15 | 30,
+    } : undefined,
+    submissionId: row.submission_id || undefined,
+    likesCount,
+    userHasLiked,
+    commentsCount,
+    isHighlighted: row.is_highlighted,
+    isPinned: row.is_pinned,
+    status: (row.status || 'published') as 'draft' | 'published' | 'archived',
+    publishedAt: row.published_at ? new Date(row.published_at) : undefined,
+    createdAt: new Date(row.created_at),
+  };
+}
+
+function computeCommunityStats(posts: CommunityPost[]): CommunityStats {
+  const totalLikes = posts.reduce((sum, p) => sum + p.likesCount, 0);
+  const totalComments = posts.reduce((sum, p) => sum + p.commentsCount, 0);
+  const publishedPosts = posts.filter(p => p.status === 'published').length;
+  const draftPosts = posts.filter(p => p.status === 'draft').length;
+
+  return {
+    totalPosts: posts.length,
+    publishedPosts,
+    draftPosts,
+    totalLikes,
+    totalComments,
+    engagementRate: posts.length > 0
+      ? Math.round(((totalLikes + totalComments) / posts.length) * 10) / 10
+      : 0,
+  };
+}
 
 interface CommunityState {
   posts: CommunityPost[];
   stats: CommunityStats;
-  addPost: (post: Omit<CommunityPost, 'id' | 'createdAt' | 'reactions' | 'totalReactions' | 'commentsCount'>) => void;
+  loading: boolean;
+  activityFeed: CommunityPost[];
+  activityFeedLoading: boolean;
+  postComments: Record<string, CommunityComment[]>;
+  loadPosts: () => Promise<void>;
+  addPost: (post: Omit<CommunityPost, 'id' | 'createdAt' | 'likesCount' | 'userHasLiked' | 'commentsCount'>) => Promise<void>;
   updatePost: (id: string, updates: Partial<CommunityPost>) => void;
-  deletePost: (id: string) => void;
-  publishPost: (id: string) => void;
-  unpublishPost: (id: string) => void;
-  pinPost: (id: string, isPinned: boolean) => void;
-  highlightPost: (id: string, isHighlighted: boolean) => void;
+  updatePostDb: (id: string, updates: { title?: string; content?: string; imageUrl?: string; linkedChallengeId?: string; isHighlighted?: boolean; isPinned?: boolean }) => Promise<void>;
+  getPost: (id: string) => CommunityPost | undefined;
+  deletePost: (id: string) => Promise<void>;
+  publishPost: (id: string) => Promise<void>;
+  unpublishPost: (id: string) => Promise<void>;
+  pinPost: (id: string, isPinned: boolean) => Promise<void>;
+  highlightPost: (id: string, isHighlighted: boolean) => Promise<void>;
+  toggleLike: (postId: string) => Promise<void>;
+  addComment: (postId: string, content: string) => Promise<void>;
+  loadComments: (postId: string) => Promise<void>;
+  loadActivityFeed: () => Promise<void>;
 }
 
-export const useCommunityStore = create<CommunityState>((set) => ({
-  posts: MOCK_COMMUNITY_POSTS,
-  stats: MOCK_COMMUNITY_STATS,
-  addPost: (post) => {
-    const newPost: CommunityPost = {
-      ...post,
-      id: `post-${Date.now()}`,
-      createdAt: new Date(),
-      reactions: { heart: 0, celebrate: 0, inspiring: 0, thanks: 0 },
-      totalReactions: 0,
-      commentsCount: 0,
-    };
-    set((state) => ({
-      posts: [newPost, ...state.posts],
-      stats: {
-        ...state.stats,
-        totalPosts: state.stats.totalPosts + 1,
-        draftPosts: post.status === 'draft' ? state.stats.draftPosts + 1 : state.stats.draftPosts,
-        publishedPosts: post.status === 'published' ? state.stats.publishedPosts + 1 : state.stats.publishedPosts,
-      },
-    }));
+export const useCommunityStore = create<CommunityState>((set, get) => ({
+  posts: [],
+  stats: { totalPosts: 0, publishedPosts: 0, draftPosts: 0, totalLikes: 0, totalComments: 0, engagementRate: 0 },
+  loading: false,
+  activityFeed: [],
+  activityFeedLoading: false,
+  postComments: {},
+
+  loadPosts: async () => {
+    const orgId = getOrgId();
+    if (!orgId) return;
+
+    set({ loading: true });
+
+    // Fetch posts for this organization
+    const { data, error } = await supabase
+      .from('community_posts')
+      .select('*, organizations(id, name, logo), challenges(id, title, image_url, xp_reward, duration_minutes, category)')
+      .eq('organization_id', orgId)
+      .order('is_pinned', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load community posts:', error);
+      showError('Community-Posts konnten nicht geladen werden');
+      set({ loading: false });
+      return;
+    }
+
+    const rows = (data || []) as DbCommunityPost[];
+    const userId = useAuthStore.getState().userId;
+
+    // Batch fetch like and comment counts
+    const postIds = rows.map(r => r.id);
+
+    let likeCounts: Record<string, number> = {};
+    let commentCounts: Record<string, number> = {};
+    let userLikedPosts: Set<string> = new Set();
+    let commentPreviews: Record<string, CommunityComment[]> = {};
+
+    if (postIds.length > 0) {
+      const [likesRes, commentsRes, userLikesRes, previewCommentsRes] = await Promise.all([
+        supabase.from('community_likes').select('post_id').in('post_id', postIds),
+        supabase.from('community_comments').select('post_id').in('post_id', postIds),
+        userId
+          ? supabase.from('community_likes').select('post_id').in('post_id', postIds).eq('user_id', userId)
+          : Promise.resolve({ data: [] }),
+        supabase
+          .from('community_comments')
+          .select('id, post_id, user_id, content, created_at')
+          .in('post_id', postIds)
+          .order('created_at', { ascending: false })
+          .limit(50),
+      ]);
+
+      for (const like of (likesRes.data || [])) {
+        likeCounts[like.post_id] = (likeCounts[like.post_id] || 0) + 1;
+      }
+      for (const comment of (commentsRes.data || [])) {
+        commentCounts[comment.post_id] = (commentCounts[comment.post_id] || 0) + 1;
+      }
+      for (const like of (userLikesRes.data || [])) {
+        userLikedPosts.add(like.post_id);
+      }
+      // Resolve user/org info for comment authors
+      const commentUserIds = Array.from(new Set((previewCommentsRes.data || []).map(c => c.user_id)));
+      let commentUserMap: Record<string, { name: string; avatar: string | null }> = {};
+      if (commentUserIds.length > 0) {
+        const { data: commentUsersData } = await supabase.from('users').select('id, name, avatar').in('id', commentUserIds);
+        (commentUsersData || []).forEach((u: { id: string; name: string; avatar: string | null }) => { commentUserMap[u.id] = u; });
+        // Check if any are NGO admins — override with org info
+        const { data: ngoAdmins } = await supabase
+          .from('ngo_admins')
+          .select('user_id, organizations(name, logo)')
+          .in('user_id', commentUserIds);
+        (ngoAdmins || []).forEach((admin: any) => {
+          if (admin.organizations) {
+            commentUserMap[admin.user_id] = { name: admin.organizations.name, avatar: admin.organizations.logo };
+          }
+        });
+      }
+
+      // Group comment previews by post (2 newest per post)
+      for (const c of (previewCommentsRes.data || [])) {
+        if (!commentPreviews[c.post_id]) commentPreviews[c.post_id] = [];
+        if (commentPreviews[c.post_id].length < 2) {
+          commentPreviews[c.post_id].push({
+            id: c.id,
+            postId: c.post_id,
+            userId: c.user_id,
+            userName: commentUserMap[c.user_id]?.name || '',
+            userAvatarUrl: commentUserMap[c.user_id]?.avatar || undefined,
+            content: c.content,
+            createdAt: new Date(c.created_at),
+          });
+        }
+      }
+    }
+
+    const posts = rows.map(row => {
+      const post = mapDbCommunityPost(
+        row,
+        likeCounts[row.id] || 0,
+        commentCounts[row.id] || 0,
+        userLikedPosts.has(row.id),
+      );
+      if (commentPreviews[row.id]) {
+        post.comments = commentPreviews[row.id];
+      }
+      return post;
+    });
+
+    set({
+      posts,
+      stats: computeCommunityStats(posts),
+      loading: false,
+    });
   },
+
+  addPost: async (post) => {
+    const orgId = getOrgId();
+    if (!orgId) return;
+
+    const { data, error } = await supabase
+      .from('community_posts')
+      .insert({
+        organization_id: orgId,
+        type: post.type,
+        title: post.title || null,
+        content: post.content || null,
+        image_url: post.imageUrl || null,
+        challenge_id: post.linkedChallengeId || null,
+        is_highlighted: post.isHighlighted || false,
+        is_pinned: post.isPinned || false,
+        status: post.status || 'draft',
+        published_at: post.status === 'published' ? new Date().toISOString() : null,
+      })
+      .select('*, organizations(id, name, logo), challenges(id, title, image_url, xp_reward, duration_minutes, category)')
+      .single();
+
+    if (error) {
+      console.error('Failed to create community post:', error);
+      showError('Post konnte nicht erstellt werden');
+      return;
+    }
+
+    const newPost = mapDbCommunityPost(data as DbCommunityPost, 0, 0);
+
+    set((state) => {
+      const posts = [newPost, ...state.posts];
+      return { posts, stats: computeCommunityStats(posts) };
+    });
+  },
+
   updatePost: (id, updates) => {
     set((state) => ({
       posts: state.posts.map((p) =>
@@ -713,56 +940,323 @@ export const useCommunityStore = create<CommunityState>((set) => ({
       ),
     }));
   },
-  deletePost: (id) => {
+
+  updatePostDb: async (id, updates) => {
+    const dbUpdates: Record<string, unknown> = {};
+    if (updates.title !== undefined) dbUpdates.title = updates.title || null;
+    if (updates.content !== undefined) dbUpdates.content = updates.content || null;
+    if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl || null;
+    if (updates.linkedChallengeId !== undefined) dbUpdates.challenge_id = updates.linkedChallengeId || null;
+    if (updates.isHighlighted !== undefined) dbUpdates.is_highlighted = updates.isHighlighted;
+    if (updates.isPinned !== undefined) dbUpdates.is_pinned = updates.isPinned;
+
+    const { error } = await supabase
+      .from('community_posts')
+      .update(dbUpdates)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to update community post:', error);
+      showError('Post konnte nicht aktualisiert werden');
+      return;
+    }
+
+    set((state) => ({
+      posts: state.posts.map((p) =>
+        p.id === id ? { ...p, ...updates } : p
+      ),
+    }));
+  },
+
+  getPost: (id) => {
+    return get().posts.find((p) => p.id === id);
+  },
+
+  deletePost: async (id) => {
+    const { error } = await supabase
+      .from('community_posts')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to delete community post:', error);
+      showError('Post konnte nicht gelöscht werden');
+      return;
+    }
+
     set((state) => {
-      const post = state.posts.find((p) => p.id === id);
-      return {
-        posts: state.posts.filter((p) => p.id !== id),
-        stats: {
-          ...state.stats,
-          totalPosts: state.stats.totalPosts - 1,
-          draftPosts: post?.status === 'draft' ? state.stats.draftPosts - 1 : state.stats.draftPosts,
-          publishedPosts: post?.status === 'published' ? state.stats.publishedPosts - 1 : state.stats.publishedPosts,
-        },
-      };
+      const posts = state.posts.filter((p) => p.id !== id);
+      return { posts, stats: computeCommunityStats(posts) };
     });
   },
-  publishPost: (id) => {
-    set((state) => ({
-      posts: state.posts.map((p) =>
-        p.id === id ? { ...p, status: 'published', publishedAt: new Date() } : p
-      ),
-      stats: {
-        ...state.stats,
-        publishedPosts: state.stats.publishedPosts + 1,
-        draftPosts: Math.max(0, state.stats.draftPosts - 1),
-      },
-    }));
+
+  publishPost: async (id) => {
+    const { error } = await supabase
+      .from('community_posts')
+      .update({ status: 'published', published_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to publish post:', error);
+      showError('Post konnte nicht veröffentlicht werden');
+      return;
+    }
+
+    set((state) => {
+      const posts = state.posts.map((p) =>
+        p.id === id ? { ...p, status: 'published' as const, publishedAt: new Date() } : p
+      );
+      return { posts, stats: computeCommunityStats(posts) };
+    });
   },
-  unpublishPost: (id) => {
-    set((state) => ({
-      posts: state.posts.map((p) =>
-        p.id === id ? { ...p, status: 'draft' } : p
-      ),
-      stats: {
-        ...state.stats,
-        publishedPosts: Math.max(0, state.stats.publishedPosts - 1),
-        draftPosts: state.stats.draftPosts + 1,
-      },
-    }));
+
+  unpublishPost: async (id) => {
+    const { error } = await supabase
+      .from('community_posts')
+      .update({ status: 'draft', published_at: null })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to unpublish post:', error);
+      showError('Post konnte nicht zurückgezogen werden');
+      return;
+    }
+
+    set((state) => {
+      const posts = state.posts.map((p) =>
+        p.id === id ? { ...p, status: 'draft' as const } : p
+      );
+      return { posts, stats: computeCommunityStats(posts) };
+    });
   },
-  pinPost: (id, isPinned) => {
+
+  pinPost: async (id, isPinned) => {
+    const { error } = await supabase
+      .from('community_posts')
+      .update({ is_pinned: isPinned })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to pin/unpin post:', error);
+      showError('Pin-Status konnte nicht geändert werden');
+      return;
+    }
+
     set((state) => ({
       posts: state.posts.map((p) =>
         p.id === id ? { ...p, isPinned } : p
       ),
     }));
   },
-  highlightPost: (id, isHighlighted) => {
+
+  highlightPost: async (id, isHighlighted) => {
+    const { error } = await supabase
+      .from('community_posts')
+      .update({ is_highlighted: isHighlighted })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to highlight post:', error);
+      showError('Highlight-Status konnte nicht geändert werden');
+      return;
+    }
+
     set((state) => ({
       posts: state.posts.map((p) =>
         p.id === id ? { ...p, isHighlighted } : p
       ),
     }));
+  },
+
+  toggleLike: async (postId) => {
+    const userId = useAuthStore.getState().userId;
+    if (!userId) return;
+
+    const post = get().posts.find(p => p.id === postId) || get().activityFeed.find(p => p.id === postId);
+    if (!post) return;
+
+    const wasLiked = post.userHasLiked;
+
+    // Optimistic update
+    const updatePosts = (posts: CommunityPost[]) =>
+      posts.map(p =>
+        p.id === postId
+          ? { ...p, userHasLiked: !wasLiked, likesCount: p.likesCount + (wasLiked ? -1 : 1) }
+          : p
+      );
+
+    set((state) => ({
+      posts: updatePosts(state.posts),
+      activityFeed: updatePosts(state.activityFeed),
+    }));
+
+    if (wasLiked) {
+      const { error } = await supabase
+        .from('community_likes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Failed to unlike:', error);
+        // Rollback
+        set((state) => ({
+          posts: updatePosts(state.posts),
+          activityFeed: updatePosts(state.activityFeed),
+        }));
+      }
+    } else {
+      const { error } = await supabase
+        .from('community_likes')
+        .insert({ post_id: postId, user_id: userId });
+
+      if (error) {
+        console.error('Failed to like:', error);
+        // Rollback
+        set((state) => ({
+          posts: updatePosts(state.posts),
+          activityFeed: updatePosts(state.activityFeed),
+        }));
+      }
+    }
+  },
+
+  addComment: async (postId, content) => {
+    const userId = useAuthStore.getState().userId;
+    if (!userId) return;
+
+    const { data, error } = await supabase
+      .from('community_comments')
+      .insert({ post_id: postId, user_id: userId, content })
+      .select('id, post_id, user_id, content, created_at')
+      .single();
+
+    if (error) {
+      console.error('Failed to add comment:', error);
+      showError('Kommentar konnte nicht gesendet werden');
+      return;
+    }
+
+    const newComment: CommunityComment = {
+      id: data.id,
+      postId: data.post_id,
+      userId: data.user_id,
+      userName: useAuthStore.getState().organization?.name || '',
+      content: data.content,
+      createdAt: new Date(data.created_at),
+    };
+
+    set((state) => ({
+      posts: state.posts.map(p =>
+        p.id === postId
+          ? { ...p, commentsCount: p.commentsCount + 1, comments: [...(p.comments || []), newComment] }
+          : p
+      ),
+      postComments: {
+        ...state.postComments,
+        [postId]: [...(state.postComments[postId] || []), newComment],
+      },
+    }));
+  },
+
+  loadComments: async (postId) => {
+    const { data, error } = await supabase
+      .from('community_comments')
+      .select('id, post_id, user_id, content, created_at')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Failed to load comments:', error);
+      return;
+    }
+
+    // Resolve user/org info for comment authors
+    const userIds = Array.from(new Set((data || []).map(c => c.user_id)));
+    const userMap: Record<string, { name: string; avatar: string | null }> = {};
+    if (userIds.length > 0) {
+      const { data: usersData } = await supabase.from('users').select('id, name, avatar').in('id', userIds);
+      (usersData || []).forEach((u: { id: string; name: string; avatar: string | null }) => { userMap[u.id] = u; });
+      // Check if any are NGO admins — override with org info
+      const { data: ngoAdmins } = await supabase
+        .from('ngo_admins')
+        .select('user_id, organizations(name, logo)')
+        .in('user_id', userIds);
+      (ngoAdmins || []).forEach((admin: any) => {
+        if (admin.organizations) {
+          userMap[admin.user_id] = { name: admin.organizations.name, avatar: admin.organizations.logo };
+        }
+      });
+    }
+
+    const comments: CommunityComment[] = (data || []).map(c => ({
+      id: c.id,
+      postId: c.post_id,
+      userId: c.user_id,
+      userName: userMap[c.user_id]?.name || '',
+      userAvatarUrl: userMap[c.user_id]?.avatar || undefined,
+      content: c.content,
+      createdAt: new Date(c.created_at),
+    }));
+
+    set((state) => ({
+      postComments: { ...state.postComments, [postId]: comments },
+    }));
+  },
+
+  loadActivityFeed: async () => {
+    const orgId = getOrgId();
+    if (!orgId) return;
+
+    set({ activityFeedLoading: true });
+
+    // Load all published posts related to our challenges + our own NGO posts
+    const { data, error } = await supabase
+      .from('community_posts')
+      .select('*, organizations(id, name, logo), challenges(id, title, image_url, xp_reward, duration_minutes, category)')
+      .eq('status', 'published')
+      .or(`organization_id.eq.${orgId}`)
+      .order('created_at', { ascending: false })
+      .limit(8);
+
+    if (error) {
+      console.error('Failed to load activity feed:', error);
+      set({ activityFeedLoading: false });
+      return;
+    }
+
+    const rows = (data || []) as DbCommunityPost[];
+    const userId = useAuthStore.getState().userId;
+    const postIds = rows.map(r => r.id);
+
+    let likeCounts: Record<string, number> = {};
+    let commentCounts: Record<string, number> = {};
+    let userLikedPosts: Set<string> = new Set();
+
+    if (postIds.length > 0) {
+      const [likesRes, commentsRes, userLikesRes] = await Promise.all([
+        supabase.from('community_likes').select('post_id').in('post_id', postIds),
+        supabase.from('community_comments').select('post_id').in('post_id', postIds),
+        userId
+          ? supabase.from('community_likes').select('post_id').in('post_id', postIds).eq('user_id', userId)
+          : Promise.resolve({ data: [] }),
+      ]);
+
+      for (const like of (likesRes.data || [])) {
+        likeCounts[like.post_id] = (likeCounts[like.post_id] || 0) + 1;
+      }
+      for (const comment of (commentsRes.data || [])) {
+        commentCounts[comment.post_id] = (commentCounts[comment.post_id] || 0) + 1;
+      }
+      for (const like of (userLikesRes.data || [])) {
+        userLikedPosts.add(like.post_id);
+      }
+    }
+
+    const activityFeed = rows.map(row =>
+      mapDbCommunityPost(row, likeCounts[row.id] || 0, commentCounts[row.id] || 0, userLikedPosts.has(row.id))
+    );
+
+    set({ activityFeed, activityFeedLoading: false });
   },
 }));

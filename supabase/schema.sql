@@ -71,7 +71,7 @@ create table submissions (
   id uuid primary key default uuid_generate_v4(),
   challenge_id uuid references challenges(id) on delete cascade,
   user_id uuid references users(id) on delete cascade,
-  status text check (status in ('accepted', 'in_progress', 'submitted', 'approved', 'rejected')) default 'accepted',
+  status text check (status in ('in_progress', 'submitted', 'approved', 'rejected')) default 'in_progress',
   proof_type text check (proof_type in ('photo', 'text', 'none')),
   proof_url text,
   proof_text text,

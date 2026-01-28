@@ -1,0 +1,66 @@
+{
+  "header": {
+    "title": "Dashboard",
+    "description": "Übersicht über deine Challenges und Einreichungen"
+  },
+  "actions": {
+    "newChallenge": "Neue Challenge",
+    "viewAll": "Alle anzeigen"
+  },
+  "stats": {
+    "activeChallenges": "Aktive Challenges",
+    "ofTotal": "von {{total}} insgesamt",
+    "participants": "Teilnehmer",
+    "participantsThisWeek": "+23 diese Woche",
+    "pendingReviews": "Ausstehende Reviews",
+    "requiresAttention": "Erfordert Aufmerksamkeit",
+    "volunteerHours": "Freiwilligenstunden",
+    "totalContribution": "Gesamtbeitrag"
+  },
+  "chart": {
+    "weeklyActivity": "Wöchentliche Aktivität",
+    "submissions": "Einreichungen",
+    "approved": "Genehmigt"
+  },
+  "pendingSubmissions": {
+    "title": "Ausstehende Einreichungen",
+    "allProcessed": "Alle Einreichungen bearbeitet!",
+    "pending": "Ausstehend"
+  },
+  "activeChallenges": {
+    "title": "Aktive Challenges",
+    "minutesXp": "{{duration}} Min · {{xp}} XP"
+  },
+  "approvalRate": {
+    "title": "Genehmigungsrate",
+    "basedOnLast30Days": "Basierend auf den letzten 30 Tagen"
+  },
+  "activityFeed": {
+    "title": "Community-Aktivität",
+    "empty": "Noch keine Community-Aktivität",
+    "viewAll": "Alle anzeigen"
+  },
+  "quickActions": {
+    "title": "Schnellaktionen",
+    "createChallenge": "Neue Challenge erstellen",
+    "reviewSubmissions": "Einreichungen prüfen",
+    "viewStatistics": "Statistiken anzeigen"
+  },
+  "categories": {
+    "environment": "Umwelt",
+    "social": "Soziales",
+    "education": "Bildung",
+    "health": "Gesundheit",
+    "animals": "Tierschutz",
+    "culture": "Kultur"
+  },
+  "statusLabels": {
+    "draft": "Entwurf",
+    "active": "Aktiv",
+    "paused": "Pausiert",
+    "completed": "Abgeschlossen",
+    "submitted": "Eingereicht",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt"
+  }
+}
