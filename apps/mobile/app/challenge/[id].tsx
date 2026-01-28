@@ -14,6 +14,7 @@ import { useTranslatedChallenge } from '@/hooks';
 import { CATEGORIES, MOCK_FRIENDS, MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
 import type { ChallengeSchedule, ChallengeLocation, ChallengeContact, TeammateSeeker } from '@solvterra/shared';
 import InviteFriendsModal from '@/components/InviteFriendsModal';
+import PhotoSubmissionModal from '@/components/PhotoSubmissionModal';
 
 // Get days until deadline
 const getDaysUntilDeadline = (deadline?: Date): number | null => {
@@ -46,7 +47,7 @@ export default function ChallengeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation('challenges');
   const { language } = useLanguageStore();
-  const { challenges, submissions, acceptChallenge, submitProof, simulateApproval, getActiveCount, canAcceptChallenge } = useChallengeStore();
+  const { challenges, submissions, acceptChallenge, submitProof, getActiveCount, canAcceptChallenge } = useChallengeStore();
   const { user } = useUserStore();
 
   const activeCount = getActiveCount();
@@ -55,6 +56,7 @@ export default function ChallengeDetailScreen() {
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamInvited, setTeamInvited] = useState(false);
   const [invitedFriends, setInvitedFriends] = useState<string[]>([]);
@@ -138,7 +140,7 @@ export default function ChallengeDetailScreen() {
       : t('schedule.daysLeft', { count: daysLeft });
   };
 
-  if (!rawChallenge) {
+  if (!rawChallenge || !challenge) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorState}>
@@ -182,38 +184,30 @@ export default function ChallengeDetailScreen() {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (!existingSubmission) return;
 
-    if (existingSubmission) {
-      submitProof(existingSubmission.id, {
-        type: challenge.verificationMethod === 'photo' ? 'photo' : 'text',
-        url: 'https://picsum.photos/800/600',
+    if (challenge.verificationMethod === 'photo') {
+      // Open the photo submission modal
+      setShowSubmitModal(false);
+      setShowPhotoModal(true);
+    } else {
+      // Text-based submission
+      setIsSubmitting(true);
+      await submitProof(existingSubmission.id, {
+        type: 'text',
         text: 'Demo submission for presentation.',
       });
+      setIsSubmitting(false);
+      setShowSubmitModal(false);
+      Alert.alert(t('alerts.submitted'), t('alerts.submittedMessage'), [{ text: t('alerts.ok') }]);
     }
+  };
 
-    setIsSubmitting(false);
-    setShowSubmitModal(false);
-
-    // Simulate automatic approval for demo
-    setTimeout(() => {
-      if (existingSubmission) {
-        simulateApproval(existingSubmission.id, 5);
-        Alert.alert(
-          t('alerts.congratulations'),
-          t('alerts.submissionApproved', { xp: challenge.xpReward }),
-          [{ text: t('alerts.great') }]
-        );
-      }
-    }, 2000);
-
-    Alert.alert(
-      t('alerts.submitted'),
-      t('alerts.submittedMessage'),
-      [{ text: t('alerts.ok') }]
-    );
+  const handlePhotoSubmit = async (data: { type: 'photo'; url: string; caption?: string }) => {
+    if (!existingSubmission) return;
+    await submitProof(existingSubmission.id, data);
+    setShowPhotoModal(false);
+    Alert.alert(t('alerts.submitted'), t('alerts.submittedMessage'), [{ text: t('alerts.ok') }]);
   };
 
   return (
@@ -874,6 +868,16 @@ export default function ChallengeDetailScreen() {
         challenge={challenge}
         onInviteComplete={handleInviteComplete}
       />
+
+      {existingSubmission && (
+        <PhotoSubmissionModal
+          visible={showPhotoModal}
+          onClose={() => setShowPhotoModal(false)}
+          onSubmit={handlePhotoSubmit}
+          submissionId={existingSubmission.id}
+          challengeTitle={challenge.title}
+        />
+      )}
     </SafeAreaView>
   );
 }

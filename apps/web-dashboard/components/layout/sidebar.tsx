@@ -10,8 +10,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronRight,
   Users,
+  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore, useSubmissionStore } from '@/store';
@@ -27,6 +27,7 @@ const navigation = [
 ];
 
 const bottomNav = [
+  { name: 'Support', href: '/support', icon: MessageSquare },
   { name: 'Einstellungen', href: '/settings', icon: Settings },
 ];
 
@@ -100,6 +101,7 @@ export function Sidebar() {
             </Link>
           );
         })}
+
       </nav>
 
       {/* Bottom Navigation */}

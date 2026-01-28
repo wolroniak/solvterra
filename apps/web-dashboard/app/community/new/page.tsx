@@ -21,6 +21,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCommunityStore, useChallengeStore, useAuthStore } from '@/store';
 import { REACTION_CONFIG } from '@/lib/mock-data';
+import { useVerificationStatus } from '@/components/verification-banner';
+import { AlertCircle } from 'lucide-react';
 
 // Sample images for selection
 const SAMPLE_IMAGES = [
@@ -37,6 +39,39 @@ export default function NewPostPage() {
   const { addPost } = useCommunityStore();
   const { challenges } = useChallengeStore();
   const { organization } = useAuthStore();
+  const { isRejected, rejectionReason } = useVerificationStatus();
+
+  // Block access for rejected organizations
+  if (isRejected) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/community">
+            <Button variant="outline" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-bold text-slate-900">Neuer Post</h1>
+        </div>
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="flex items-start gap-4 p-6">
+            <AlertCircle className="h-6 w-6 text-red-600 shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-red-800">Zugang eingeschraenkt</h3>
+              <p className="text-sm text-red-700 mt-1">
+                Deine Organisation wurde abgelehnt und kann keine neuen Posts erstellen.
+              </p>
+              {rejectionReason && (
+                <p className="text-sm text-red-600 mt-2 p-2 bg-red-100 rounded">
+                  <strong>Grund:</strong> {rejectionReason}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');

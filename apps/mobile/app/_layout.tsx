@@ -35,6 +35,26 @@ function RootLayoutNav() {
             headerStyle: { backgroundColor: '#fff' },
           }}
         />
+        <Stack.Screen
+          name="user/[id]"
+          options={{
+            headerShown: true,
+            headerTitle: '',
+            headerBackTitle: t('back'),
+            headerTintColor: theme.colors.primary,
+            headerStyle: { backgroundColor: '#fff' },
+          }}
+        />
+        <Stack.Screen
+          name="post/[id]"
+          options={{
+            headerShown: true,
+            headerTitle: '',
+            headerBackTitle: t('back'),
+            headerTintColor: theme.colors.primary,
+            headerStyle: { backgroundColor: '#fff' },
+          }}
+        />
       </Stack>
     </>
   );

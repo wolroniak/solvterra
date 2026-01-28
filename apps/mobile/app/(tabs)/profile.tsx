@@ -1,14 +1,24 @@
 // Profile Screen
 // User stats, badges, and settings
 
-import { View, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, ScrollView, Image, Pressable, Dimensions, Alert, ActivityIndicator } from 'react-native';
 import { Text, Surface, Button, ProgressBar } from 'react-native-paper';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import * as ImagePicker from 'expo-image-picker';
 import { Colors, spacing } from '@/constants/theme';
-import { useUserStore, useLanguageStore } from '@/store';
+import { useUserStore, useLanguageStore, useCommunityStore } from '@/store';
+import { supabase } from '@/lib/supabase';
+import type { CommunityPost } from '@solvterra/shared';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const GRID_GAP = 2;
+const GRID_COLUMNS = 3;
+const TILE_SIZE = (SCREEN_WIDTH - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
 
 // Badge emoji config (names come from i18n)
 const BADGE_ICONS: Record<string, string> = {
@@ -34,10 +44,129 @@ const LEVELS = [
   { level: 5, key: 'legend', minXp: 1000, maxXp: 2000 },
 ];
 
+type ProfileTab = 'posts' | 'badges';
+
 export default function ProfileScreen() {
   const { t } = useTranslation('profile');
-  const { user, logout } = useUserStore();
+  const { user, logout, updateProfile } = useUserStore();
   const { language, setLanguage } = useLanguageStore();
+  const { getUserPosts, deletePost } = useCommunityStore();
+
+  const [activeTab, setActiveTab] = useState<ProfileTab>('posts');
+  const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const loadUserPosts = useCallback(async () => {
+    if (!user) return;
+    setIsLoadingPosts(true);
+    const posts = await getUserPosts(user.id);
+    setUserPosts(posts);
+    setIsLoadingPosts(false);
+  }, [user, getUserPosts]);
+
+  // Reload posts when the profile tab is focused (e.g. returning from creating a post)
+  useFocusEffect(
+    useCallback(() => {
+      if (user && activeTab === 'posts') {
+        loadUserPosts();
+      }
+    }, [user, activeTab, loadUserPosts])
+  );
+
+  useEffect(() => {
+    if (user && activeTab === 'posts') {
+      loadUserPosts();
+    }
+  }, [user, activeTab]);
+
+  const handleAvatarPress = useCallback(async () => {
+    if (!user) return;
+
+    // Request permission
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Berechtigung benötigt', 'Bitte erlaube den Zugriff auf deine Fotos, um ein Profilbild auszuwählen.');
+      return;
+    }
+
+    // Launch picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (result.canceled || !result.assets?.[0]) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      const asset = result.assets[0];
+      const fileName = `${user.id}.jpg`;
+
+      // Fetch the image as a blob and convert to ArrayBuffer
+      const response = await fetch(asset.uri);
+      const blob = await response.blob();
+      const arrayBuffer = await new Response(blob).arrayBuffer();
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, arrayBuffer, {
+          contentType: 'image/jpeg',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        Alert.alert('Upload fehlgeschlagen', uploadError.message);
+        return;
+      }
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const publicUrl = urlData.publicUrl;
+
+      // Update users table
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ avatar: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Failed to update user avatar in DB:', updateError);
+      }
+
+      // Update local state
+      updateProfile({ avatarUrl: publicUrl });
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      Alert.alert('Fehler', 'Profilbild konnte nicht hochgeladen werden.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  }, [user, updateProfile]);
+
+  const handleDeletePost = useCallback((post: CommunityPost) => {
+    Alert.alert(
+      'Beitrag löschen',
+      'Möchtest du diesen Beitrag wirklich löschen?',
+      [
+        { text: 'Abbrechen', style: 'cancel' },
+        {
+          text: 'Löschen',
+          style: 'destructive',
+          onPress: async () => {
+            await deletePost(post.id);
+            setUserPosts(prev => prev.filter(p => p.id !== post.id));
+          },
+        },
+      ]
+    );
+  }, [deletePost]);
 
   if (!user) return null;
 
@@ -62,13 +191,29 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Title Bar */}
+      <View style={styles.titleBar}>
+        <Text style={styles.titleText}>{t('title', { defaultValue: 'Profil' })}</Text>
+      </View>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Profile Header */}
         <View style={styles.header}>
-          <Image
-            source={{ uri: user.avatarUrl }}
-            style={styles.avatar}
-          />
+          <Pressable onPress={handleAvatarPress} style={styles.avatarContainer}>
+            <Image
+              source={{ uri: user.avatarUrl }}
+              style={styles.avatar}
+            />
+            {isUploadingAvatar ? (
+              <View style={styles.avatarOverlay}>
+                <ActivityIndicator size="small" color="#fff" />
+              </View>
+            ) : (
+              <View style={styles.avatarEditIcon}>
+                <MaterialCommunityIcons name="camera" size={16} color="#fff" />
+              </View>
+            )}
+          </Pressable>
           <Text variant="headlineSmall" style={styles.name}>
             {user.name}
           </Text>
@@ -164,53 +309,136 @@ export default function ProfileScreen() {
           </Surface>
         </View>
 
-        {/* Badges Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>
-              {t('badges.title')}
-            </Text>
-            <Pressable onPress={() => router.push('/badges')}>
-              <Text style={styles.seeAll}>{t('badges.seeAll')}</Text>
-            </Pressable>
-          </View>
-
-          {user.badges.length > 0 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.badgesScroll}
-            >
-              {user.badges.map((userBadge, index) => {
-                const badgeId = userBadge.badge?.id || '';
-                const displayIcon = BADGE_ICONS[badgeId] || '🏅';
-                const displayName = t(`badgeNames.${badgeId}`, { defaultValue: userBadge.badge?.name || 'Badge' });
-
-                return (
-                  <Surface key={badgeId || `badge-${index}`} style={styles.badgeCard} elevation={1}>
-                    <View style={[styles.badgeIcon, { backgroundColor: `${Colors.accent[500]}15` }]}>
-                      <Text style={styles.badgeEmoji}>{displayIcon}</Text>
-                    </View>
-                    <Text variant="labelSmall" style={styles.badgeName} numberOfLines={2}>
-                      {displayName}
-                    </Text>
-                  </Surface>
-                );
-              })}
-            </ScrollView>
-          ) : (
-            <View style={styles.noBadges}>
-              <MaterialCommunityIcons
-                name="medal-outline"
-                size={32}
-                color={Colors.neutral[300]}
-              />
-              <Text variant="bodySmall" style={styles.noBadgesText}>
-                {t('badges.empty')}
-              </Text>
-            </View>
-          )}
+        {/* Tab Switcher: Posts / Badges */}
+        <View style={styles.tabSwitcher}>
+          <Pressable
+            style={[styles.tab, activeTab === 'posts' && styles.tabActive]}
+            onPress={() => setActiveTab('posts')}
+          >
+            <MaterialCommunityIcons
+              name="grid"
+              size={24}
+              color={activeTab === 'posts' ? Colors.textPrimary : Colors.textMuted}
+            />
+          </Pressable>
+          <Pressable
+            style={[styles.tab, activeTab === 'badges' && styles.tabActive]}
+            onPress={() => setActiveTab('badges')}
+          >
+            <MaterialCommunityIcons
+              name="medal-outline"
+              size={24}
+              color={activeTab === 'badges' ? Colors.textPrimary : Colors.textMuted}
+            />
+          </Pressable>
         </View>
+
+        {/* Posts Grid */}
+        {activeTab === 'posts' && (
+          <View>
+            {isLoadingPosts ? (
+              <View style={styles.postsLoading}>
+                <ActivityIndicator size="small" color={Colors.primary[600]} />
+              </View>
+            ) : userPosts.length > 0 ? (
+              <View style={styles.postsGrid}>
+                {userPosts.map(post => (
+                  <Pressable
+                    key={post.id}
+                    onPress={() => router.push(`/post/${post.id}`)}
+                    onLongPress={() => handleDeletePost(post)}
+                    style={styles.postTile}
+                  >
+                    {post.imageUrl ? (
+                      <Image
+                        source={{ uri: post.imageUrl }}
+                        style={styles.postTileImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.postTileNoImage}>
+                        <MaterialCommunityIcons
+                          name="text-box-outline"
+                          size={24}
+                          color={Colors.neutral[400]}
+                        />
+                      </View>
+                    )}
+                    {/* Overlay with like count */}
+                    <View style={styles.postTileOverlay}>
+                      <MaterialCommunityIcons name="heart" size={12} color="#fff" />
+                      <Text style={styles.postTileCount}>{post.likesCount}</Text>
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyPosts}>
+                <MaterialCommunityIcons
+                  name="camera-outline"
+                  size={48}
+                  color={Colors.neutral[300]}
+                />
+                <Text style={styles.emptyPostsTitle}>
+                  Noch keine Beiträge
+                </Text>
+                <Text style={styles.emptyPostsSubtitle}>
+                  Schließe eine Challenge ab und teile deinen Erfolg!
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Badges Grid */}
+        {activeTab === 'badges' && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>
+                {t('badges.title')}
+              </Text>
+              <Pressable onPress={() => router.push('/badges')}>
+                <Text style={styles.seeAll}>{t('badges.seeAll')}</Text>
+              </Pressable>
+            </View>
+
+            {user.badges.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.badgesScroll}
+              >
+                {user.badges.map((userBadge, index) => {
+                  const badgeId = userBadge.badge?.id || '';
+                  const displayIcon = BADGE_ICONS[badgeId] || '🏅';
+                  const displayName = t(`badgeNames.${badgeId}`, { defaultValue: userBadge.badge?.name || 'Badge' });
+
+                  return (
+                    <Surface key={badgeId || `badge-${index}`} style={styles.badgeCard} elevation={1}>
+                      <View style={[styles.badgeIcon, { backgroundColor: `${Colors.accent[500]}15` }]}>
+                        <Text style={styles.badgeEmoji}>{displayIcon}</Text>
+                      </View>
+                      <Text variant="labelSmall" style={styles.badgeName} numberOfLines={2}>
+                        {displayName}
+                      </Text>
+                    </Surface>
+                  );
+                })}
+              </ScrollView>
+            ) : (
+              <View style={styles.noBadges}>
+                <MaterialCommunityIcons
+                  name="medal-outline"
+                  size={32}
+                  color={Colors.neutral[300]}
+                />
+                <Text variant="bodySmall" style={styles.noBadgesText}>
+                  {t('badges.empty')}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Settings Section */}
         <View style={styles.section}>
@@ -345,19 +573,55 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#fff',
+  },
+  titleBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.neutral[200],
+  },
+  titleText: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.textPrimary,
   },
   header: {
     alignItems: 'center',
     paddingVertical: spacing.xl,
     backgroundColor: '#fff',
   },
+  avatarContainer: {
+    width: 96,
+    height: 96,
+    marginBottom: spacing.md,
+    position: 'relative',
+  },
   avatar: {
     width: 96,
     height: 96,
     borderRadius: 48,
     backgroundColor: Colors.neutral[200],
-    marginBottom: spacing.md,
+  },
+  avatarOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 48,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarEditIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.primary[600],
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   name: {
     fontWeight: '700',
@@ -560,5 +824,88 @@ const styles = StyleSheet.create({
   languageDivider: {
     color: Colors.textMuted,
     fontSize: 13,
+  },
+
+  // Tab Switcher
+  tabSwitcher: {
+    flexDirection: 'row',
+    borderTopWidth: 0.5,
+    borderTopColor: Colors.neutral[200],
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.neutral[200],
+    marginTop: spacing.xl,
+    backgroundColor: '#fff',
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomColor: Colors.textPrimary,
+  },
+
+  // Posts Grid
+  postsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: GRID_GAP,
+  },
+  postTile: {
+    width: TILE_SIZE,
+    height: TILE_SIZE,
+    position: 'relative',
+  },
+  postTileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  postTileNoImage: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: Colors.neutral[100],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  postTileOverlay: {
+    position: 'absolute',
+    bottom: 6,
+    right: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  postTileCount: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  postsLoading: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  emptyPosts: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 40,
+  },
+  emptyPostsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginTop: 14,
+  },
+  emptyPostsSubtitle: {
+    fontSize: 14,
+    color: Colors.textMuted,
+    marginTop: 6,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });

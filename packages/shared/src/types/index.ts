@@ -31,6 +31,8 @@ export type SubmissionStatus =
 
 export type UserLevel = 'starter' | 'helper' | 'supporter' | 'champion' | 'legend';
 
+export type VerificationStatus = 'pending' | 'verified' | 'rejected';
+
 // ============================================
 // ORGANIZATION
 // ============================================
@@ -46,10 +48,21 @@ export interface Organization {
   logoUrl: string;
   website?: string;
   contactEmail?: string;
-  verified: boolean;
+  category: ChallengeCategory;
+
+  // Verification status
+  verificationStatus: VerificationStatus;
+  rejectionReason?: string;   // Reason if rejected
+  verifiedAt?: Date;          // When verification was approved
+  verifiedBy?: string;        // Admin who verified
+
+  // Legacy field (deprecated, use verificationStatus)
+  verified?: boolean;
+
+  // Stats
   ratingAvg: number;
   ratingCount: number;
-  category: string;
+
   createdAt: Date;
 }
 
@@ -360,18 +373,14 @@ export const XP_BY_DURATION: Record<ChallengeDuration, number> = {
 // COMMUNITY FEED & POSTS
 // ============================================
 
-// Reaction types - themed for achievements, not generic social media
-export type ReactionType = 'heart' | 'celebrate' | 'inspiring' | 'thanks';
-
-// Post types - distinction from social media: everything tied to achievements
+// Post types - everything tied to verified achievements
 export type CommunityPostType =
-  | 'ngo_promotion'      // NGO promotes a challenge
-  | 'success_story'      // User shares verified completion story
+  | 'success_story'       // User shares verified completion story
   | 'challenge_completed' // Auto-generated on completion
   | 'badge_earned'        // Auto-generated on badge
   | 'level_up'            // Auto-generated on level up
-  | 'team_challenge'      // Auto-generated team completion
-  | 'streak_achieved';    // Auto-generated streak
+  | 'streak_achieved'     // Auto-generated streak
+  | 'ngo_promotion';      // NGO-authored promotional post
 
 // Comment on a community post
 export interface CommunityComment {
@@ -436,10 +445,9 @@ export interface CommunityPost {
   teamMemberNames?: string[];
   streakDays?: number;
 
-  // Social interactions - reactions instead of simple likes
-  reactions: Record<ReactionType, number>;  // {heart: 5, celebrate: 3, ...}
-  userReaction?: ReactionType;              // Current user's reaction
-  totalReactions: number;                   // Sum of all reactions
+  // Social interactions - simple like system
+  likesCount: number;
+  userHasLiked: boolean;
   commentsCount: number;
   comments?: CommunityComment[];            // First few comments for preview
 
@@ -450,46 +458,6 @@ export interface CommunityPost {
   createdAt: Date;
 }
 
-// Legacy FeedItem type for backward compatibility
-export type FeedItemType =
-  | 'challenge_completed'
-  | 'badge_earned'
-  | 'level_up'
-  | 'team_challenge'
-  | 'streak_achieved';
-
-export interface FeedItem {
-  id: string;
-  type: FeedItemType;
-  userId: string;
-  userName: string;
-  userAvatarUrl?: string;
-  userLevel?: UserLevel;
-  // Content based on type
-  challengeId?: string;
-  challengeTitle?: string;
-  challengeTitle_en?: string;      // English translation
-  challengeImageUrl?: string;
-  badgeId?: string;
-  badgeName?: string;
-  badgeName_en?: string;           // English translation
-  badgeIcon?: string;
-  newLevel?: UserLevel;
-  teamMemberNames?: string[];
-  streakDays?: number;
-  // Social
-  likesCount: number;
-  isLiked: boolean;
-  createdAt: Date;
-}
-
-// Reaction icons mapping for UI
-export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string; label_en: string; color: string }> = {
-  heart: { emoji: '❤️', label: 'Gefällt mir', label_en: 'Like', color: '#ef4444' },
-  celebrate: { emoji: '🎉', label: 'Feiern', label_en: 'Celebrate', color: '#f59e0b' },
-  inspiring: { emoji: '💪', label: 'Inspirierend', label_en: 'Inspiring', color: '#8b5cf6' },
-  thanks: { emoji: '🙏', label: 'Danke', label_en: 'Thanks', color: '#06b6d4' },
-};
 
 // ============================================
 // FRIENDS / SOCIAL

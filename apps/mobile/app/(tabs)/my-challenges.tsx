@@ -1,16 +1,18 @@
 // My Challenges Screen
 // Shows user's active, pending, and completed challenges with timeline view
 
-import { useState, useMemo } from 'react';
-import { View, StyleSheet, FlatList, Pressable, Image, SectionList } from 'react-native';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { View, StyleSheet, FlatList, Pressable, Image, SectionList, Alert } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, spacing } from '@/constants/theme';
-import { useChallengeStore } from '@/store';
+import { useChallengeStore, useCommunityStore } from '@/store';
 import { MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
-import type { Submission, Challenge } from '@solvterra/shared';
+import type { Submission, Challenge, CommunityPost } from '@solvterra/shared';
+import CreatePostModal from '@/components/CreatePostModal';
+import PhotoSubmissionModal from '@/components/PhotoSubmissionModal';
 
 type TabValue = 'active' | 'pending' | 'completed';
 
@@ -82,9 +84,120 @@ const getTimelineLabel = (challenge: Challenge, submission: Submission): { text:
 };
 
 export default function MyChallengesScreen() {
-  const { submissions, challenges, getActiveCount } = useChallengeStore();
+  const { submissions, challenges, getActiveCount, updateProof } = useChallengeStore();
+  const { getPostBySubmissionId, deletePost } = useCommunityStore();
   const [activeTab, setActiveTab] = useState<TabValue>('active');
   const activeCount = getActiveCount();
+
+  // Post management state
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [postSubmissionData, setPostSubmissionData] = useState<{
+    submissionId: string;
+    challengeId: string;
+    challengeTitle: string;
+    proofUrl?: string;
+    xpEarned?: number;
+  } | undefined>(undefined);
+  const [editPostData, setEditPostData] = useState<{
+    id: string;
+    content: string;
+    challengeTitle: string;
+    imageUrl?: string;
+    xpEarned?: number;
+  } | undefined>(undefined);
+  // Map submission ID -> existing post (null = no post, undefined = not yet loaded)
+  const [submissionPosts, setSubmissionPosts] = useState<Record<string, CommunityPost | null>>({});
+
+  // Edit submission state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editSubmission, setEditSubmission] = useState<Submission | null>(null);
+  const [editChallenge, setEditChallenge] = useState<Challenge | null>(null);
+
+  // Load post status for approved submissions
+  const loadSubmissionPosts = useCallback(async () => {
+    const approved = submissions.filter(s => s.status === 'approved');
+    const results: Record<string, CommunityPost | null> = {};
+    await Promise.all(
+      approved.map(async (sub) => {
+        const post = await getPostBySubmissionId(sub.id);
+        results[sub.id] = post;
+      })
+    );
+    setSubmissionPosts(results);
+  }, [submissions, getPostBySubmissionId]);
+
+  useEffect(() => {
+    if (activeTab === 'completed') {
+      loadSubmissionPosts();
+    }
+  }, [activeTab, submissions]);
+
+  const handleCreatePost = (submission: Submission, challenge: Challenge) => {
+    setEditPostData(undefined);
+    setPostSubmissionData({
+      submissionId: submission.id,
+      challengeId: challenge.id,
+      challengeTitle: challenge.title,
+      proofUrl: submission.proofUrl,
+      xpEarned: challenge.xpReward,
+    });
+    setShowPostModal(true);
+  };
+
+  const handleEditPost = (post: CommunityPost, challenge: Challenge) => {
+    setPostSubmissionData(undefined);
+    setEditPostData({
+      id: post.id,
+      content: post.content || '',
+      challengeTitle: challenge.title,
+      imageUrl: post.imageUrl,
+      xpEarned: post.xpEarned,
+    });
+    setShowPostModal(true);
+  };
+
+  const handleDeletePost = (post: CommunityPost, submissionId: string) => {
+    Alert.alert(
+      'Beitrag löschen',
+      'Möchtest du diesen Beitrag wirklich löschen?',
+      [
+        { text: 'Abbrechen', style: 'cancel' },
+        {
+          text: 'Löschen',
+          style: 'destructive',
+          onPress: async () => {
+            await deletePost(post.id);
+            setSubmissionPosts(prev => ({ ...prev, [submissionId]: null }));
+          },
+        },
+      ]
+    );
+  };
+
+  const handlePostModalClose = () => {
+    setShowPostModal(false);
+    setPostSubmissionData(undefined);
+    setEditPostData(undefined);
+    // Refresh posts after create/edit
+    loadSubmissionPosts();
+  };
+
+  const handleEditSubmission = (submission: Submission, challenge: Challenge) => {
+    setEditSubmission(submission);
+    setEditChallenge(challenge);
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (data: { type: 'photo'; url: string; caption?: string }) => {
+    if (!editSubmission) return;
+    await updateProof(editSubmission.id, data);
+  };
+
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
+    setEditSubmission(null);
+    setEditChallenge(null);
+  };
 
   // Group submissions by status and sort active ones by urgency
   const groupedSubmissions = useMemo(() => {
@@ -227,6 +340,24 @@ export default function MyChallengesScreen() {
                   color={Colors.textMuted}
                 />
               )}
+
+              {/* Edit button for submitted/rejected */}
+              {(item.status === 'submitted' || item.status === 'rejected') && (
+                <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleEditSubmission(item, challenge);
+                  }}
+                  style={styles.editButton}
+                  hitSlop={8}
+                >
+                  <MaterialCommunityIcons
+                    name="pencil-outline"
+                    size={20}
+                    color={Colors.primary[600]}
+                  />
+                </Pressable>
+              )}
             </View>
 
             {/* Location & deadline info for active */}
@@ -252,6 +383,42 @@ export default function MyChallengesScreen() {
                 )}
               </View>
             )}
+
+            {/* Post actions for approved submissions */}
+            {item.status === 'approved' && activeTab === 'completed' && (() => {
+              const existingPost = submissionPosts[item.id];
+              if (existingPost === undefined) return null; // still loading
+              return (
+                <View style={styles.postActions}>
+                  {existingPost ? (
+                    <>
+                      <Pressable
+                        style={styles.postActionButton}
+                        onPress={() => handleEditPost(existingPost, challenge)}
+                      >
+                        <MaterialCommunityIcons name="pencil-outline" size={16} color={Colors.primary[600]} />
+                        <Text style={styles.postActionText}>Bearbeiten</Text>
+                      </Pressable>
+                      <Pressable
+                        style={styles.postActionButtonDanger}
+                        onPress={() => handleDeletePost(existingPost, item.id)}
+                      >
+                        <MaterialCommunityIcons name="delete-outline" size={16} color={Colors.error} />
+                        <Text style={styles.postActionTextDanger}>Löschen</Text>
+                      </Pressable>
+                    </>
+                  ) : (
+                    <Pressable
+                      style={styles.postActionButtonPrimary}
+                      onPress={() => handleCreatePost(item, challenge)}
+                    >
+                      <MaterialCommunityIcons name="share-outline" size={16} color="#fff" />
+                      <Text style={styles.postActionTextPrimary}>Erfolg teilen</Text>
+                    </Pressable>
+                  )}
+                </View>
+              );
+            })()}
           </Surface>
     );
 
@@ -293,29 +460,25 @@ export default function MyChallengesScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header with Active Count */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text variant="headlineSmall" style={styles.title}>
-            Meine Challenges
-          </Text>
-          {/* Active challenge counter */}
-          <View style={[
-            styles.activeCounter,
-            activeCount >= MAX_ACTIVE_CHALLENGES && styles.activeCounterFull
+      {/* Title Bar */}
+      <View style={styles.titleBar}>
+        <Text style={styles.titleText}>Meine Challenges</Text>
+        {/* Active challenge counter */}
+        <View style={[
+          styles.activeCounter,
+          activeCount >= MAX_ACTIVE_CHALLENGES && styles.activeCounterFull
+        ]}>
+          <MaterialCommunityIcons
+            name={activeCount >= MAX_ACTIVE_CHALLENGES ? 'clipboard-check' : 'clipboard-list-outline'}
+            size={16}
+            color={activeCount >= MAX_ACTIVE_CHALLENGES ? Colors.error : Colors.primary[600]}
+          />
+          <Text style={[
+            styles.activeCounterText,
+            activeCount >= MAX_ACTIVE_CHALLENGES && styles.activeCounterTextFull
           ]}>
-            <MaterialCommunityIcons
-              name={activeCount >= MAX_ACTIVE_CHALLENGES ? 'clipboard-check' : 'clipboard-list-outline'}
-              size={16}
-              color={activeCount >= MAX_ACTIVE_CHALLENGES ? Colors.error : Colors.primary[600]}
-            />
-            <Text style={[
-              styles.activeCounterText,
-              activeCount >= MAX_ACTIVE_CHALLENGES && styles.activeCounterTextFull
-            ]}>
-              {activeCount}/{MAX_ACTIVE_CHALLENGES}
-            </Text>
-          </View>
+            {activeCount}/{MAX_ACTIVE_CHALLENGES}
+          </Text>
         </View>
       </View>
 
@@ -392,6 +555,27 @@ export default function MyChallengesScreen() {
           </View>
         }
       />
+
+      {/* Post Create/Edit Modal */}
+      <CreatePostModal
+        visible={showPostModal}
+        onClose={handlePostModalClose}
+        submissionData={postSubmissionData}
+        editPost={editPostData}
+      />
+
+      {/* Submission Edit Modal */}
+      <PhotoSubmissionModal
+        visible={showEditModal}
+        onClose={handleEditModalClose}
+        onSubmit={handleEditSubmit}
+        submissionId={editSubmission?.id || ''}
+        challengeTitle={editChallenge?.title || ''}
+        existingProof={editSubmission ? {
+          proofUrl: editSubmission.proofUrl,
+          caption: editSubmission.caption,
+        } : undefined}
+      />
     </SafeAreaView>
   );
 }
@@ -399,19 +583,19 @@ export default function MyChallengesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    padding: spacing.lg,
-    paddingBottom: spacing.md,
     backgroundColor: '#fff',
   },
-  headerTop: {
+  titleBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.neutral[200],
   },
-  title: {
+  titleText: {
+    fontSize: 22,
     fontWeight: '700',
     color: Colors.textPrimary,
   },
@@ -439,11 +623,8 @@ const styles = StyleSheet.create({
     color: Colors.error,
   },
   tabsContainer: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.neutral[100],
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   tabBar: {
     flexDirection: 'row',
@@ -504,8 +685,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   listContent: {
-    padding: spacing.lg,
+    paddingHorizontal: 16,
     paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
   },
   card: {
     backgroundColor: '#fff',
@@ -682,6 +864,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textMuted,
   },
+  editButton: {
+    padding: 8,
+    backgroundColor: Colors.primary[50],
+    borderRadius: 20,
+  },
   durationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -691,5 +878,58 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.textMuted,
     fontWeight: '500',
+  },
+
+  // Post action buttons for approved submissions
+  postActions: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  postActionButtonPrimary: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary[600],
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  postActionTextPrimary: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  postActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary[50],
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  postActionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.primary[600],
+  },
+  postActionButtonDanger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    backgroundColor: `${Colors.error}10`,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    borderRadius: 8,
+  },
+  postActionTextDanger: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.error,
   },
 });

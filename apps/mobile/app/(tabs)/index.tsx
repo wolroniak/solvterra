@@ -1,9 +1,9 @@
 // Home / Feed Screen
 // Challenge discovery with micro-volunteering emphasis
 
-import { useState, useMemo, useEffect } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
-import { Text, Searchbar } from 'react-native-paper';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { View, StyleSheet, FlatList, RefreshControl, ActivityIndicator, Alert, Pressable, TextInput } from 'react-native';
+import { Text } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,27 +11,125 @@ import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useChallengeStore, useUserStore } from '@/store';
 import { useTranslatedChallenges } from '@/hooks';
+import { supabase } from '@/lib/supabase';
 import ChallengeCard from '@/components/ChallengeCard';
 import ChallengeFilters from '@/components/ChallengeFilters';
+import CreatePostModal from '@/components/CreatePostModal';
 
 export default function FeedScreen() {
   const { t } = useTranslation('challenges');
   const { t: tCommon } = useTranslation('common');
-  const { user } = useUserStore();
+  const { user, addXp } = useUserStore();
   const { challenges, isLoading, loadChallenges } = useChallengeStore();
 
   // Translate challenges for display
   const translatedChallenges = useTranslatedChallenges(challenges);
 
-  // Load challenges on mount
+  const initialLoadDone = useRef(false);
+
+  // Post creation modal state
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [postSubmissionData, setPostSubmissionData] = useState<{
+    submissionId: string;
+    challengeId: string;
+    challengeTitle: string;
+    proofUrl?: string;
+    xpEarned?: number;
+  } | undefined>(undefined);
+
+  // Load challenges on mount and subscribe to real-time updates
   useEffect(() => {
-    loadChallenges();
+    loadChallenges().then(() => {
+      initialLoadDone.current = true;
+    });
+
+    // Real-time: listen for new/updated challenges
+    const challengeChannel = supabase
+      .channel('mobile-challenges')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'challenges',
+      }, () => {
+        loadChallenges();
+      })
+      .subscribe();
+
+    // Real-time: listen for submission status updates (approval/rejection from NGO)
+    const submissionChannel = supabase
+      .channel('mobile-submissions')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'submissions',
+      }, (payload) => {
+        loadChallenges();
+
+        if (!initialLoadDone.current) return;
+
+        const sub = payload.new as {
+          id?: string;
+          status?: string;
+          xp_earned?: number;
+          challenge_id?: string;
+          ngo_feedback?: string;
+          proof_url?: string;
+        };
+
+        // Look up challenge title from local state
+        const challenge = challenges.find(c => c.id === sub.challenge_id);
+        const challengeTitle = challenge?.title || 'Aufgabe';
+
+        if (sub.status === 'approved') {
+          const xpEarned = sub.xp_earned || 0;
+          if (xpEarned > 0) {
+            addXp(xpEarned);
+          }
+          Alert.alert(
+            '🎉 Genehmigt!',
+            `"${challengeTitle}" wurde genehmigt! +${xpEarned} XP\n\nMöchtest du deinen Erfolg mit der Community teilen?`,
+            [
+              { text: 'Später', style: 'cancel' },
+              {
+                text: 'Teilen',
+                onPress: () => {
+                  setPostSubmissionData({
+                    submissionId: sub.id || '',
+                    challengeId: sub.challenge_id || '',
+                    challengeTitle,
+                    proofUrl: sub.proof_url,
+                    xpEarned,
+                  });
+                  setShowPostModal(true);
+                },
+              },
+            ]
+          );
+        } else if (sub.status === 'rejected') {
+          const feedback = sub.ngo_feedback
+            ? `Feedback: "${sub.ngo_feedback}"`
+            : 'Schau dir das Feedback an.';
+          Alert.alert(
+            `"${challengeTitle}" abgelehnt`,
+            feedback,
+            [{ text: 'OK' }]
+          );
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(challengeChannel);
+      supabase.removeChannel(submissionChannel);
+    };
   }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const searchInputRef = useRef<TextInput>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [selectedType, setSelectedType] = useState<'digital' | 'onsite' | null>(null);
+  const [selectedTeamMode, setSelectedTeamMode] = useState<'solo' | 'team' | null>(null);
   const [showQuickOnly, setShowQuickOnly] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -53,26 +151,24 @@ export default function FeedScreen() {
       result = result.filter(c => c.category === selectedCategory);
     }
 
-    if (selectedDuration) {
-      result = result.filter(c => c.durationMinutes === selectedDuration);
-    }
-
     if (selectedType) {
       result = result.filter(c => c.type === selectedType);
     }
 
-    // Quick filter: show only 5-10 min challenges
-    if (showQuickOnly) {
-      result = result.filter(c => c.durationMinutes <= 10);
+    if (selectedTeamMode === 'team') {
+      result = result.filter(c => c.isMultiPerson);
+    } else if (selectedTeamMode === 'solo') {
+      result = result.filter(c => !c.isMultiPerson);
     }
 
-    // Sort by duration (shortest first) when quick filter is active
+    // Quick filter: show only 5-10 min challenges, sorted by duration
     if (showQuickOnly) {
+      result = result.filter(c => c.durationMinutes <= 10);
       result = [...result].sort((a, b) => a.durationMinutes - b.durationMinutes);
     }
 
     return result;
-  }, [translatedChallenges, searchQuery, selectedCategory, selectedDuration, selectedType, showQuickOnly]);
+  }, [translatedChallenges, searchQuery, selectedCategory, selectedType, selectedTeamMode, showQuickOnly]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -84,55 +180,61 @@ export default function FeedScreen() {
     router.push(`/challenge/${challengeId}`);
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return tCommon('greeting.morning');
-    if (hour < 18) return tCommon('greeting.afternoon');
-    return tCommon('greeting.evening');
-  };
-
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header with Micro-Volunteering Branding */}
-      <View style={styles.header}>
-        <View style={styles.greetingRow}>
-          <View>
-            <Text variant="titleLarge" style={styles.greeting}>
-              {getGreeting()}, {user?.name.split(' ')[0] || 'Nutzer'}!
-            </Text>
-            <View style={styles.subtitleRow}>
-              <MaterialCommunityIcons name="clock-fast" size={16} color={Colors.primary[600]} />
-              <Text variant="bodyMedium" style={styles.subtitle}>
-                {t('discover.tagline')}
-              </Text>
-            </View>
+      {/* Title Bar / Search Bar */}
+      <View style={styles.titleBar}>
+        {isSearchActive ? (
+          <View style={styles.searchRow}>
+            <Pressable
+              onPress={() => {
+                setIsSearchActive(false);
+                setSearchQuery('');
+              }}
+              style={styles.searchBackButton}
+              hitSlop={8}
+            >
+              <MaterialCommunityIcons name="arrow-left" size={24} color={Colors.textPrimary} />
+            </Pressable>
+            <TextInput
+              ref={searchInputRef}
+              style={styles.searchInput}
+              placeholder={t('discover.searchPlaceholder')}
+              placeholderTextColor={Colors.neutral[400]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoFocus
+              returnKeyType="search"
+            />
+            {searchQuery.length > 0 && (
+              <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+                <MaterialCommunityIcons name="close-circle" size={20} color={Colors.textMuted} />
+              </Pressable>
+            )}
           </View>
-          <View style={styles.xpBadge}>
-            <MaterialCommunityIcons name="star" size={18} color={Colors.accent[500]} />
-            <Text style={styles.xpText}>{user?.xpTotal || 0} XP</Text>
-          </View>
-        </View>
-
-        {/* Search */}
-        <Searchbar
-          placeholder={t('discover.searchPlaceholder')}
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={styles.searchbar}
-          inputStyle={styles.searchInput}
-          iconColor={Colors.textMuted}
-        />
+        ) : (
+          <>
+            <Text style={styles.titleText}>{t('discover.discoverTitle')}</Text>
+            <Pressable
+              onPress={() => setIsSearchActive(true)}
+              style={styles.searchIconButton}
+              hitSlop={8}
+            >
+              <MaterialCommunityIcons name="magnify" size={24} color={Colors.textPrimary} />
+            </Pressable>
+          </>
+        )}
       </View>
 
-      {/* Filters with Quick Filter */}
+      {/* Filters */}
       <ChallengeFilters
         selectedCategory={selectedCategory}
-        selectedDuration={selectedDuration}
         selectedType={selectedType}
+        selectedTeamMode={selectedTeamMode}
         showQuickOnly={showQuickOnly}
         onCategoryChange={setSelectedCategory}
-        onDurationChange={setSelectedDuration}
         onTypeChange={setSelectedType}
+        onTeamModeChange={setSelectedTeamMode}
         onQuickFilterChange={setShowQuickOnly}
       />
 
@@ -182,6 +284,16 @@ export default function FeedScreen() {
           </View>
         }
       />
+
+      {/* Post Creation Modal (triggered after approval) */}
+      <CreatePostModal
+        visible={showPostModal}
+        onClose={() => {
+          setShowPostModal(false);
+          setPostSubmissionData(undefined);
+        }}
+        submissionData={postSubmissionData}
+      />
     </SafeAreaView>
   );
 }
@@ -189,58 +301,45 @@ export default function FeedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    padding: spacing.lg,
-    paddingBottom: spacing.md,
     backgroundColor: '#fff',
   },
-  greetingRow: {
+  titleBar: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.neutral[200],
+    minHeight: 52,
   },
-  greeting: {
+  titleText: {
+    fontSize: 22,
     fontWeight: '700',
     color: Colors.textPrimary,
   },
-  subtitleRow: {
+  searchIconButton: {
+    padding: 4,
+  },
+  searchRow: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
+    gap: 10,
   },
-  subtitle: {
-    color: Colors.primary[600],
-    fontWeight: '500',
-  },
-  xpBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.accent[50],
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 20,
-    gap: 4,
-  },
-  xpText: {
-    color: Colors.accent[700],
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  searchbar: {
-    backgroundColor: Colors.neutral[100],
-    borderRadius: 12,
-    elevation: 0,
+  searchBackButton: {
+    padding: 4,
   },
   searchInput: {
-    fontSize: 14,
+    flex: 1,
+    fontSize: 16,
+    color: Colors.textPrimary,
+    paddingVertical: 0,
   },
   listContent: {
-    padding: spacing.lg,
+    paddingHorizontal: 16,
     paddingTop: spacing.sm,
+    paddingBottom: spacing.lg,
   },
   emptyState: {
     alignItems: 'center',

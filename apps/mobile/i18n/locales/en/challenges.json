@@ -2,6 +2,7 @@
   "discover": {
     "title": "Discover",
     "tagline": "Micro-volunteering in 5-30 min",
+    "discoverTitle": "Discover Challenges",
     "searchPlaceholder": "Search challenges...",
     "featuredSection": "Featured",
     "allChallenges": "All Challenges",
@@ -21,7 +22,9 @@
     "onsite": "On-site",
     "allTypes": "All types",
     "allCategories": "All categories",
-    "allDurations": "All durations"
+    "allDurations": "All durations",
+    "solo": "Solo",
+    "team": "Team"
   },
   "categories": {
     "environment": "Environment",

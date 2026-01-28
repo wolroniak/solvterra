@@ -1,7 +1,7 @@
 // Sign Up Screen
 // User registration with email or social login
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Text, Button, TextInput, Divider } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -11,10 +11,11 @@ import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
 import LanguageToggle from '@/components/LanguageToggle';
+import OnboardingProgress from '@/components/OnboardingProgress';
 
 export default function SignUpScreen() {
   const { t } = useTranslation('auth');
-  const { loginWithGoogle, loginWithApple, isLoading } = useUserStore();
+  const { signUp, loginWithGoogle, isLoading, isAuthenticated } = useUserStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,26 +43,31 @@ export default function SignUpScreen() {
 
   const handleEmailSignUp = async () => {
     if (!validateForm()) return;
-
-    // For demo, go to interests selection
-    router.push('/(auth)/interests');
+    await signUp(email, password);
+    // Navigation happens after successful auth - check in useEffect
   };
 
   const handleGoogleSignUp = async () => {
     await loginWithGoogle();
-    router.push('/(auth)/interests');
+    // Navigation happens after successful auth - check in useEffect
   };
 
-  const handleAppleSignUp = async () => {
-    await loginWithApple();
-    router.push('/(auth)/interests');
-  };
+  // Navigate to interests after successful authentication
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/(auth)/interests');
+    }
+  }, [isAuthenticated]);
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Language Toggle - top right */}
-      <View style={styles.languageToggleContainer}>
-        <LanguageToggle />
+      {/* Header with Progress and Language Toggle */}
+      <View style={styles.topBar}>
+        <View style={{ width: 60 }} />
+        <OnboardingProgress currentStep={2} totalSteps={4} />
+        <View style={styles.languageToggleContainer}>
+          <LanguageToggle />
+        </View>
       </View>
 
       <KeyboardAvoidingView
@@ -82,7 +88,7 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          {/* Social Login Buttons */}
+          {/* Social Login Button */}
           <View style={styles.socialButtons}>
             <Button
               mode="outlined"
@@ -93,24 +99,10 @@ export default function SignUpScreen() {
                 <MaterialCommunityIcons name="google" size={20} color={Colors.textPrimary} />
               )}
               loading={isLoading}
+              disabled={isLoading}
             >
               {t('welcome.continueWithGoogle')}
             </Button>
-
-            {Platform.OS === 'ios' && (
-              <Button
-                mode="outlined"
-                onPress={handleAppleSignUp}
-                style={styles.socialButton}
-                contentStyle={styles.socialButtonContent}
-                icon={() => (
-                  <MaterialCommunityIcons name="apple" size={20} color={Colors.textPrimary} />
-                )}
-                loading={isLoading}
-              >
-                {t('welcome.continueWithApple')}
-              </Button>
-            )}
           </View>
 
           {/* Divider */}
@@ -215,10 +207,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  languageToggleContainer: {
-    alignItems: 'flex-end',
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
+  },
+  languageToggleContainer: {
+    width: 60,
+    alignItems: 'flex-end',
   },
   scrollContent: {
     padding: spacing.lg,

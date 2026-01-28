@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
+import OnboardingProgress from '@/components/OnboardingProgress';
 
 const { width } = Dimensions.get('window');
 
@@ -129,12 +130,15 @@ export default function TutorialScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Skip Button */}
+      {/* Header with Progress and Skip */}
       <View style={styles.header}>
+        <View style={{ width: 80 }} />
+        <OnboardingProgress currentStep={4} totalSteps={4} />
         <Button
           mode="text"
           onPress={handleSkip}
           textColor={Colors.textSecondary}
+          compact
         >
           {t('onboarding.interestsStep.skip')}
         </Button>
@@ -185,7 +189,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
   },

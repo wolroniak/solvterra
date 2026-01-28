@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCommunityStore, useChallengeStore } from '@/store';
 import { REACTION_CONFIG, type CommunityPost } from '@/lib/mock-data';
+import { useIsRejected } from '@/components/verification-banner';
 
 // Format time ago
 const formatTimeAgo = (date: Date) => {
@@ -254,6 +255,7 @@ export default function CommunityPage() {
   const { posts, stats, publishPost, unpublishPost, pinPost, highlightPost, deletePost } = useCommunityStore();
   const { challenges } = useChallengeStore();
   const [filter, setFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const isRejected = useIsRejected();
 
   const filteredPosts = posts.filter((post) => {
     if (filter === 'all') return true;
@@ -280,12 +282,27 @@ export default function CommunityPage() {
             Erstelle Posts, um deine Challenges in der Community zu bewerben
           </p>
         </div>
-        <Link href="/community/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Neuer Post
-          </Button>
-        </Link>
+        <div className="relative group">
+          {isRejected ? (
+            <Button disabled className="gap-2 opacity-50 cursor-not-allowed">
+              <Plus className="h-4 w-4" />
+              Neuer Post
+            </Button>
+          ) : (
+            <Link href="/community/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Neuer Post
+              </Button>
+            </Link>
+          )}
+          {isRejected && (
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              Organisation wurde abgelehnt
+              <div className="absolute top-full right-4 border-4 border-transparent border-t-slate-900" />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}

@@ -2,7 +2,8 @@
   "discover": {
     "title": "Entdecken",
     "tagline": "Micro-Volunteering in 5-30 Min",
-    "searchPlaceholder": "Challenges suchen...",
+    "discoverTitle": "Entdecke Challenges",
+    "searchPlaceholder": "Challenges durchsuchen...",
     "featuredSection": "Empfohlen",
     "allChallenges": "Alle Challenges",
     "teamChallenges": "Team-Challenges",
@@ -21,7 +22,9 @@
     "onsite": "Vor Ort",
     "allTypes": "Alle Arten",
     "allCategories": "Alle Kategorien",
-    "allDurations": "Alle Dauern"
+    "allDurations": "Alle Dauern",
+    "solo": "Einzel",
+    "team": "Team"
   },
   "categories": {
     "environment": "Umwelt",

@@ -8,7 +8,12 @@ import { useUserStore } from '@/store';
 import { Colors } from '@/constants/theme';
 
 export default function Index() {
-  const { isAuthenticated, user, isLoading } = useUserStore();
+  const { isAuthenticated, user, isLoading, checkSession } = useUserStore();
+
+  // Check for existing session on app start
+  useEffect(() => {
+    checkSession();
+  }, []);
 
   // Show loading spinner while checking auth
   if (isLoading) {

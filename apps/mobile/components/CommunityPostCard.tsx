@@ -1,133 +1,102 @@
 // CommunityPostCard Component
-// Displays community posts with reactions, comments, and challenge linking
+// Instagram-style feed card with like, comment, and image display
 
-import { useState, useRef } from 'react';
-import { View, StyleSheet, Pressable, Image, Animated } from 'react-native';
-import { Text, Surface } from 'react-native-paper';
+import { useState, useRef, useCallback } from 'react';
+import { View, StyleSheet, Pressable, Image, Animated, Dimensions, Alert } from 'react-native';
+import { Text } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Colors, spacing } from '@/constants/theme';
-import type { CommunityPost, ReactionType, UserLevel } from '@solvterra/shared';
-import { REACTION_CONFIG, LEVELS } from '@solvterra/shared';
+import type { CommunityPost, UserLevel } from '@solvterra/shared';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface CommunityPostCardProps {
   post: CommunityPost;
-  onReact: (postId: string, reactionType: ReactionType) => void;
-  onComment?: (postId: string) => void;
+  currentUserId?: string;
+  onLike: (postId: string) => void;
+  onComment: (postId: string) => void;
+  onEdit?: (post: CommunityPost) => void;
+  onDelete?: (post: CommunityPost) => void;
 }
 
-// Level badge colors
-const getLevelColor = (level: UserLevel) => {
-  const levelConfig = LEVELS.find(l => l.level === level);
-  return levelConfig?.color || Colors.neutral[500];
+// Level ring colors
+const LEVEL_RING_COLORS: Record<UserLevel, string> = {
+  starter: '#9ca3af',
+  helper: '#4ade80',
+  supporter: '#3b82f6',
+  champion: '#8b5cf6',
+  legend: '#f59e0b',
 };
 
-// Format time ago
-const formatTimeAgo = (date: Date) => {
+// Format relative time
+const formatTimeAgo = (date: Date): string => {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMins = Math.floor(diffMs / (1000 * 60));
 
-  if (diffHours < 1) {
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    return `vor ${diffMins} Min`;
-  }
-  if (diffHours < 24) {
-    return `vor ${diffHours} Std`;
-  }
+  if (diffMins < 1) return 'Gerade eben';
+  if (diffMins < 60) return `vor ${diffMins} Min`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `vor ${diffHours} Std`;
   const diffDays = Math.floor(diffHours / 24);
-  return `vor ${diffDays} ${diffDays === 1 ? 'Tag' : 'Tagen'}`;
+  if (diffDays < 7) return `vor ${diffDays} ${diffDays === 1 ? 'Tag' : 'Tagen'}`;
+  const diffWeeks = Math.floor(diffDays / 7);
+  return `vor ${diffWeeks} ${diffWeeks === 1 ? 'Woche' : 'Wochen'}`;
 };
 
-// Get post type message
-const getPostTypeMessage = (post: CommunityPost): string => {
-  switch (post.type) {
-    case 'ngo_promotion':
-      return 'Challenge-Empfehlung';
-    case 'success_story':
-      return `hat "${post.linkedChallenge?.title}" abgeschlossen`;
-    case 'challenge_completed':
-      return `hat "${post.linkedChallenge?.title}" abgeschlossen`;
-    case 'badge_earned':
-      return `hat das Badge "${post.badgeName}" verdient`;
-    case 'level_up':
-      return `ist jetzt ${post.newLevel === 'helper' ? 'Helfer' : post.newLevel === 'supporter' ? 'Untersttzer' : post.newLevel === 'champion' ? 'Champion' : 'Legende'}!`;
-    case 'team_challenge':
-      return `hat mit ${post.teamMemberNames?.join(', ')} eine Team-Challenge gemeistert`;
-    case 'streak_achieved':
-      return `hat ${post.streakDays} Tage Streak erreicht!`;
-    default:
-      return '';
-  }
-};
-
-// Get icon for post type
-const getPostTypeIcon = (type: CommunityPost['type']): string => {
-  switch (type) {
-    case 'ngo_promotion':
-      return 'bullhorn';
-    case 'success_story':
-      return 'star';
-    case 'challenge_completed':
-      return 'check-circle';
-    case 'badge_earned':
-      return 'medal';
-    case 'level_up':
-      return 'arrow-up-circle';
-    case 'team_challenge':
-      return 'account-group';
-    case 'streak_achieved':
-      return 'fire';
-    default:
-      return 'star';
-  }
-};
-
-// Get color for post type
-const getPostTypeColor = (type: CommunityPost['type']): string => {
-  switch (type) {
-    case 'ngo_promotion':
-      return Colors.primary[600];
-    case 'success_story':
-      return Colors.accent[500];
-    case 'challenge_completed':
-      return Colors.success;
-    case 'badge_earned':
-      return Colors.accent[500];
-    case 'level_up':
-      return '#7c3aed';
-    case 'team_challenge':
-      return Colors.secondary[500];
-    case 'streak_achieved':
-      return '#f97316';
-    default:
-      return Colors.primary[600];
-  }
-};
-
-export default function CommunityPostCard({ post, onReact, onComment }: CommunityPostCardProps) {
+export default function CommunityPostCard({ post, currentUserId, onLike, onComment, onEdit, onDelete }: CommunityPostCardProps) {
   const router = useRouter();
-  const [showReactionPicker, setShowReactionPicker] = useState(false);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const heartAnimScale = useRef(new Animated.Value(0)).current;
+  const heartAnimOpacity = useRef(new Animated.Value(0)).current;
+  const lastTapRef = useRef<number>(0);
+  const [textExpanded, setTextExpanded] = useState(false);
 
-  const handleReaction = (type: ReactionType) => {
-    // Animate
+  const isOwnPost = !!currentUserId && post.authorId === currentUserId;
+
+  const handleAvatarPress = useCallback(() => {
+    if (isOwnPost) {
+      router.push('/(tabs)/profile');
+    } else {
+      router.push(`/user/${post.authorId}`);
+    }
+  }, [isOwnPost, post.authorId, router]);
+
+  // Double-tap detection for like
+  const handleImagePress = useCallback(() => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      if (!post.userHasLiked) {
+        onLike(post.id);
+      }
+      triggerHeartAnimation();
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
+  }, [post.id, post.userHasLiked, onLike]);
+
+  const triggerHeartAnimation = useCallback(() => {
+    heartAnimScale.setValue(0);
+    heartAnimOpacity.setValue(1);
+
     Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 1.2,
-        duration: 100,
+      Animated.spring(heartAnimScale, {
+        toValue: 1,
+        friction: 3,
+        tension: 150,
         useNativeDriver: true,
       }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 100,
+      Animated.timing(heartAnimOpacity, {
+        toValue: 0,
+        duration: 400,
+        delay: 200,
         useNativeDriver: true,
       }),
     ]).start();
-
-    onReact(post.id, type);
-    setShowReactionPicker(false);
-  };
+  }, [heartAnimScale, heartAnimOpacity]);
 
   const handleChallengePress = () => {
     if (post.linkedChallengeId) {
@@ -135,620 +104,380 @@ export default function CommunityPostCard({ post, onReact, onComment }: Communit
     }
   };
 
-  const isNgoPost = post.authorType === 'organization';
-  const hasContent = post.title || post.content;
+  const handleMenuPress = () => {
+    Alert.alert(
+      'Beitrag',
+      undefined,
+      [
+        {
+          text: 'Bearbeiten',
+          onPress: () => onEdit?.(post),
+        },
+        {
+          text: 'Löschen',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Beitrag löschen',
+              'Möchtest du diesen Beitrag wirklich löschen?',
+              [
+                { text: 'Abbrechen', style: 'cancel' },
+                {
+                  text: 'Löschen',
+                  style: 'destructive',
+                  onPress: () => onDelete?.(post),
+                },
+              ]
+            );
+          },
+        },
+        { text: 'Abbrechen', style: 'cancel' },
+      ]
+    );
+  };
+
+  const hasImage = !!post.imageUrl;
+  const authorLevel = post.authorLevel || 'starter';
+  const ringColor = LEVEL_RING_COLORS[authorLevel];
+  const isOrgPost = post.authorType === 'organization';
+
+  // Build author sub-label
+  const getAuthorSubLabel = (): string | null => {
+    if (isOrgPost) return null;
+    if (post.linkedChallenge?.organizationName) {
+      return `half ${post.linkedChallenge.organizationName}`;
+    }
+    return null;
+  };
+
+  const authorSubLabel = getAuthorSubLabel();
+  const hasChallengeLink = !!post.linkedChallengeId;
 
   return (
-    <Surface style={styles.card} elevation={1}>
-      {/* Pinned/Highlighted Badge */}
-      {(post.isPinned || post.isHighlighted) && (
-        <View style={styles.badgeRow}>
-          {post.isPinned && (
-            <View style={[styles.badge, styles.pinnedBadge]}>
-              <MaterialCommunityIcons name="pin" size={12} color={Colors.primary[600]} />
-              <Text style={styles.badgeText}>Angepinnt</Text>
-            </View>
-          )}
-          {post.isHighlighted && (
-            <View style={[styles.badge, styles.highlightedBadge]}>
-              <MaterialCommunityIcons name="star" size={12} color="#f59e0b" />
-              <Text style={[styles.badgeText, { color: '#b45309' }]}>Hervorgehoben</Text>
-            </View>
-          )}
-        </View>
-      )}
-
-      {/* Header */}
+    <View style={styles.card}>
+      {/* Header: Avatar + Name + Time + Menu */}
       <View style={styles.header}>
-        <Image
-          source={{ uri: post.authorAvatarUrl }}
-          style={[styles.avatar, isNgoPost && styles.avatarOrg]}
-        />
-        <View style={styles.headerInfo}>
-          <View style={styles.nameRow}>
+        <Pressable onPress={handleAvatarPress}>
+          <View style={[styles.avatarRing, { borderColor: isOrgPost ? Colors.primary[600] : ringColor }]}>
+            <Image
+              source={{ uri: post.authorAvatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${post.authorName}` }}
+              style={styles.avatar}
+            />
+          </View>
+        </Pressable>
+        <View style={styles.headerText}>
+          <View style={styles.authorRow}>
             <Text style={styles.authorName}>{post.authorName}</Text>
-            {isNgoPost && (
-              <View style={styles.verifiedBadge}>
-                <MaterialCommunityIcons name="check-decagram" size={14} color={Colors.primary[600]} />
-              </View>
-            )}
-            {post.authorLevel && (
-              <View style={[styles.levelBadge, { backgroundColor: `${getLevelColor(post.authorLevel)}20` }]}>
-                <MaterialCommunityIcons
-                  name="star"
-                  size={10}
-                  color={getLevelColor(post.authorLevel)}
-                />
-              </View>
+            {isOrgPost && (
+              <MaterialCommunityIcons name="check-decagram" size={16} color={Colors.primary[600]} style={{ marginLeft: 4 }} />
             )}
           </View>
-          <View style={styles.subRow}>
-            <Text style={styles.timestamp}>{formatTimeAgo(post.createdAt)}</Text>
-            {!isNgoPost && (
-              <Text style={styles.postTypeText}> {getPostTypeMessage(post)}</Text>
-            )}
+          {authorSubLabel && (
+            <Text style={styles.authorSubLabel} numberOfLines={1}>
+              {authorSubLabel}
+            </Text>
+          )}
+        </View>
+        {post.xpEarned ? (
+          <View style={styles.xpBadge}>
+            <MaterialCommunityIcons name="lightning-bolt" size={14} color="#f59e0b" />
+            <Text style={styles.xpBadgeText}>+{post.xpEarned} XP</Text>
           </View>
-        </View>
-        <View style={[styles.typeIcon, { backgroundColor: `${getPostTypeColor(post.type)}15` }]}>
-          <MaterialCommunityIcons
-            name={getPostTypeIcon(post.type) as any}
-            size={20}
-            color={getPostTypeColor(post.type)}
-          />
-        </View>
+        ) : null}
+        {/* 3-dot menu for own posts */}
+        {isOwnPost && (
+          <Pressable onPress={handleMenuPress} style={styles.menuButton} hitSlop={8}>
+            <MaterialCommunityIcons name="dots-vertical" size={22} color={Colors.textMuted} />
+          </Pressable>
+        )}
       </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Title */}
-        {post.title && (
-          <Text style={styles.title}>{post.title}</Text>
-        )}
-
-        {/* Text Content */}
-        {post.content && (
-          <Text style={styles.text} numberOfLines={4}>
-            {post.content}
-          </Text>
-        )}
-
-        {/* Post Image */}
-        {post.imageUrl && (
-          <View style={styles.imageContainer}>
+      {/* Image (full-width, Instagram-style) */}
+      {hasImage && (
+        <Pressable onPress={handleImagePress}>
+          <View style={styles.imageWrapper}>
             <Image
               source={{ uri: post.imageUrl }}
               style={styles.postImage}
+              resizeMode="cover"
             />
-          </View>
-        )}
-
-        {/* Linked Challenge Card */}
-        {post.linkedChallenge && (
-          <Pressable
-            style={styles.challengeCard}
-            onPress={handleChallengePress}
-          >
-            {post.linkedChallenge.imageUrl && (
-              <Image
-                source={{ uri: post.linkedChallenge.imageUrl }}
-                style={styles.challengeImage}
-              />
-            )}
-            <View style={styles.challengeInfo}>
-              <Text style={styles.challengeTitle} numberOfLines={2}>
-                {post.linkedChallenge.title}
-              </Text>
-              <View style={styles.challengeMeta}>
-                <View style={styles.xpBadge}>
-                  <MaterialCommunityIcons name="lightning-bolt" size={12} color="#f59e0b" />
-                  <Text style={styles.xpText}>{post.linkedChallenge.xpReward} XP</Text>
-                </View>
-                <Text style={styles.durationText}>
-                  {post.linkedChallenge.durationMinutes} Min
-                </Text>
-              </View>
-            </View>
-            <MaterialCommunityIcons name="chevron-right" size={20} color={Colors.neutral[400]} />
-          </Pressable>
-        )}
-
-        {/* Badge Display */}
-        {post.type === 'badge_earned' && post.badgeIcon && (
-          <View style={styles.badgeContainer}>
-            <MaterialCommunityIcons
-              name={post.badgeIcon as any}
-              size={48}
-              color={Colors.accent[500]}
-            />
-            <Text style={styles.badgeName}>{post.badgeName}</Text>
-          </View>
-        )}
-
-        {/* Team Members */}
-        {post.teamMemberNames && post.teamMemberNames.length > 0 && (
-          <View style={styles.teamRow}>
-            <MaterialCommunityIcons name="account-group" size={16} color={Colors.secondary[600]} />
-            <Text style={styles.teamText}>
-              Team: {post.teamMemberNames.join(', ')}
-            </Text>
-          </View>
-        )}
-
-        {/* Streak Badge */}
-        {post.type === 'streak_achieved' && post.streakDays && (
-          <View style={styles.streakBadge}>
-            <MaterialCommunityIcons name="fire" size={24} color="#f97316" />
-            <Text style={styles.streakText}>{post.streakDays} Tage</Text>
-          </View>
-        )}
-
-        {/* XP Earned */}
-        {post.xpEarned && post.type === 'success_story' && (
-          <View style={styles.xpEarnedBadge}>
-            <MaterialCommunityIcons name="lightning-bolt" size={16} color="#f59e0b" />
-            <Text style={styles.xpEarnedText}>+{post.xpEarned} XP verdient</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Reactions Summary */}
-      <View style={styles.reactionsSummary}>
-        {post.totalReactions > 0 && (
-          <View style={styles.reactionsRow}>
-            {Object.entries(post.reactions).map(([type, count]) => {
-              if (count === 0) return null;
-              const config = REACTION_CONFIG[type as ReactionType];
-              return (
-                <Text key={type} style={styles.reactionEmoji}>
-                  {config.emoji}
-                </Text>
-              );
-            })}
-            <Text style={styles.reactionCount}>{post.totalReactions}</Text>
-          </View>
-        )}
-        {post.commentsCount > 0 && (
-          <Text style={styles.commentCount}>{post.commentsCount} Kommentare</Text>
-        )}
-      </View>
-
-      {/* Actions */}
-      <View style={styles.actions}>
-        {/* Reaction Button with Picker */}
-        <View style={styles.reactionWrapper}>
-          <Pressable
-            style={styles.actionButton}
-            onLongPress={() => setShowReactionPicker(true)}
-            onPress={() => handleReaction(post.userReaction || 'heart')}
-          >
-            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-              {post.userReaction ? (
-                <Text style={styles.activeReaction}>
-                  {REACTION_CONFIG[post.userReaction].emoji}
-                </Text>
-              ) : (
-                <MaterialCommunityIcons
-                  name="heart-outline"
-                  size={22}
-                  color={Colors.textMuted}
-                />
-              )}
+            {/* Double-tap heart animation overlay */}
+            <Animated.View
+              style={[
+                styles.heartOverlay,
+                {
+                  opacity: heartAnimOpacity,
+                  transform: [
+                    { scale: heartAnimScale },
+                  ],
+                },
+              ]}
+              pointerEvents="none"
+            >
+              <MaterialCommunityIcons name="heart" size={80} color="#fff" />
             </Animated.View>
-            <Text style={[styles.actionText, post.userReaction && styles.actionTextActive]}>
-              {post.userReaction ? REACTION_CONFIG[post.userReaction].label : 'Gefällt mir'}
+          </View>
+        </Pressable>
+      )}
+
+      {/* Action Row: Like (with count) + Comment + Challenge Link */}
+      <View style={styles.actionRow}>
+        <Pressable style={styles.actionButton} onPress={() => onLike(post.id)}>
+          <MaterialCommunityIcons
+            name={post.userHasLiked ? 'heart' : 'heart-outline'}
+            size={26}
+            color={post.userHasLiked ? '#ef4444' : Colors.textPrimary}
+          />
+          {post.likesCount > 0 && (
+            <Text style={[styles.actionCount, post.userHasLiked && styles.actionCountLiked]}>
+              {post.likesCount}
             </Text>
-          </Pressable>
-
-          {/* Reaction Picker */}
-          {showReactionPicker && (
-            <View style={styles.reactionPicker}>
-              {Object.entries(REACTION_CONFIG).map(([type, config]) => (
-                <Pressable
-                  key={type}
-                  style={styles.reactionOption}
-                  onPress={() => handleReaction(type as ReactionType)}
-                >
-                  <Text style={styles.reactionOptionEmoji}>{config.emoji}</Text>
-                </Pressable>
-              ))}
-            </View>
           )}
-        </View>
-
-        {/* Comment Button */}
-        <Pressable style={styles.actionButton} onPress={() => onComment?.(post.id)}>
+        </Pressable>
+        <Pressable style={styles.actionButton} onPress={() => onComment(post.id)}>
           <MaterialCommunityIcons
             name="comment-outline"
-            size={20}
-            color={Colors.textMuted}
+            size={24}
+            color={Colors.textPrimary}
           />
-          <Text style={styles.actionText}>Kommentieren</Text>
+          {post.commentsCount > 0 && (
+            <Text style={styles.actionCount}>{post.commentsCount}</Text>
+          )}
         </Pressable>
+        {/* Challenge link button */}
+        <Pressable
+          style={styles.actionButton}
+          onPress={hasChallengeLink ? handleChallengePress : undefined}
+          disabled={!hasChallengeLink}
+        >
+          <MaterialCommunityIcons
+            name="trophy-outline"
+            size={24}
+            color={hasChallengeLink ? Colors.primary[600] : Colors.neutral[300]}
+          />
+        </Pressable>
+      </View>
 
-        {/* Challenge Button (for NGO posts) */}
-        {isNgoPost && post.linkedChallengeId && (
-          <Pressable style={styles.joinButton} onPress={handleChallengePress}>
-            <MaterialCommunityIcons
-              name="arrow-right"
-              size={16}
-              color="#fff"
-            />
-            <Text style={styles.joinButtonText}>Teilnehmen</Text>
+      {/* Caption — tap to expand */}
+      <View style={styles.captionContainer}>
+        {post.content && (
+          <Pressable onPress={() => setTextExpanded(!textExpanded)}>
+            <Text
+              style={styles.captionText}
+              numberOfLines={textExpanded ? undefined : 3}
+            >
+              {post.content}
+            </Text>
+            {!textExpanded && (
+              <Text style={styles.moreText}>mehr</Text>
+            )}
           </Pressable>
         )}
       </View>
 
       {/* Comments Preview */}
+      {post.commentsCount > 0 && (
+        <Pressable onPress={() => onComment(post.id)}>
+          <Text style={styles.viewComments}>
+            Alle {post.commentsCount} Kommentare ansehen
+          </Text>
+        </Pressable>
+      )}
+
+      {/* Comment previews */}
       {post.comments && post.comments.length > 0 && (
-        <View style={styles.commentsPreview}>
-          {post.comments.slice(0, 2).map((comment) => (
-            <View key={comment.id} style={styles.commentRow}>
-              <Image
-                source={{ uri: comment.userAvatarUrl }}
-                style={styles.commentAvatar}
-              />
-              <View style={styles.commentContent}>
-                <Text style={styles.commentText}>
-                  <Text style={styles.commentAuthor}>{comment.userName}</Text>
-                  {' '}{comment.content}
-                </Text>
-              </View>
+        <View style={styles.commentPreview}>
+          {post.comments.slice(0, 2).map(comment => (
+            <View key={comment.id} style={styles.commentPreviewRow}>
+              <Pressable onPress={() => {
+                if (currentUserId && comment.userId === currentUserId) {
+                  router.push('/(tabs)/profile');
+                } else {
+                  router.push(`/user/${comment.userId}`);
+                }
+              }}>
+                <Image
+                  source={{ uri: comment.userAvatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${comment.userName}` }}
+                  style={styles.commentPreviewAvatar}
+                />
+              </Pressable>
+              <Text style={styles.commentText} numberOfLines={2}>
+                {comment.content}
+              </Text>
             </View>
           ))}
-          {post.commentsCount > 2 && (
-            <Pressable onPress={() => onComment?.(post.id)}>
-              <Text style={styles.moreComments}>
-                Alle {post.commentsCount} Kommentare anzeigen
-              </Text>
-            </Pressable>
-          )}
         </View>
       )}
-    </Surface>
+
+      {/* Timestamp */}
+      <Text style={styles.timestamp}>{formatTimeAgo(post.createdAt)}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: spacing.md,
-    overflow: 'hidden',
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.neutral[200],
   },
-  badgeRow: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  pinnedBadge: {
-    backgroundColor: Colors.primary[50],
-  },
-  highlightedBadge: {
-    backgroundColor: '#fef3c7',
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: Colors.primary[700],
-  },
+
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  avatarRing: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2.5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: Colors.neutral[100],
   },
-  avatarOrg: {
-    borderRadius: 12,
-  },
-  headerInfo: {
+  headerText: {
     flex: 1,
-    marginLeft: spacing.sm,
+    marginLeft: 10,
   },
-  nameRow: {
+  authorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   authorName: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.textPrimary,
   },
-  verifiedBadge: {
-    marginLeft: 2,
-  },
-  levelBadge: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  timestamp: {
+  authorSubLabel: {
     fontSize: 12,
     color: Colors.textMuted,
-  },
-  postTypeText: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-  typeIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  text: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: spacing.sm,
-  },
-  imageContainer: {
-    marginTop: spacing.sm,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  postImage: {
-    width: '100%',
-    height: 180,
-    backgroundColor: Colors.neutral[100],
-  },
-  challengeCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.sm,
-    backgroundColor: Colors.neutral[50],
-    borderRadius: 12,
-    marginTop: spacing.sm,
-  },
-  challengeImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    backgroundColor: Colors.neutral[100],
-  },
-  challengeInfo: {
-    flex: 1,
-    marginLeft: spacing.sm,
-  },
-  challengeTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-  },
-  challengeMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 4,
+    marginTop: 1,
   },
   xpBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-  },
-  xpText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#f59e0b',
-  },
-  durationText: {
-    fontSize: 12,
-    color: Colors.textMuted,
-  },
-  badgeContainer: {
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    backgroundColor: Colors.accent[50],
-    borderRadius: 12,
-    marginTop: spacing.sm,
-  },
-  badgeName: {
-    marginTop: spacing.xs,
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.accent[700],
-  },
-  teamRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: spacing.sm,
-    backgroundColor: Colors.secondary[50],
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-  },
-  teamText: {
-    fontSize: 12,
-    color: Colors.secondary[700],
-    fontWeight: '500',
-  },
-  streakBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: spacing.sm,
-    backgroundColor: '#fff7ed',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  streakText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#c2410c',
-  },
-  xpEarnedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: spacing.sm,
     backgroundColor: '#fef3c7',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  xpEarnedText: {
+  xpBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#b45309',
   },
-  reactionsSummary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+  menuButton: {
+    marginLeft: 8,
+    padding: 4,
   },
-  reactionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  reactionEmoji: {
-    fontSize: 14,
-  },
-  reactionCount: {
-    fontSize: 13,
-    color: Colors.textMuted,
-    marginLeft: 4,
-  },
-  commentCount: {
-    fontSize: 13,
-    color: Colors.textMuted,
-  },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: Colors.neutral[100],
-    gap: spacing.lg,
-  },
-  reactionWrapper: {
+
+  // Image
+  imageWrapper: {
+    width: SCREEN_WIDTH,
+    aspectRatio: 4 / 3,
+    backgroundColor: Colors.neutral[100],
     position: 'relative',
+  },
+  postImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heartOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Actions
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 4,
+    gap: 16,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-  },
-  activeReaction: {
-    fontSize: 20,
-  },
-  actionText: {
-    fontSize: 13,
-    color: Colors.textMuted,
-    fontWeight: '500',
-  },
-  actionTextActive: {
-    color: Colors.primary[600],
-  },
-  reactionPicker: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    padding: 2,
     gap: 4,
   },
-  reactionOption: {
-    padding: 6,
-  },
-  reactionOptionEmoji: {
-    fontSize: 24,
-  },
-  joinButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.primary[600],
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 16,
-    marginLeft: 'auto',
-  },
-  joinButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  commentsPreview: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    gap: 8,
-  },
-  commentRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  commentAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.neutral[100],
-  },
-  commentContent: {
-    flex: 1,
-  },
-  commentText: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-    lineHeight: 18,
-  },
-  commentAuthor: {
+  actionCount: {
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.textPrimary,
   },
-  moreComments: {
-    fontSize: 13,
+  actionCountLiked: {
+    color: '#ef4444',
+  },
+
+  // Caption
+  captionContainer: {
+    paddingHorizontal: 14,
+    paddingTop: 4,
+  },
+  captionText: {
+    fontSize: 14,
+    color: Colors.textPrimary,
+    lineHeight: 20,
+  },
+  moreText: {
+    fontSize: 14,
     color: Colors.textMuted,
-    fontWeight: '500',
-    marginTop: 4,
+    marginTop: 2,
+  },
+
+  // Comments
+  viewComments: {
+    fontSize: 14,
+    color: Colors.textMuted,
+    paddingHorizontal: 14,
+    paddingTop: 6,
+  },
+  commentPreview: {
+    paddingHorizontal: 14,
+    paddingTop: 4,
+    gap: 6,
+  },
+  commentPreviewRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  commentPreviewAvatar: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: Colors.neutral[100],
+    marginTop: 1,
+  },
+  commentText: {
+    fontSize: 14,
+    color: Colors.textPrimary,
+    lineHeight: 18,
+    flex: 1,
+  },
+  // Timestamp
+  timestamp: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    paddingHorizontal: 14,
+    paddingTop: 6,
+    paddingBottom: 14,
+    textTransform: 'lowercase',
   },
 });

@@ -1,8 +1,8 @@
 // Interests Selection Screen
 // Users select their preferred challenge categories
 
-import { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, Animated } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
 import { useLanguageStore } from '@/store/languageStore';
+import OnboardingProgress from '@/components/OnboardingProgress';
 import { CATEGORIES as SHARED_CATEGORIES } from '@solvterra/shared';
 import type { ChallengeCategory } from '@solvterra/shared';
 
@@ -82,6 +83,11 @@ export default function InterestsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Progress Indicator */}
+      <View style={styles.progressContainer}>
+        <OnboardingProgress currentStep={3} totalSteps={4} />
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
@@ -172,6 +178,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  progressContainer: {
+    paddingTop: spacing.md,
   },
   scrollContent: {
     padding: spacing.lg,

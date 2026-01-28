@@ -2,6 +2,8 @@
 // Demo data for presentation - aligned with mobile app data
 // Presentation date: December 11, 2025
 
+export type VerificationStatus = 'pending' | 'verified' | 'rejected';
+
 export interface Organization {
   id: string;
   name: string;
@@ -10,8 +12,17 @@ export interface Organization {
   mission: string;
   email: string;
   website: string;
-  verified: boolean;
-  category: string;
+  category: 'environment' | 'social' | 'education' | 'health' | 'animals' | 'culture';
+
+  // Verification
+  verificationStatus: VerificationStatus;
+  rejectionReason?: string;
+  verifiedAt?: Date;
+
+  // Legacy field (deprecated)
+  verified?: boolean;
+
+  // Stats
   ratingAvg: number;
   ratingCount: number;
   createdAt: Date;
@@ -165,8 +176,10 @@ export const MOCK_ORGANIZATION: Organization = {
   mission: 'Lebensmittel retten. Menschen helfen.',
   email: 'kontakt@tafel-rheinmain.de',
   website: 'https://tafel-rheinmain.de',
-  verified: true,
-  category: 'Soziales',
+  category: 'social',
+  verificationStatus: 'verified',
+  verifiedAt: new Date('2025-02-01'),
+  verified: true, // Legacy
   ratingAvg: 4.9,
   ratingCount: 456,
   createdAt: new Date('2025-02-01'),
@@ -815,6 +828,18 @@ export const STATUS_LABELS: Record<string, string> = {
   submitted: 'Eingereicht',
   approved: 'Genehmigt',
   rejected: 'Abgelehnt',
+};
+
+export const VERIFICATION_STATUS_LABELS: Record<VerificationStatus, string> = {
+  pending: 'Wird geprüft',
+  verified: 'Verifiziert',
+  rejected: 'Abgelehnt',
+};
+
+export const VERIFICATION_STATUS_COLORS: Record<VerificationStatus, string> = {
+  pending: '#f59e0b', // Amber
+  verified: '#22c55e', // Green
+  rejected: '#ef4444', // Red
 };
 
 export const LEVEL_LABELS: Record<string, string> = {

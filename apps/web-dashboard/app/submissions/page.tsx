@@ -18,6 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSubmissionStore } from '@/store';
 import { formatRelativeTime, formatDateTime } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useIsRejected } from '@/components/verification-banner';
 
 const STATUS_CONFIG = {
   submitted: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50', label: 'Ausstehend' },
@@ -25,10 +27,33 @@ const STATUS_CONFIG = {
   rejected: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', label: 'Abgelehnt' },
 };
 
+function SubmissionsSkeleton() {
+  return (
+    <div className="p-6 space-y-4">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Card key={i}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5 w-36" />
+                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 export default function SubmissionsPage() {
-  const { submissions, pendingCount, approveSubmission, rejectSubmission } = useSubmissionStore();
+  const { submissions, loading, pendingCount, approveSubmission, rejectSubmission } = useSubmissionStore();
   const [activeTab, setActiveTab] = useState('submitted');
   const [selectedSubmission, setSelectedSubmission] = useState<string | null>(null);
+  const isRejected = useIsRejected();
 
   const filteredSubmissions = submissions.filter((s) => s.status === activeTab);
 
@@ -49,6 +74,18 @@ export default function SubmissionsPage() {
   };
 
   const selected = submissions.find((s) => s.id === selectedSubmission);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col">
+        <Header
+          title="Einreichungen"
+          description="Prüfe und bewerte Studenteneinreichungen"
+        />
+        <SubmissionsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col">
@@ -205,22 +242,31 @@ export default function SubmissionsPage() {
 
                   {/* Actions */}
                   {selected.status === 'submitted' && (
-                    <div className="flex gap-2 pt-4">
-                      <Button
-                        variant="outline"
-                        className="flex-1 text-red-600 hover:bg-red-50"
-                        onClick={() => handleReject(selected.id)}
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Ablehnen
-                      </Button>
-                      <Button
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handleApprove(selected.id)}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Genehmigen
-                      </Button>
+                    <div className="space-y-3 pt-4">
+                      {isRejected && (
+                        <p className="text-xs text-red-600 bg-red-50 p-2 rounded">
+                          Deine Organisation wurde abgelehnt. Du kannst Einreichungen nicht mehr bewerten.
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1 text-red-600 hover:bg-red-50"
+                          onClick={() => handleReject(selected.id)}
+                          disabled={isRejected}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Ablehnen
+                        </Button>
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleApprove(selected.id)}
+                          disabled={isRejected}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Genehmigen
+                        </Button>
+                      </div>
                     </div>
                   )}
 

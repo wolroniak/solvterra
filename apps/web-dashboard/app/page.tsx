@@ -30,10 +30,62 @@ import { Progress } from '@/components/ui/progress';
 import { useChallengeStore, useSubmissionStore } from '@/store';
 import { MOCK_WEEKLY_DATA, STATUS_LABELS, CATEGORY_LABELS } from '@/lib/mock-data';
 import { formatRelativeTime } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function DashboardSkeleton() {
+  return (
+    <div className="flex flex-col">
+      <div className="border-b px-6 py-4">
+        <Skeleton className="h-8 w-40" />
+        <Skeleton className="h-4 w-72 mt-2" />
+      </div>
+      <div className="p-6 space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-4 rounded" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-7 w-12 mb-1" />
+                <Skeleton className="h-3 w-24" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader><Skeleton className="h-5 w-44" /></CardHeader>
+            <CardContent><Skeleton className="h-64 w-full" /></CardContent>
+          </Card>
+          <Card>
+            <CardHeader><Skeleton className="h-5 w-48" /></CardHeader>
+            <CardContent className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
-  const { challenges, stats } = useChallengeStore();
-  const { submissions, pendingCount } = useSubmissionStore();
+  const { challenges, stats, loading: challengesLoading } = useChallengeStore();
+  const { submissions, pendingCount, loading: submissionsLoading } = useSubmissionStore();
+
+  if (challengesLoading || submissionsLoading) {
+    return <DashboardSkeleton />;
+  }
 
   const recentSubmissions = submissions
     .filter((s) => s.status === 'submitted')

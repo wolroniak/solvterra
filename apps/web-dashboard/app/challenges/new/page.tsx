@@ -27,6 +27,8 @@ import {
   type ChallengeSchedule,
   type ChallengeContact,
 } from '@/lib/mock-data';
+import { useVerificationStatus } from '@/components/verification-banner';
+import { AlertCircle } from 'lucide-react';
 import {
   LocationSection,
   ScheduleSection,
@@ -110,6 +112,48 @@ const TEMPLATES = [
 export default function NewChallengePage() {
   const router = useRouter();
   const { addChallenge } = useChallengeStore();
+  const { isRejected, rejectionReason } = useVerificationStatus();
+
+  // Block access for rejected organizations
+  if (isRejected) {
+    return (
+      <div className="flex flex-col">
+        <Header
+          title="Neue Challenge"
+          description="Erstelle eine neue Micro-Volunteering Challenge"
+          action={
+            <Link href="/challenges">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Zurück
+              </Button>
+            </Link>
+          }
+        />
+        <div className="p-6">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="flex items-start gap-4 p-6">
+              <AlertCircle className="h-6 w-6 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-800">Zugang eingeschränkt</h3>
+                <p className="text-sm text-red-700 mt-1">
+                  Deine Organisation wurde abgelehnt und kann keine neuen Challenges erstellen.
+                </p>
+                {rejectionReason && (
+                  <p className="text-sm text-red-600 mt-2 p-2 bg-red-100 rounded">
+                    <strong>Grund:</strong> {rejectionReason}
+                  </p>
+                )}
+                <p className="text-sm text-red-700 mt-3">
+                  Bitte kontaktiere den Support, wenn du Fragen hast oder Einspruch erheben möchtest.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // Basic form data
   const [formData, setFormData] = useState({

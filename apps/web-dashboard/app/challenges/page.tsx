@@ -19,7 +19,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useChallengeStore } from '@/store';
 import { CATEGORY_LABELS, STATUS_LABELS } from '@/lib/mock-data';
+import { useCanPublish, useCanCreateChallenges } from '@/components/verification-banner';
 import { formatDate, cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const STATUS_BADGES: Record<string, { variant: 'default' | 'success' | 'warning' | 'info' | 'outline'; label: string }> = {
   draft: { variant: 'outline', label: 'Entwurf' },
@@ -28,10 +30,40 @@ const STATUS_BADGES: Record<string, { variant: 'default' | 'success' | 'warning'
   completed: { variant: 'info', label: 'Abgeschlossen' },
 };
 
+function ChallengesSkeleton() {
+  return (
+    <div className="p-6 space-y-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Card key={i}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-72" />
+                <div className="flex gap-3">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-8 w-8 rounded" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 export default function ChallengesPage() {
-  const { challenges, deleteChallenge, publishChallenge, pauseChallenge } = useChallengeStore();
+  const { challenges, loading, deleteChallenge, publishChallenge, pauseChallenge } = useChallengeStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const canPublish = useCanPublish();
+  const canCreate = useCanCreateChallenges();
 
   const filteredChallenges = challenges.filter((c) => {
     const matchesSearch =
@@ -49,19 +81,49 @@ export default function ChallengesPage() {
     paused: challenges.filter((c) => c.status === 'paused').length,
   };
 
+  const NewChallengeButton = () => (
+    <div className="relative group">
+      {canCreate ? (
+        <Link href="/challenges/new">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Neue Challenge
+          </Button>
+        </Link>
+      ) : (
+        <Button disabled className="opacity-50 cursor-not-allowed">
+          <Plus className="h-4 w-4 mr-2" />
+          Neue Challenge
+        </Button>
+      )}
+      {!canCreate && (
+        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+          Organisation wurde abgelehnt
+          <div className="absolute top-full right-4 border-4 border-transparent border-t-slate-900" />
+        </div>
+      )}
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="flex flex-col">
+        <Header
+          title="Challenges"
+          description="Verwalte deine Micro-Volunteering Challenges"
+          action={<NewChallengeButton />}
+        />
+        <ChallengesSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
       <Header
         title="Challenges"
         description="Verwalte deine Micro-Volunteering Challenges"
-        action={
-          <Link href="/challenges/new">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Neue Challenge
-            </Button>
-          </Link>
-        }
+        action={<NewChallengeButton />}
       />
 
       <div className="p-6 space-y-6">
@@ -177,14 +239,22 @@ export default function ChallengesPage() {
                               </Button>
                             </Link>
                             {challenge.status === 'draft' && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-green-600"
-                                onClick={() => publishChallenge(challenge.id)}
-                              >
-                                <Play className="h-4 w-4" />
-                              </Button>
+                              <div className="relative group">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className={`h-8 w-8 ${canPublish ? 'text-green-600' : 'text-slate-400 cursor-not-allowed'}`}
+                                  onClick={() => canPublish && publishChallenge(challenge.id)}
+                                  disabled={!canPublish}
+                                >
+                                  <Play className="h-4 w-4" />
+                                </Button>
+                                {!canPublish && (
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                                    Warte auf Verifizierung
+                                  </div>
+                                )}
+                              </div>
                             )}
                             {challenge.status === 'active' && (
                               <Button
