@@ -1,13 +1,14 @@
 // InviteFriendsModal Component
 // Modal for inviting friends to team challenges
 
-import { useState } from 'react';
-import { View, StyleSheet, FlatList, Image, Pressable, Share, Platform } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, StyleSheet, FlatList, Image, Pressable, Share, Alert } from 'react-native';
 import { Text, Button, Portal, Modal, Checkbox, Divider } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, spacing } from '@/constants/theme';
-import { MOCK_FRIENDS, LEVELS } from '@solvterra/shared';
-import type { Friend, Challenge } from '@solvterra/shared';
+import { LEVELS } from '@solvterra/shared';
+import type { FriendListItem, Challenge } from '@solvterra/shared';
+import { useFriendStore, useTeamStore } from '@/store';
 
 interface InviteFriendsModalProps {
   visible: boolean;
@@ -17,7 +18,7 @@ interface InviteFriendsModalProps {
 }
 
 // Get level color
-const getLevelColor = (level: Friend['level']) => {
+const getLevelColor = (level: FriendListItem['level']) => {
   const levelConfig = LEVELS.find(l => l.level === level);
   return levelConfig?.color || Colors.neutral[500];
 };
@@ -30,6 +31,15 @@ export default function InviteFriendsModal({
 }: InviteFriendsModalProps) {
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [inviteSent, setInviteSent] = useState(false);
+
+  const { friends, fetchFriends, isLoading: isFriendsLoading } = useFriendStore();
+  const { createTeam } = useTeamStore();
+
+  useEffect(() => {
+    if (visible) {
+      fetchFriends();
+    }
+  }, [visible, fetchFriends]);
 
   const minRequired = challenge.minTeamSize ? challenge.minTeamSize - 1 : 1;
   const maxAllowed = challenge.maxTeamSize ? challenge.maxTeamSize - 1 : 3;
@@ -57,11 +67,21 @@ export default function InviteFriendsModal({
     }
   };
 
-  const handleSendInvites = () => {
+  const handleSendInvites = async () => {
     setInviteSent(true);
-    setTimeout(() => {
-      onInviteComplete(selectedFriends);
-    }, 1500);
+
+    // Create team with selected friends
+    const team = await createTeam(challenge.id, selectedFriends);
+
+    if (team) {
+      setTimeout(() => {
+        onInviteComplete(selectedFriends);
+      }, 1500);
+    } else {
+      // Handle error
+      setInviteSent(false);
+      Alert.alert('Fehler', 'Team konnte nicht erstellt werden');
+    }
   };
 
   const handleClose = () => {
@@ -70,9 +90,10 @@ export default function InviteFriendsModal({
     onDismiss();
   };
 
-  const renderFriendItem = ({ item }: { item: Friend }) => {
+  const renderFriendItem = ({ item }: { item: FriendListItem }) => {
     const isSelected = selectedFriends.includes(item.id);
     const isDisabled = !isSelected && selectedFriends.length >= maxAllowed;
+    const levelConfig = LEVELS.find(l => l.level === item.level);
 
     return (
       <Pressable
@@ -88,7 +109,7 @@ export default function InviteFriendsModal({
           <Text style={styles.friendName}>{item.name}</Text>
           <View style={styles.friendMeta}>
             <View style={[styles.levelDot, { backgroundColor: getLevelColor(item.level) }]} />
-            <Text style={styles.friendXp}>{item.xpTotal} XP</Text>
+            <Text style={styles.friendXp}>{levelConfig?.name || item.level}</Text>
           </View>
         </View>
         <Checkbox
@@ -103,7 +124,7 @@ export default function InviteFriendsModal({
 
   // Success State
   if (inviteSent) {
-    const invitedNames = MOCK_FRIENDS
+    const invitedNames = friends
       .filter(f => selectedFriends.includes(f.id))
       .map(f => f.name.split(' ')[0]);
 
@@ -136,7 +157,7 @@ export default function InviteFriendsModal({
                   <Text style={styles.teamAvatarName}>Du</Text>
                 </View>
                 {/* Invited friends */}
-                {MOCK_FRIENDS
+                {friends
                   .filter(f => selectedFriends.includes(f.id))
                   .map(friend => (
                     <View key={friend.id} style={styles.teamAvatarContainer}>
@@ -180,11 +201,18 @@ export default function InviteFriendsModal({
         <View style={styles.friendsSection}>
           <Text style={styles.sectionTitle}>Freunde einladen</Text>
           <FlatList
-            data={MOCK_FRIENDS}
+            data={friends}
             keyExtractor={item => item.id}
             renderItem={renderFriendItem}
             style={styles.friendsList}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              isFriendsLoading ? (
+                <Text style={styles.emptyText}>Lade Freunde...</Text>
+              ) : (
+                <Text style={styles.emptyText}>Noch keine Freunde hinzugefügt</Text>
+              )
+            }
           />
 
           {selectedFriends.length > 0 && (
@@ -316,6 +344,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
     marginTop: spacing.sm,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: Colors.textMuted,
+    fontSize: 14,
+    paddingVertical: spacing.md,
   },
   divider: {
     marginVertical: spacing.md,
