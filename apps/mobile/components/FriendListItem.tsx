@@ -21,7 +21,7 @@ const getLevelColor = (level: string) => {
 
 const getLevelLabel = (level: string) => {
   const levelConfig = LEVELS.find(l => l.level === level);
-  return levelConfig?.label || level;
+  return levelConfig?.name || level;
 };
 
 export default function FriendListItem({
