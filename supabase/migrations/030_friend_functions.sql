@@ -8,7 +8,7 @@ RETURNS TABLE(
   name TEXT,
   username TEXT,
   avatar_url TEXT,
-  level TEXT,
+  level INT,
   shared_challenges BIGINT
 ) AS $$
 BEGIN
@@ -46,7 +46,7 @@ RETURNS TABLE(
   name TEXT,
   username TEXT,
   avatar_url TEXT,
-  level TEXT,
+  level INT,
   friendship_id UUID
 ) AS $$
 BEGIN
@@ -76,7 +76,7 @@ RETURNS TABLE(
   name TEXT,
   username TEXT,
   avatar_url TEXT,
-  level TEXT,
+  level INT,
   created_at TIMESTAMPTZ
 ) AS $$
 BEGIN
@@ -104,7 +104,7 @@ RETURNS TABLE(
   name TEXT,
   username TEXT,
   avatar_url TEXT,
-  level TEXT,
+  level INT,
   friendship_status TEXT
 ) AS $$
 BEGIN

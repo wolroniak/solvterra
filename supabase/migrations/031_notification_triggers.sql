@@ -9,7 +9,7 @@ DECLARE
 BEGIN
   SELECT name INTO requester_name FROM users WHERE id = NEW.requester_id;
 
-  INSERT INTO notifications (user_id, type, title, body, data)
+  INSERT INTO app_notifications (user_id, type, title, body, data)
   VALUES (
     NEW.addressee_id,
     'friend_request',
@@ -36,7 +36,7 @@ BEGIN
   IF NEW.status = 'accepted' AND OLD.status = 'pending' THEN
     SELECT name INTO accepter_name FROM users WHERE id = NEW.addressee_id;
 
-    INSERT INTO notifications (user_id, type, title, body, data)
+    INSERT INTO app_notifications (user_id, type, title, body, data)
     VALUES (
       NEW.requester_id,
       'friend_accepted',
@@ -73,7 +73,7 @@ BEGIN
   JOIN challenges c ON t.challenge_id = c.id
   WHERE t.id = NEW.team_id;
 
-  INSERT INTO notifications (user_id, type, title, body, data)
+  INSERT INTO app_notifications (user_id, type, title, body, data)
   VALUES (
     NEW.user_id,
     'team_invite',
@@ -117,7 +117,7 @@ BEGIN
     SET status = 'active', activated_at = now()
     WHERE id = NEW.team_id;
 
-    INSERT INTO notifications (user_id, type, title, body, data)
+    INSERT INTO app_notifications (user_id, type, title, body, data)
     SELECT
       tm.user_id,
       'team_activated',
@@ -179,7 +179,7 @@ BEGIN
 
     UPDATE teams SET status = 'completed' WHERE id = NEW.team_id;
 
-    INSERT INTO notifications (user_id, type, title, body, data)
+    INSERT INTO app_notifications (user_id, type, title, body, data)
     SELECT
       tm.user_id,
       'team_bonus',
