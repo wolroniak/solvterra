@@ -17,8 +17,8 @@ interface NotificationData {
  */
 export function useNotificationListener() {
   const router = useRouter();
-  const notificationListener = useRef<Subscription>();
-  const responseListener = useRef<Subscription>();
+  const notificationListener = useRef<Subscription | null>(null);
+  const responseListener = useRef<Subscription | null>(null);
 
   useEffect(() => {
     // Handle notifications received while app is in foreground
@@ -66,10 +66,10 @@ export function useNotificationListener() {
     // Cleanup subscriptions on unmount
     return () => {
       if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
+        notificationListener.current.remove();
       }
       if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
+        responseListener.current.remove();
       }
     };
   }, [router]);
