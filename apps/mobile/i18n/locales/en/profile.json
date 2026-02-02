@@ -49,5 +49,29 @@
     "night-owl": "Night Owl",
     "five-star": "Five Star",
     "week-streak": "Week Warrior"
+  },
+  "badgeDescriptions": {
+    "first-challenge": "Complete your first challenge",
+    "five-challenges": "Complete 5 challenges",
+    "ten-challenges": "Complete 10 challenges",
+    "twentyfive-challenges": "Complete 25 challenges",
+    "eco-warrior": "5 environment challenges",
+    "social-butterfly": "5 social challenges",
+    "knowledge-seeker": "5 education challenges",
+    "health-hero": "5 health challenges",
+    "early-bird": "Complete a challenge before 8 AM",
+    "night-owl": "Complete a challenge after 10 PM",
+    "five-star": "Receive a 5-star rating",
+    "week-streak": "7 days active in a row"
+  },
+  "badgeCategories": {
+    "milestone": "Milestone",
+    "category": "Category",
+    "special": "Special",
+    "streak": "Streak"
+  },
+  "badgeCollection": {
+    "title": "Badge Collection",
+    "progress": "of {{total}} Badges"
   }
 }

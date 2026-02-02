@@ -49,5 +49,29 @@
     "night-owl": "Nachteule",
     "five-star": "Fünf Sterne",
     "week-streak": "Wochenkrieger"
+  },
+  "badgeDescriptions": {
+    "first-challenge": "Erste Challenge abgeschlossen",
+    "five-challenges": "5 Challenges abgeschlossen",
+    "ten-challenges": "10 Challenges abgeschlossen",
+    "twentyfive-challenges": "25 Challenges abgeschlossen",
+    "eco-warrior": "5 Umwelt-Challenges",
+    "social-butterfly": "5 Soziale Challenges",
+    "knowledge-seeker": "5 Bildungs-Challenges",
+    "health-hero": "5 Gesundheits-Challenges",
+    "early-bird": "Challenge vor 8 Uhr abgeschlossen",
+    "night-owl": "Challenge nach 22 Uhr abgeschlossen",
+    "five-star": "5-Sterne-Bewertung erhalten",
+    "week-streak": "7 Tage in Folge aktiv"
+  },
+  "badgeCategories": {
+    "milestone": "Meilenstein",
+    "category": "Kategorie",
+    "special": "Speziell",
+    "streak": "Streak"
+  },
+  "badgeCollection": {
+    "title": "Badge-Sammlung",
+    "progress": "von {{total}} Badges"
   }
 }
