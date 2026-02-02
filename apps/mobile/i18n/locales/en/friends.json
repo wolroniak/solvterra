@@ -49,6 +49,7 @@
     },
     "yourTeam": "Your Team",
     "completedCount": "{{completed}}/{{total}} completed",
+    "you": "You",
     "bonusHint": "Complete as a team for +20% XP bonus!",
     "bonusEarned": "Team bonus unlocked: +{{xp}} XP!"
   }
