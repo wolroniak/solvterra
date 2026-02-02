@@ -13,7 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#2e6417"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "de.solvterra.app"
@@ -43,6 +45,13 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6ae053af-e71e-4c1f-b158-5f89d2b4b68f"
+      }
+    },
+    "owner": "solvterra"
   }
 }
