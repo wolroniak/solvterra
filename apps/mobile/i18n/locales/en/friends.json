@@ -1,0 +1,55 @@
+{
+  "title": "Friends",
+  "search": {
+    "title": "Search Friends",
+    "placeholder": "Search by username...",
+    "noResults": "No users found",
+    "minChars": "Enter at least 2 characters"
+  },
+  "sections": {
+    "requests": "Requests",
+    "suggestions": "Suggestions",
+    "friends": "My Friends"
+  },
+  "suggestion": {
+    "sharedChallenges": "{{count}} shared challenges"
+  },
+  "actions": {
+    "add": "Add",
+    "accept": "Accept",
+    "decline": "Decline",
+    "unfriend": "Remove",
+    "requestSent": "Request sent"
+  },
+  "empty": {
+    "requests": "No pending requests",
+    "suggestions": "No suggestions available",
+    "friends": "You don't have any friends yet",
+    "friendsHint": "Search for users or complete challenges to get suggestions"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "older": "Older"
+  },
+  "team": {
+    "invite": "Team Invitation",
+    "members": "{{current}}/{{max}} members",
+    "endsIn": "Ends in {{days}} days",
+    "accept": "Join",
+    "decline": "Decline",
+    "status": {
+      "forming": "Team forming",
+      "active": "Team active",
+      "completed": "Completed"
+    },
+    "yourTeam": "Your Team",
+    "completedCount": "{{completed}}/{{total}} completed",
+    "bonusHint": "Complete as a team for +20% XP bonus!",
+    "bonusEarned": "Team bonus unlocked: +{{xp}} XP!"
+  }
+}

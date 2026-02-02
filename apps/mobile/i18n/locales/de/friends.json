@@ -1,0 +1,55 @@
+{
+  "title": "Freunde",
+  "search": {
+    "title": "Freunde suchen",
+    "placeholder": "Nutzername suchen...",
+    "noResults": "Keine Nutzer gefunden",
+    "minChars": "Mindestens 2 Zeichen eingeben"
+  },
+  "sections": {
+    "requests": "Anfragen",
+    "suggestions": "Vorschläge",
+    "friends": "Meine Freunde"
+  },
+  "suggestion": {
+    "sharedChallenges": "{{count}} gemeinsame Challenges"
+  },
+  "actions": {
+    "add": "Hinzufügen",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "unfriend": "Entfernen",
+    "requestSent": "Anfrage gesendet"
+  },
+  "empty": {
+    "requests": "Keine ausstehenden Anfragen",
+    "suggestions": "Keine Vorschläge verfügbar",
+    "friends": "Du hast noch keine Freunde",
+    "friendsHint": "Suche nach Nutzern oder schließe Challenges ab, um Vorschläge zu erhalten"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "empty": "Keine Benachrichtigungen",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "thisWeek": "Diese Woche",
+    "older": "Älter"
+  },
+  "team": {
+    "invite": "Team-Einladung",
+    "members": "{{current}}/{{max}} Mitglieder",
+    "endsIn": "Endet in {{days}} Tagen",
+    "accept": "Beitreten",
+    "decline": "Ablehnen",
+    "status": {
+      "forming": "Team wird gebildet",
+      "active": "Team aktiv",
+      "completed": "Abgeschlossen"
+    },
+    "yourTeam": "Dein Team",
+    "completedCount": "{{completed}}/{{total}} abgeschlossen",
+    "bonusHint": "Schließt als Team ab für +20% XP Bonus!",
+    "bonusEarned": "Team-Bonus freigeschaltet: +{{xp}} XP!"
+  }
+}
