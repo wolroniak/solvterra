@@ -12,6 +12,7 @@ import deAuth from './locales/de/auth.json';
 import deChallenges from './locales/de/challenges.json';
 import deProfile from './locales/de/profile.json';
 import deCommunity from './locales/de/community.json';
+import deFriends from './locales/de/friends.json';
 
 import enCommon from './locales/en/common.json';
 import enNavigation from './locales/en/navigation.json';
@@ -19,6 +20,7 @@ import enAuth from './locales/en/auth.json';
 import enChallenges from './locales/en/challenges.json';
 import enProfile from './locales/en/profile.json';
 import enCommunity from './locales/en/community.json';
+import enFriends from './locales/en/friends.json';
 
 // Resources object with namespaces
 const resources = {
@@ -29,6 +31,7 @@ const resources = {
     challenges: deChallenges,
     profile: deProfile,
     community: deCommunity,
+    friends: deFriends,
   },
   en: {
     common: enCommon,
@@ -37,6 +40,7 @@ const resources = {
     challenges: enChallenges,
     profile: enProfile,
     community: enCommunity,
+    friends: enFriends,
   },
 };
 
@@ -52,7 +56,7 @@ i18n.use(initReactI18next).init({
   lng: defaultLanguage,
   fallbackLng: 'de',
   defaultNS: 'common',
-  ns: ['common', 'navigation', 'auth', 'challenges', 'profile', 'community'],
+  ns: ['common', 'navigation', 'auth', 'challenges', 'profile', 'community', 'friends'],
   interpolation: {
     escapeValue: false, // React already escapes values
   },

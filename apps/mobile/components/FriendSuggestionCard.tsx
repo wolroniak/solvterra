@@ -8,15 +8,19 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { LEVELS } from '@solvterra/shared';
-import type { FriendSuggestion } from '@solvterra/shared';
+import type { FriendSuggestion, UserLevel } from '@solvterra/shared';
 
 interface FriendSuggestionCardProps {
   suggestion: FriendSuggestion;
   onAdd: (userId: string) => Promise<boolean>;
 }
 
-const getLevelColor = (level: string) => {
-  const levelConfig = LEVELS.find(l => l.level === level);
+// Convert numeric level (1-5) to UserLevel string
+const LEVEL_MAP: UserLevel[] = ['starter', 'helper', 'supporter', 'champion', 'legend'];
+
+const getLevelColor = (level: number | UserLevel) => {
+  const levelStr = typeof level === 'string' ? level : LEVEL_MAP[Math.max(0, Math.min(level - 1, LEVEL_MAP.length - 1))] || 'starter';
+  const levelConfig = LEVELS.find(l => l.level === levelStr);
   return levelConfig?.color || Colors.neutral[500];
 };
 

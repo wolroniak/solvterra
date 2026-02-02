@@ -6,7 +6,7 @@ import { Text, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
 import { LEVELS } from '@solvterra/shared';
-import type { FriendRequest } from '@solvterra/shared';
+import type { FriendRequest, UserLevel } from '@solvterra/shared';
 
 interface FriendRequestCardProps {
   request: FriendRequest;
@@ -15,9 +15,17 @@ interface FriendRequestCardProps {
   isLoading?: boolean;
 }
 
-const getLevelColor = (level: string) => {
-  const levelConfig = LEVELS.find(l => l.level === level);
-  return levelConfig?.color || Colors.neutral[500];
+// Convert numeric level (1-5) to UserLevel string
+const LEVEL_MAP: UserLevel[] = ['starter', 'helper', 'supporter', 'champion', 'legend'];
+
+const getLevelString = (level: number | UserLevel): UserLevel => {
+  if (typeof level === 'string') return level;
+  return LEVEL_MAP[Math.max(0, Math.min(level - 1, LEVEL_MAP.length - 1))] || 'starter';
+};
+
+const getLevelConfig = (level: number | UserLevel) => {
+  const levelStr = getLevelString(level);
+  return LEVELS.find(l => l.level === levelStr) || LEVELS[0];
 };
 
 export default function FriendRequestCard({
@@ -42,9 +50,9 @@ export default function FriendRequestCard({
           <Text style={styles.username}>@{request.user.username}</Text>
         )}
         <View style={styles.levelRow}>
-          <View style={[styles.levelDot, { backgroundColor: getLevelColor(request.user.level) }]} />
+          <View style={[styles.levelDot, { backgroundColor: getLevelConfig(request.user.level).color }]} />
           <Text style={styles.levelText}>
-            {request.user.level.charAt(0).toUpperCase() + request.user.level.slice(1)}
+            {getLevelConfig(request.user.level).name}
           </Text>
         </View>
       </View>

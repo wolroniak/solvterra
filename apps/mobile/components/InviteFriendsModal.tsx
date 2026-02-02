@@ -7,7 +7,7 @@ import { Text, Button, Portal, Modal, Checkbox, Divider } from 'react-native-pap
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, spacing } from '@/constants/theme';
 import { LEVELS } from '@solvterra/shared';
-import type { FriendListItem, Challenge } from '@solvterra/shared';
+import type { FriendListItem, Challenge, UserLevel } from '@solvterra/shared';
 import { useFriendStore, useTeamStore } from '@/store';
 
 interface InviteFriendsModalProps {
@@ -17,10 +17,12 @@ interface InviteFriendsModalProps {
   onInviteComplete: (friends: string[]) => void;
 }
 
-// Get level color
-const getLevelColor = (level: FriendListItem['level']) => {
-  const levelConfig = LEVELS.find(l => l.level === level);
-  return levelConfig?.color || Colors.neutral[500];
+// Convert numeric level (1-5) to UserLevel string
+const LEVEL_MAP: UserLevel[] = ['starter', 'helper', 'supporter', 'champion', 'legend'];
+
+const getLevelConfig = (level: number | UserLevel) => {
+  const levelStr = typeof level === 'string' ? level : LEVEL_MAP[Math.max(0, Math.min(level - 1, LEVEL_MAP.length - 1))] || 'starter';
+  return LEVELS.find(l => l.level === levelStr) || LEVELS[0];
 };
 
 export default function InviteFriendsModal({
@@ -93,7 +95,7 @@ export default function InviteFriendsModal({
   const renderFriendItem = ({ item }: { item: FriendListItem }) => {
     const isSelected = selectedFriends.includes(item.id);
     const isDisabled = !isSelected && selectedFriends.length >= maxAllowed;
-    const levelConfig = LEVELS.find(l => l.level === item.level);
+    const levelConfig = getLevelConfig(item.level);
 
     return (
       <Pressable
@@ -114,8 +116,8 @@ export default function InviteFriendsModal({
         <View style={styles.friendInfo}>
           <Text style={styles.friendName}>{item.name}</Text>
           <View style={styles.friendMeta}>
-            <View style={[styles.levelDot, { backgroundColor: getLevelColor(item.level) }]} />
-            <Text style={styles.friendXp}>{levelConfig?.name || item.level}</Text>
+            <View style={[styles.levelDot, { backgroundColor: levelConfig.color }]} />
+            <Text style={styles.friendXp}>{levelConfig.name}</Text>
           </View>
         </View>
         <Checkbox

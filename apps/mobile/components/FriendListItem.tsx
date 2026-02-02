@@ -7,21 +7,24 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
 import { LEVELS } from '@solvterra/shared';
-import type { FriendListItem as FriendListItemType } from '@solvterra/shared';
+import type { FriendListItem as FriendListItemType, UserLevel } from '@solvterra/shared';
 
 interface FriendListItemProps {
   friend: FriendListItemType;
   onUnfriend: (friendshipId: string) => void;
 }
 
-const getLevelColor = (level: string) => {
-  const levelConfig = LEVELS.find(l => l.level === level);
-  return levelConfig?.color || Colors.neutral[500];
+// Convert numeric level (1-5) to UserLevel string
+const LEVEL_MAP: UserLevel[] = ['starter', 'helper', 'supporter', 'champion', 'legend'];
+
+const getLevelString = (level: number | UserLevel): UserLevel => {
+  if (typeof level === 'string') return level;
+  return LEVEL_MAP[Math.max(0, Math.min(level - 1, LEVEL_MAP.length - 1))] || 'starter';
 };
 
-const getLevelLabel = (level: string) => {
-  const levelConfig = LEVELS.find(l => l.level === level);
-  return levelConfig?.name || level;
+const getLevelConfig = (level: number | UserLevel) => {
+  const levelStr = getLevelString(level);
+  return LEVELS.find(l => l.level === levelStr) || LEVELS[0];
 };
 
 export default function FriendListItem({
@@ -62,8 +65,8 @@ export default function FriendListItem({
       <View style={styles.info}>
         <Text style={styles.name}>{friend.name}</Text>
         <View style={styles.levelRow}>
-          <View style={[styles.levelDot, { backgroundColor: getLevelColor(friend.level) }]} />
-          <Text style={styles.levelText}>{getLevelLabel(friend.level)}</Text>
+          <View style={[styles.levelDot, { backgroundColor: getLevelConfig(friend.level).color }]} />
+          <Text style={styles.levelText}>{getLevelConfig(friend.level).name}</Text>
         </View>
       </View>
 
