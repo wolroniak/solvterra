@@ -9,7 +9,6 @@ import { makeRedirectUri } from 'expo-auth-session';
 import type { User, UserBadge, ChallengeCategory, UserStats, UserLevel } from '@solvterra/shared';
 import { MOCK_USER, MOCK_NEW_USER, MOCK_USER_STATS, AVAILABLE_BADGES, XP_LEVELS } from '@solvterra/shared';
 import { supabase } from '../lib/supabase';
-import { registerForPushNotifications, unregisterPushToken } from '@/lib/notifications';
 
 // Required for Google OAuth to work properly
 WebBrowser.maybeCompleteAuthSession();
@@ -186,8 +185,6 @@ export const useUserStore = create<UserState>((set, get) => ({
           isAuthenticated: true,
           isLoading: false,
         });
-        // Register for push notifications (fire and forget)
-        registerForPushNotifications(session.user.id);
       } else {
         set({ isLoading: false });
       }
@@ -220,8 +217,6 @@ export const useUserStore = create<UserState>((set, get) => ({
           isAuthenticated: true,
           isLoading: false,
         });
-        // Register for push notifications (fire and forget)
-        registerForPushNotifications(data.user.id);
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -253,8 +248,6 @@ export const useUserStore = create<UserState>((set, get) => ({
           isAuthenticated: true,
           isLoading: false,
         });
-        // Register for push notifications (fire and forget)
-        registerForPushNotifications(data.user.id);
       }
     } catch (error) {
       console.error('Sign up failed:', error);
@@ -316,8 +309,6 @@ export const useUserStore = create<UserState>((set, get) => ({
                 isAuthenticated: true,
                 isLoading: false,
               });
-              // Register for push notifications (fire and forget)
-              registerForPushNotifications(sessionData.user.id);
               return;
             }
           }
@@ -334,12 +325,7 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   // Logout
   logout: async () => {
-    const { user } = get();
     try {
-      // Unregister push token before signing out
-      if (user) {
-        await unregisterPushToken(user.id);
-      }
       await supabase.auth.signOut();
     } catch (error) {
       console.error('Logout error:', error);

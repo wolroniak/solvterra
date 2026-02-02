@@ -8,8 +8,3 @@ export {
   useTranslatedChallenges,
   useTranslatedCommunityPosts,
 } from './useTranslatedContent';
-
-export {
-  useNotificationListener,
-  useLastNotificationResponse,
-} from './useNotificationListener';

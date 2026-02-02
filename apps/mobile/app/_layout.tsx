@@ -7,15 +7,11 @@ import { PaperProvider } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
-import { useNotificationListener } from '@/hooks/useNotificationListener';
 import i18n from '../i18n';
 
 // Inner component that uses translation hook
 function RootLayoutNav() {
   const { t } = useTranslation('common');
-
-  // Listen for incoming notifications while app is running
-  useNotificationListener();
 
   return (
     <>

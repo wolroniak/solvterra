@@ -597,7 +597,9 @@ export const useSubmissionStore = create<SubmissionState>((set) => ({
     );
     const xpEarned = challenge?.xpReward || 0;
 
-    const { error } = await supabase
+    console.log('Approving submission:', { id, rating, feedback, xpEarned });
+
+    const { data, error } = await supabase
       .from('submissions')
       .update({
         status: 'approved',
@@ -606,11 +608,20 @@ export const useSubmissionStore = create<SubmissionState>((set) => ({
         xp_earned: xpEarned,
         reviewed_at: new Date().toISOString(),
       })
-      .eq('id', id);
+      .eq('id', id)
+      .select();
+
+    console.log('Approve result:', { data, error });
 
     if (error) {
       console.error('Failed to approve submission:', error);
       showError('Einreichung konnte nicht genehmigt werden');
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      console.error('No rows updated - possible RLS policy issue or submission not found');
+      showError('Keine Berechtigung zum Genehmigen dieser Einreichung');
       return;
     }
 
@@ -641,18 +652,29 @@ export const useSubmissionStore = create<SubmissionState>((set) => ({
   },
 
   rejectSubmission: async (id, feedback) => {
-    const { error } = await supabase
+    console.log('Rejecting submission:', { id, feedback });
+
+    const { data, error } = await supabase
       .from('submissions')
       .update({
         status: 'rejected',
         ngo_feedback: feedback,
         reviewed_at: new Date().toISOString(),
       })
-      .eq('id', id);
+      .eq('id', id)
+      .select();
+
+    console.log('Reject result:', { data, error });
 
     if (error) {
       console.error('Failed to reject submission:', error);
       showError('Einreichung konnte nicht abgelehnt werden');
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      console.error('No rows updated - possible RLS policy issue or submission not found');
+      showError('Keine Berechtigung zum Ablehnen dieser Einreichung');
       return;
     }
 
