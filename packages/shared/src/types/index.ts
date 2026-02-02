@@ -497,3 +497,122 @@ export interface Friend {
   xpTotal: number;
   isFriend: boolean;
 }
+
+// ============================================
+// FRIENDSHIP SYSTEM
+// ============================================
+
+export type FriendshipStatus = 'pending' | 'accepted' | 'declined' | 'none';
+
+export interface Friendship {
+  id: string;
+  requesterId: string;
+  addresseeId: string;
+  status: FriendshipStatus;
+  createdAt: Date;
+  acceptedAt?: Date;
+}
+
+export interface FriendRequest {
+  friendshipId: string;
+  user: {
+    id: string;
+    name: string;
+    username?: string;
+    avatarUrl?: string;
+    level: UserLevel;
+  };
+  createdAt: Date;
+}
+
+export interface FriendSuggestion {
+  id: string;
+  name: string;
+  username?: string;
+  avatarUrl?: string;
+  level: UserLevel;
+  sharedChallenges: number;
+}
+
+export interface FriendListItem {
+  id: string;
+  name: string;
+  username?: string;
+  avatarUrl?: string;
+  level: UserLevel;
+  friendshipId: string;
+}
+
+export interface UserSearchResult {
+  id: string;
+  name: string;
+  username?: string;
+  avatarUrl?: string;
+  level: UserLevel;
+  friendshipStatus: FriendshipStatus;
+}
+
+// ============================================
+// TEAM SYSTEM
+// ============================================
+
+export type TeamStatus = 'forming' | 'active' | 'completed';
+export type TeamMemberRole = 'creator' | 'member';
+export type TeamMemberStatus = 'invited' | 'accepted' | 'declined';
+
+export interface Team {
+  id: string;
+  challengeId: string;
+  creatorId: string;
+  status: TeamStatus;
+  createdAt: Date;
+  activatedAt?: Date;
+  members?: TeamMember[];
+  challenge?: Challenge;
+}
+
+export interface TeamMember {
+  id: string;
+  teamId: string;
+  userId: string;
+  role: TeamMemberRole;
+  status: TeamMemberStatus;
+  invitedAt: Date;
+  acceptedAt?: Date;
+  user?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    level: UserLevel;
+  };
+  submission?: Submission;
+}
+
+// ============================================
+// APP NOTIFICATIONS (In-app, not push)
+// ============================================
+
+export type AppNotificationType =
+  | 'friend_request'
+  | 'friend_accepted'
+  | 'team_invite'
+  | 'team_activated'
+  | 'team_bonus';
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  type: AppNotificationType;
+  title: string;
+  body?: string;
+  data?: {
+    friendshipId?: string;
+    requesterId?: string;
+    friendId?: string;
+    teamId?: string;
+    challengeId?: string;
+    bonusXp?: number;
+  };
+  read: boolean;
+  createdAt: Date;
+}
