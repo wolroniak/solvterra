@@ -90,13 +90,20 @@ function levelFromXp(xp: number): UserLevel {
   return 'starter';
 }
 
-// User data from database (stats + profile)
+// Badge data from database
+interface DbBadgeData {
+  badge_id: string;
+  earned_at: string;
+}
+
+// User data from database (stats + profile + badges)
 interface DbUserData {
   xp: number;
   completedChallenges: number;
   hoursContributed: number;
   avatarUrl: string | null;
   name: string | null;
+  badges: DbBadgeData[];
 }
 
 // Ensure a users table entry exists and fetch data from database
@@ -132,12 +139,19 @@ async function ensureUserRecordAndFetchData(authUser: { id: string; email?: stri
         .eq('id', authUser.id);
     }
 
+    // Fetch user's existing badges
+    const { data: badgesData } = await supabase
+      .from('user_badges')
+      .select('badge_id, earned_at')
+      .eq('user_id', authUser.id);
+
     return {
       xp: existingUser.xp ?? 0,
       completedChallenges: existingUser.completed_challenges ?? 0,
       hoursContributed: Number(existingUser.hours_contributed ?? 0),
       avatarUrl: existingUser.avatar || authAvatarUrl,
       name: existingUser.name || authName,
+      badges: badgesData || [],
     };
   }
 
@@ -158,15 +172,32 @@ async function ensureUserRecordAndFetchData(authUser: { id: string; email?: stri
     hoursContributed: 0,
     avatarUrl: authAvatarUrl,
     name: newName,
+    badges: [],
   };
 }
 
 // Create a User object from Supabase auth user with data from database
 function createUserFromAuth(
   authUser: { id: string; email?: string },
-  dbData: DbUserData = { xp: 0, completedChallenges: 0, hoursContributed: 0, avatarUrl: null, name: null }
+  dbData: DbUserData = { xp: 0, completedChallenges: 0, hoursContributed: 0, avatarUrl: null, name: null, badges: [] }
 ): User {
   const name = dbData.name || (authUser.email ? nameFromEmail(authUser.email) : 'New User');
+
+  // Convert database badges to UserBadge objects
+  const userBadges: UserBadge[] = dbData.badges.map(dbBadge => {
+    const badge = AVAILABLE_BADGES.find(b => b.id === dbBadge.badge_id);
+    return {
+      badge: badge || {
+        id: dbBadge.badge_id,
+        name: dbBadge.badge_id,
+        description: '',
+        iconName: 'award',
+        category: 'milestone' as const,
+        criteria: '',
+      },
+      earnedAt: new Date(dbBadge.earned_at),
+    };
+  });
 
   return {
     id: authUser.id,
@@ -175,7 +206,7 @@ function createUserFromAuth(
     avatarUrl: dbData.avatarUrl || undefined,
     level: levelFromXp(dbData.xp),
     xpTotal: dbData.xp,
-    badges: [],
+    badges: userBadges,
     completedChallenges: dbData.completedChallenges,
     hoursContributed: dbData.hoursContributed,
     savedChallengeIds: [],

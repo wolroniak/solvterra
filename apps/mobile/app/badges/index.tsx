@@ -1,7 +1,7 @@
 // Badges Collection Screen
 // Shows all available badges and user's earned badges with progress
 
-import { useEffect } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Text, Surface, ProgressBar } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
 import { AVAILABLE_BADGES } from '@solvterra/shared';
+import BadgeDetailModal from '@/components/BadgeDetailSheet';
 
 // Map badge IDs to emojis for display
 const BADGE_ICONS: Record<string, string> = {
@@ -31,11 +32,26 @@ const BADGE_ICONS: Record<string, string> = {
 // Category order for display
 const CATEGORY_ORDER = ['milestone', 'category', 'special', 'streak'];
 
+// Type for selected badge state
+interface SelectedBadge {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  category: string;
+  categoryLabel: string;
+  xpBonus: number;
+}
+
 export default function BadgesScreen() {
   const { t } = useTranslation('profile');
   const user = useUserStore(state => state.user);
   const badgeProgress = useUserStore(state => state.badgeProgress);
   const fetchBadgeProgress = useUserStore(state => state.fetchBadgeProgress);
+
+  // Modal state
+  const [selectedBadge, setSelectedBadge] = useState<SelectedBadge | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Get earned badge IDs from user state
   const earnedBadgeIds = user?.badges.map(b => b.badge.id) || [];
@@ -47,6 +63,23 @@ export default function BadgesScreen() {
     }
   }, [user?.id]);
 
+  // Handle badge tap
+  const handleBadgePress = useCallback((badge: SelectedBadge) => {
+    setSelectedBadge(badge);
+    setModalVisible(true);
+  }, []);
+
+  // Handle modal close
+  const handleModalClose = useCallback(() => {
+    setModalVisible(false);
+  }, []);
+
+  // Get earned date for a badge
+  const getEarnedDate = useCallback((badgeId: string): string | null => {
+    const userBadge = user?.badges.find(b => b.badge.id === badgeId);
+    return userBadge?.earnedAt ? userBadge.earnedAt.toString() : null;
+  }, [user?.badges]);
+
   // Build badges with translated info
   const allBadges = AVAILABLE_BADGES.map(badge => ({
     id: badge.id,
@@ -55,6 +88,7 @@ export default function BadgesScreen() {
     description: t(`badgeDescriptions.${badge.id}`, { defaultValue: badge.description }),
     category: badge.category,
     categoryLabel: t(`badgeCategories.${badge.category}`, { defaultValue: badge.category }),
+    xpBonus: badge.xpBonus || 0,
   }));
 
   // Group by category
@@ -121,68 +155,76 @@ export default function BadgesScreen() {
                   const hasProgress = progress && !isEarned && progress.required > 1;
 
                   return (
-                    <Surface
+                    <Pressable
                       key={badge.id}
-                      style={[styles.badgeCard, !isEarned && styles.badgeCardLocked]}
-                      elevation={isEarned ? 1 : 0}
+                      onPress={() => handleBadgePress(badge)}
+                      style={({ pressed }) => [
+                        styles.badgeCardWrapper,
+                        pressed && styles.badgeCardPressed,
+                      ]}
                     >
-                      <View
-                        style={[
-                          styles.badgeIcon,
-                          isEarned
-                            ? { backgroundColor: Colors.accent[100] }
-                            : { backgroundColor: Colors.neutral[100] },
-                        ]}
+                      <Surface
+                        style={[styles.badgeCard, !isEarned && styles.badgeCardLocked]}
+                        elevation={isEarned ? 1 : 0}
                       >
-                        <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
-                          {badge.icon}
+                        <View
+                          style={[
+                            styles.badgeIcon,
+                            isEarned
+                              ? { backgroundColor: Colors.accent[100] }
+                              : { backgroundColor: Colors.neutral[100] },
+                          ]}
+                        >
+                          <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
+                            {badge.icon}
+                          </Text>
+                          {!isEarned && (
+                            <View style={styles.lockOverlay}>
+                              <MaterialCommunityIcons name="lock" size={16} color={Colors.textMuted} />
+                            </View>
+                          )}
+                        </View>
+                        <Text
+                          variant="labelMedium"
+                          style={[styles.badgeName, !isEarned && styles.badgeNameLocked]}
+                          numberOfLines={1}
+                        >
+                          {badge.name}
                         </Text>
-                        {!isEarned && (
-                          <View style={styles.lockOverlay}>
-                            <MaterialCommunityIcons name="lock" size={16} color={Colors.textMuted} />
+                        <Text
+                          variant="bodySmall"
+                          style={styles.badgeDescription}
+                          numberOfLines={2}
+                        >
+                          {badge.description}
+                        </Text>
+
+                        {/* Progress bar for unearned badges */}
+                        {hasProgress && (
+                          <View style={styles.badgeProgress}>
+                            <ProgressBar
+                              progress={progress.current / progress.required}
+                              color={Colors.accent[500]}
+                              style={styles.badgeProgressBar}
+                            />
+                            <Text style={styles.badgeProgressText}>
+                              {progress.current}/{progress.required}
+                            </Text>
                           </View>
                         )}
-                      </View>
-                      <Text
-                        variant="labelMedium"
-                        style={[styles.badgeName, !isEarned && styles.badgeNameLocked]}
-                        numberOfLines={1}
-                      >
-                        {badge.name}
-                      </Text>
-                      <Text
-                        variant="bodySmall"
-                        style={styles.badgeDescription}
-                        numberOfLines={2}
-                      >
-                        {badge.description}
-                      </Text>
 
-                      {/* Progress bar for unearned badges */}
-                      {hasProgress && (
-                        <View style={styles.badgeProgress}>
-                          <ProgressBar
-                            progress={progress.current / progress.required}
-                            color={Colors.accent[500]}
-                            style={styles.badgeProgressBar}
-                          />
-                          <Text style={styles.badgeProgressText}>
-                            {progress.current}/{progress.required}
-                          </Text>
-                        </View>
-                      )}
-
-                      {/* Checkmark for earned badges */}
-                      {isEarned && (
-                        <View style={styles.earnedBadge}>
-                          <MaterialCommunityIcons
-                            name="check-circle"
-                            size={16}
-                            color={Colors.success}
-                          />
-                        </View>
-                      )}
-                    </Surface>
+                        {/* Checkmark for earned badges */}
+                        {isEarned && (
+                          <View style={styles.earnedBadge}>
+                            <MaterialCommunityIcons
+                              name="check-circle"
+                              size={16}
+                              color={Colors.success}
+                            />
+                          </View>
+                        )}
+                      </Surface>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -192,6 +234,15 @@ export default function BadgesScreen() {
 
         <View style={styles.footer} />
       </ScrollView>
+
+      {/* Badge Detail Modal */}
+      <BadgeDetailModal
+        badge={selectedBadge}
+        progress={selectedBadge ? badgeProgress?.[selectedBadge.id] || null : null}
+        earnedAt={selectedBadge ? getEarnedDate(selectedBadge.id) : null}
+        visible={modalVisible}
+        onClose={handleModalClose}
+      />
     </SafeAreaView>
   );
 }
@@ -259,8 +310,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  badgeCard: {
+  badgeCardWrapper: {
     width: '31%',
+  },
+  badgeCardPressed: {
+    opacity: 0.7,
+  },
+  badgeCard: {
+    width: '100%',
     padding: spacing.sm,
     borderRadius: 12,
     backgroundColor: '#fff',
