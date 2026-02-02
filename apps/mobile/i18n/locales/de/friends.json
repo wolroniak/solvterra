@@ -52,5 +52,10 @@
     "you": "Du",
     "bonusHint": "Schließt als Team ab für +20% XP Bonus!",
     "bonusEarned": "Team-Bonus freigeschaltet: +{{xp}} XP!"
+  },
+  "userProfile": {
+    "notFound": "Nicht gefunden",
+    "notFoundText": "Nutzer nicht gefunden",
+    "challenges": "Challenges"
   }
 }

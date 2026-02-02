@@ -52,5 +52,10 @@
     "you": "You",
     "bonusHint": "Complete as a team for +20% XP bonus!",
     "bonusEarned": "Team bonus unlocked: +{{xp}} XP!"
+  },
+  "userProfile": {
+    "notFound": "Not found",
+    "notFoundText": "User not found",
+    "challenges": "Challenges"
   }
 }

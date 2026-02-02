@@ -152,6 +152,7 @@ export default function FriendsScreen() {
           <FriendListItem
             friend={item as FriendListItemType}
             onUnfriend={unfriend}
+            onPress={(userId) => router.push(`/user/${userId}`)}
           />
         );
       case 'search':

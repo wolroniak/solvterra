@@ -12,6 +12,7 @@ import type { FriendListItem as FriendListItemType, UserLevel } from '@solvterra
 interface FriendListItemProps {
   friend: FriendListItemType;
   onUnfriend: (friendshipId: string) => void;
+  onPress?: (userId: string) => void;
 }
 
 // Convert numeric level (1-5) to UserLevel string
@@ -30,8 +31,13 @@ const getLevelConfig = (level: number | UserLevel) => {
 export default function FriendListItem({
   friend,
   onUnfriend,
+  onPress,
 }: FriendListItemProps) {
   const { t } = useTranslation('friends');
+
+  const handlePress = () => {
+    onPress?.(friend.id);
+  };
 
   const handleLongPress = () => {
     Alert.alert(
@@ -51,6 +57,7 @@ export default function FriendListItem({
   return (
     <Pressable
       style={styles.container}
+      onPress={handlePress}
       onLongPress={handleLongPress}
       android_ripple={{ color: Colors.neutral[100] }}
     >

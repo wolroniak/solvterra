@@ -47,10 +47,21 @@ CREATE INDEX idx_team_members_status ON team_members(status);
 
 ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
 
+-- Helper function to check team membership (bypasses RLS to avoid infinite recursion)
+CREATE OR REPLACE FUNCTION is_user_team_member(check_team_id UUID, check_user_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM team_members
+    WHERE team_id = check_team_id AND user_id = check_user_id
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 CREATE POLICY "Users can view team members of their teams" ON team_members
   FOR SELECT USING (
     user_id = auth.uid() OR
-    team_id IN (SELECT team_id FROM team_members tm WHERE tm.user_id = auth.uid())
+    is_user_team_member(team_id, auth.uid())
   );
 
 CREATE POLICY "Team creators can invite members" ON team_members
