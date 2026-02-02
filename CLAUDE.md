@@ -30,6 +30,11 @@ pnpm type-check          # TypeScript strict checking across all packages
 cd apps/mobile
 pnpm android             # Run on Android
 pnpm ios                 # Run on iOS
+
+# EAS Build (mobile)
+cd apps/mobile
+npx eas-cli@latest build --profile development --platform android  # Dev build for testing
+npx eas-cli@latest build --platform all                            # Production builds
 ```
 
 ## Architecture
@@ -50,7 +55,21 @@ pnpm ios                 # Run on iOS
 
 **UI Libraries:** React Native Paper (Material Design) for mobile; shadcn/ui (Radix primitives + Tailwind) for web.
 
-**Data:** Currently mock-only with realistic demo data in `packages/shared/src/mock-data/`. No backend connected yet.
+**Data:** Supabase backend (project: `qoiujdxivwnymyftnxlc`). Edge Functions for push notifications. Mock data in `packages/shared/src/mock-data/` for development.
+
+### Supabase
+
+- **Project ID:** `qoiujdxivwnymyftnxlc`
+- **Secrets:** Use Vault (`vault.decrypted_secrets`) not `ALTER DATABASE` (no superuser access)
+- **Edge Functions:** `notify-user`, `notify-organization`, `notify-new-challenge`
+- **Triggers:** 9 notification triggers read credentials from Vault
+
+### Push Notifications
+
+- Uses Expo Push Notifications + Supabase Edge Functions
+- Requires development build (not Expo Go) to test on physical device
+- Android testing is free; iOS requires Apple Developer ($99/year)
+- Token registration happens on login via `userStore.ts`
 
 ### Data Models (packages/shared/src/types/)
 
@@ -74,3 +93,9 @@ Category colors: environment (green), social (pink), education (purple), health 
 - **Styling:** `StyleSheet.create()` in mobile; Tailwind utility classes in web
 - **Mock data:** All prefixed with `MOCK_` and exported from shared package for both apps to consume
 - **Bilingual fields:** German is the base language; English translations stored in `*_en` suffix fields on entities
+
+## Gotchas
+
+- `npx eas` fails on Windows — use `npx eas-cli@latest` instead
+- Font files in `app.json` plugins must exist or EAS Build fails
+- ESLint not configured in apps — `pnpm lint` may fail (known issue)
