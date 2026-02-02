@@ -6,55 +6,54 @@ import { Text, Surface } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore } from '@/store';
 import { AVAILABLE_BADGES } from '@solvterra/shared';
 
-// Map badge IDs to German names and emojis for display
-// This ensures alignment with AVAILABLE_BADGES from shared package
-const BADGE_DISPLAY_CONFIG: Record<string, { name: string; icon: string; description: string; category: string }> = {
-  // Milestone Badges
-  'first-challenge': { name: 'Erste Schritte', icon: '🌱', description: 'Erste Challenge abgeschlossen', category: 'Meilenstein' },
-  'five-challenges': { name: 'Durchstarter', icon: '🤝', description: '5 Challenges abgeschlossen', category: 'Meilenstein' },
-  'ten-challenges': { name: 'Auf dem Vormarsch', icon: '💪', description: '10 Challenges abgeschlossen', category: 'Meilenstein' },
-  'twentyfive-challenges': { name: 'Champion', icon: '🏆', description: '25 Challenges abgeschlossen', category: 'Meilenstein' },
-
-  // Category Badges
-  'eco-warrior': { name: 'Öko-Krieger', icon: '🌿', description: '5 Umwelt-Challenges', category: 'Kategorie' },
-  'social-butterfly': { name: 'Sozialheld', icon: '❤️', description: '5 Soziale Challenges', category: 'Kategorie' },
-  'knowledge-seeker': { name: 'Wissenssuchend', icon: '📚', description: '5 Bildungs-Challenges', category: 'Kategorie' },
-  'health-hero': { name: 'Gesundheitsheld', icon: '🏥', description: '5 Gesundheits-Challenges', category: 'Kategorie' },
-
-  // Special Badges
-  'early-bird': { name: 'Frühaufsteher', icon: '🌅', description: 'Challenge vor 8 Uhr abgeschlossen', category: 'Speziell' },
-  'night-owl': { name: 'Nachteule', icon: '🦉', description: 'Challenge nach 22 Uhr abgeschlossen', category: 'Speziell' },
-  'five-star': { name: 'Fünf Sterne', icon: '⭐', description: '5-Sterne-Bewertung erhalten', category: 'Speziell' },
-
-  // Streak Badges
-  'week-streak': { name: 'Wochenkrieger', icon: '🔥', description: '7 Tage in Folge aktiv', category: 'Streak' },
+// Map badge IDs to emojis for display
+const BADGE_ICONS: Record<string, string> = {
+  'first-challenge': '🌱',
+  'five-challenges': '🤝',
+  'ten-challenges': '💪',
+  'twentyfive-challenges': '🏆',
+  'eco-warrior': '🌿',
+  'social-butterfly': '❤️',
+  'knowledge-seeker': '📚',
+  'health-hero': '🏥',
+  'early-bird': '🌅',
+  'night-owl': '🦉',
+  'five-star': '⭐',
+  'week-streak': '🔥',
 };
 
-// Build ALL_BADGES from AVAILABLE_BADGES with German display info
-const ALL_BADGES = AVAILABLE_BADGES.map(badge => {
-  const displayConfig = BADGE_DISPLAY_CONFIG[badge.id];
-  return {
-    id: badge.id,
-    name: displayConfig?.name || badge.name,
-    icon: displayConfig?.icon || '🏅',
-    description: displayConfig?.description || badge.description,
-    category: displayConfig?.category || badge.category,
-  };
-});
+// Category order for display
+const CATEGORY_ORDER = ['milestone', 'category', 'special', 'streak'];
 
 export default function BadgesScreen() {
+  const { t } = useTranslation('profile');
   const { user } = useUserStore();
   const earnedBadgeIds = user?.badges.map(b => b.badge.id) || [];
 
-  const badgesByCategory = ALL_BADGES.reduce((acc, badge) => {
+  // Build badges with translated info
+  const allBadges = AVAILABLE_BADGES.map(badge => ({
+    id: badge.id,
+    name: t(`badgeNames.${badge.id}`, { defaultValue: badge.name }),
+    icon: BADGE_ICONS[badge.id] || '🏅',
+    description: t(`badgeDescriptions.${badge.id}`, { defaultValue: badge.description }),
+    category: badge.category,
+    categoryLabel: t(`badgeCategories.${badge.category}`, { defaultValue: badge.category }),
+  }));
+
+  // Group by category
+  const badgesByCategory = allBadges.reduce((acc, badge) => {
     if (!acc[badge.category]) acc[badge.category] = [];
     acc[badge.category].push(badge);
     return acc;
-  }, {} as Record<string, typeof ALL_BADGES>);
+  }, {} as Record<string, typeof allBadges>);
+
+  // Sort categories by defined order
+  const sortedCategories = CATEGORY_ORDER.filter(cat => badgesByCategory[cat]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -65,7 +64,7 @@ export default function BadgesScreen() {
             <MaterialCommunityIcons name="arrow-left" size={24} color={Colors.textPrimary} />
           </Pressable>
           <Text variant="headlineSmall" style={styles.title}>
-            Badge-Sammlung
+            {t('badgeCollection.title')}
           </Text>
         </View>
 
@@ -73,74 +72,78 @@ export default function BadgesScreen() {
         <Surface style={styles.progressCard} elevation={1}>
           <View style={styles.progressContent}>
             <Text variant="displaySmall" style={styles.progressNumber}>
-              {earnedBadgeIds.length}
+              {allBadges.length} {/* DEMO: was earnedBadgeIds.length */}
             </Text>
             <Text variant="bodyMedium" style={styles.progressLabel}>
-              von {ALL_BADGES.length} Badges
+              {t('badgeCollection.progress', { total: allBadges.length })}
             </Text>
           </View>
           <View style={styles.progressBar}>
             <View
               style={[
                 styles.progressFill,
-                { width: `${(earnedBadgeIds.length / ALL_BADGES.length) * 100}%` },
+                { width: '100%' }, // DEMO: was (earnedBadgeIds.length / allBadges.length) * 100
               ]}
             />
           </View>
         </Surface>
 
         {/* Badge Categories */}
-        {Object.entries(badgesByCategory).map(([category, badges]) => (
-          <View key={category} style={styles.section}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>
-              {category}
-            </Text>
-            <View style={styles.badgeGrid}>
-              {badges.map((badge) => {
-                const isEarned = earnedBadgeIds.includes(badge.id);
-                return (
-                  <Surface
-                    key={badge.id}
-                    style={[styles.badgeCard, !isEarned && styles.badgeCardLocked]}
-                    elevation={isEarned ? 1 : 0}
-                  >
-                    <View
-                      style={[
-                        styles.badgeIcon,
-                        isEarned
-                          ? { backgroundColor: Colors.accent[100] }
-                          : { backgroundColor: Colors.neutral[100] },
-                      ]}
+        {sortedCategories.map((category) => {
+          const badges = badgesByCategory[category];
+          const categoryLabel = badges[0]?.categoryLabel || category;
+          return (
+            <View key={category} style={styles.section}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>
+                {categoryLabel}
+              </Text>
+              <View style={styles.badgeGrid}>
+                {badges.map((badge) => {
+                  const isEarned = true; // DEMO: was earnedBadgeIds.includes(badge.id);
+                  return (
+                    <Surface
+                      key={badge.id}
+                      style={[styles.badgeCard, !isEarned && styles.badgeCardLocked]}
+                      elevation={isEarned ? 1 : 0}
                     >
-                      <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
-                        {badge.icon}
+                      <View
+                        style={[
+                          styles.badgeIcon,
+                          isEarned
+                            ? { backgroundColor: Colors.accent[100] }
+                            : { backgroundColor: Colors.neutral[100] },
+                        ]}
+                      >
+                        <Text style={[styles.badgeEmoji, !isEarned && styles.badgeEmojiLocked]}>
+                          {badge.icon}
+                        </Text>
+                        {!isEarned && (
+                          <View style={styles.lockOverlay}>
+                            <MaterialCommunityIcons name="lock" size={16} color={Colors.textMuted} />
+                          </View>
+                        )}
+                      </View>
+                      <Text
+                        variant="labelMedium"
+                        style={[styles.badgeName, !isEarned && styles.badgeNameLocked]}
+                        numberOfLines={1}
+                      >
+                        {badge.name}
                       </Text>
-                      {!isEarned && (
-                        <View style={styles.lockOverlay}>
-                          <MaterialCommunityIcons name="lock" size={16} color={Colors.textMuted} />
-                        </View>
-                      )}
-                    </View>
-                    <Text
-                      variant="labelMedium"
-                      style={[styles.badgeName, !isEarned && styles.badgeNameLocked]}
-                      numberOfLines={1}
-                    >
-                      {badge.name}
-                    </Text>
-                    <Text
-                      variant="bodySmall"
-                      style={styles.badgeDescription}
-                      numberOfLines={2}
-                    >
-                      {badge.description}
-                    </Text>
-                  </Surface>
-                );
-              })}
+                      <Text
+                        variant="bodySmall"
+                        style={styles.badgeDescription}
+                        numberOfLines={2}
+                      >
+                        {badge.description}
+                      </Text>
+                    </Surface>
+                  );
+                })}
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
 
         <View style={styles.footer} />
       </ScrollView>

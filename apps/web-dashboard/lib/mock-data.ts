@@ -2,6 +2,8 @@
 // Demo data for presentation - aligned with mobile app data
 // Presentation date: December 11, 2025
 
+export type VerificationStatus = 'pending' | 'verified' | 'rejected';
+
 export interface Organization {
   id: string;
   name: string;
@@ -10,8 +12,17 @@ export interface Organization {
   mission: string;
   email: string;
   website: string;
-  verified: boolean;
-  category: string;
+  category: 'environment' | 'social' | 'education' | 'health' | 'animals' | 'culture';
+
+  // Verification
+  verificationStatus: VerificationStatus;
+  rejectionReason?: string;
+  verifiedAt?: Date;
+
+  // Legacy field (deprecated)
+  verified?: boolean;
+
+  // Stats
   ratingAvg: number;
   ratingCount: number;
   createdAt: Date;
@@ -165,8 +176,10 @@ export const MOCK_ORGANIZATION: Organization = {
   mission: 'Lebensmittel retten. Menschen helfen.',
   email: 'kontakt@tafel-rheinmain.de',
   website: 'https://tafel-rheinmain.de',
-  verified: true,
-  category: 'Soziales',
+  category: 'social',
+  verificationStatus: 'verified',
+  verifiedAt: new Date('2025-02-01'),
+  verified: true, // Legacy
   ratingAvg: 4.9,
   ratingCount: 456,
   createdAt: new Date('2025-02-01'),
@@ -563,9 +576,6 @@ export const MOCK_WEEKLY_DATA = [
 // COMMUNITY POSTS - NGO promotional posts
 // ============================================
 
-// Reaction types - themed for achievements
-export type ReactionType = 'heart' | 'celebrate' | 'inspiring' | 'thanks';
-
 // Community Post types
 export type CommunityPostType =
   | 'ngo_promotion'       // NGO promotes a challenge
@@ -622,9 +632,8 @@ export interface CommunityPost {
   newLevel?: 'starter' | 'helper' | 'supporter' | 'champion';
   teamMemberNames?: string[];
   streakDays?: number;
-  reactions: Record<ReactionType, number>;
-  userReaction?: ReactionType;
-  totalReactions: number;
+  likesCount: number;
+  userHasLiked: boolean;
   commentsCount: number;
   comments?: CommunityComment[];
   isHighlighted?: boolean;
@@ -633,14 +642,6 @@ export interface CommunityPost {
   createdAt: Date;
   publishedAt?: Date;
 }
-
-// Reaction config for UI
-export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string; color: string }> = {
-  heart: { emoji: '❤️', label: 'Gefällt mir', color: '#ef4444' },
-  celebrate: { emoji: '🎉', label: 'Feiern', color: '#f59e0b' },
-  inspiring: { emoji: '💪', label: 'Inspirierend', color: '#8b5cf6' },
-  thanks: { emoji: '🙏', label: 'Danke', color: '#06b6d4' },
-};
 
 // Mock Community Posts for Tafel Rhein-Main e.V. (org-2)
 // Aligned with mobile app and Max's investor story
@@ -666,8 +667,8 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
       xpReward: 50,
       durationMinutes: 30,
     },
-    reactions: { heart: 42, celebrate: 28, inspiring: 19, thanks: 15 },
-    totalReactions: 104,
+    likesCount: 104,
+    userHasLiked: false,
     commentsCount: 12,
     comments: [
       {
@@ -718,8 +719,8 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
       xpReward: 20,
       durationMinutes: 10,
     },
-    reactions: { heart: 38, celebrate: 15, inspiring: 22, thanks: 11 },
-    totalReactions: 86,
+    likesCount: 86,
+    userHasLiked: false,
     commentsCount: 7,
     isHighlighted: false,
     isPinned: false,
@@ -748,8 +749,8 @@ export const MOCK_COMMUNITY_POSTS: CommunityPost[] = [
       xpReward: 50,
       durationMinutes: 30,
     },
-    reactions: { heart: 0, celebrate: 0, inspiring: 0, thanks: 0 },
-    totalReactions: 0,
+    likesCount: 0,
+    userHasLiked: false,
     commentsCount: 0,
     isHighlighted: false,
     isPinned: false,
@@ -763,7 +764,7 @@ export interface CommunityStats {
   totalPosts: number;
   publishedPosts: number;
   draftPosts: number;
-  totalReactions: number;
+  totalLikes: number;
   totalComments: number;
   engagementRate: number;
 }
@@ -772,7 +773,7 @@ export const MOCK_COMMUNITY_STATS: CommunityStats = {
   totalPosts: 3,
   publishedPosts: 2,
   draftPosts: 1,
-  totalReactions: 190, // 104 + 86 from published posts
+  totalLikes: 190, // 104 + 86 from published posts
   totalComments: 19,   // 12 + 7 from published posts
   engagementRate: 12.4, // Higher engagement for social cause
 };
@@ -815,6 +816,18 @@ export const STATUS_LABELS: Record<string, string> = {
   submitted: 'Eingereicht',
   approved: 'Genehmigt',
   rejected: 'Abgelehnt',
+};
+
+export const VERIFICATION_STATUS_LABELS: Record<VerificationStatus, string> = {
+  pending: 'Wird geprüft',
+  verified: 'Verifiziert',
+  rejected: 'Abgelehnt',
+};
+
+export const VERIFICATION_STATUS_COLORS: Record<VerificationStatus, string> = {
+  pending: '#f59e0b', // Amber
+  verified: '#22c55e', // Green
+  rejected: '#ef4444', // Red
 };
 
 export const LEVEL_LABELS: Record<string, string> = {

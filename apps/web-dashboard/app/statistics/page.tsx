@@ -23,12 +23,13 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useChallengeStore, useSubmissionStore } from '@/store';
-import { MOCK_WEEKLY_DATA, CATEGORY_LABELS } from '@/lib/mock-data';
+import { MOCK_WEEKLY_DATA } from '@/lib/mock-data';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -43,6 +44,7 @@ const MONTHLY_DATA = [
 ];
 
 export default function StatisticsPage() {
+  const { t } = useTranslation('statistics');
   const { challenges, stats } = useChallengeStore();
   const { submissions } = useSubmissionStore();
 
@@ -53,7 +55,7 @@ export default function StatisticsPage() {
       return acc;
     }, {} as Record<string, number>)
   ).map(([name, value], index) => ({
-    name: CATEGORY_LABELS[name] || name,
+    name: t(`categories.${name}`),
     value,
     color: COLORS[index % COLORS.length],
   }));
@@ -61,17 +63,17 @@ export default function StatisticsPage() {
   // Submission status distribution
   const statusData = [
     {
-      name: 'Genehmigt',
+      name: t('statusLabels.approved'),
       value: submissions.filter((s) => s.status === 'approved').length,
       color: '#10b981',
     },
     {
-      name: 'Abgelehnt',
+      name: t('statusLabels.rejected'),
       value: submissions.filter((s) => s.status === 'rejected').length,
       color: '#ef4444',
     },
     {
-      name: 'Ausstehend',
+      name: t('statusLabels.pending'),
       value: submissions.filter((s) => s.status === 'submitted').length,
       color: '#f59e0b',
     },
@@ -79,17 +81,17 @@ export default function StatisticsPage() {
 
   // Duration distribution
   const durationData = [
-    { name: '5 Min', value: challenges.filter((c) => c.duration === 5).length },
-    { name: '10 Min', value: challenges.filter((c) => c.duration === 10).length },
-    { name: '15 Min', value: challenges.filter((c) => c.duration === 15).length },
-    { name: '30 Min', value: challenges.filter((c) => c.duration === 30).length },
+    { name: t('durationLabels.5min'), value: challenges.filter((c) => c.duration === 5).length },
+    { name: t('durationLabels.10min'), value: challenges.filter((c) => c.duration === 10).length },
+    { name: t('durationLabels.15min'), value: challenges.filter((c) => c.duration === 15).length },
+    { name: t('durationLabels.30min'), value: challenges.filter((c) => c.duration === 30).length },
   ];
 
   return (
     <div className="flex flex-col">
       <Header
-        title="Statistiken"
-        description="Analyse deiner Challenge-Performance und Wirkung"
+        title={t('page.title')}
+        description={t('page.description')}
       />
 
       <div className="p-6 space-y-6">
@@ -98,7 +100,7 @@ export default function StatisticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
-                Gesamte Teilnehmer
+                {t('summary.totalParticipants')}
               </CardTitle>
               <Users className="h-4 w-4 text-slate-400" />
             </CardHeader>
@@ -106,7 +108,7 @@ export default function StatisticsPage() {
               <div className="text-2xl font-bold">{stats.totalParticipants}</div>
               <div className="flex items-center text-xs text-green-600 mt-1">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                +18% zum Vormonat
+                {t('summary.participantsGrowth')}
               </div>
             </CardContent>
           </Card>
@@ -114,14 +116,14 @@ export default function StatisticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
-                Freiwilligenstunden
+                {t('summary.volunteerHours')}
               </CardTitle>
               <Clock className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalVolunteerHours}h</div>
               <p className="text-xs text-slate-500 mt-1">
-                ≈ 8.6 Arbeitstage gespendet
+                {t('summary.workDaysDonated')}
               </p>
             </CardContent>
           </Card>
@@ -129,15 +131,17 @@ export default function StatisticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
-                Genehmigungsrate
+                {t('summary.approvalRate')}
               </CardTitle>
               <CheckCircle className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.approvalRate}%</div>
               <p className="text-xs text-slate-500 mt-1">
-                {submissions.filter((s) => s.status === 'approved').length} von{' '}
-                {submissions.filter((s) => s.status !== 'submitted').length} Einreichungen
+                {t('summary.approvalRateStat', {
+                  approved: submissions.filter((s) => s.status === 'approved').length,
+                  total: submissions.filter((s) => s.status !== 'submitted').length,
+                })}
               </p>
             </CardContent>
           </Card>
@@ -145,14 +149,14 @@ export default function StatisticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">
-                Aktive Challenges
+                {t('summary.activeChallenges')}
               </CardTitle>
               <Calendar className="h-4 w-4 text-slate-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.activeChallenges}</div>
               <p className="text-xs text-slate-500 mt-1">
-                {challenges.filter((c) => c.status === 'draft').length} im Entwurf
+                {t('summary.draftsCount', { count: challenges.filter((c) => c.status === 'draft').length })}
               </p>
             </CardContent>
           </Card>
@@ -163,7 +167,7 @@ export default function StatisticsPage() {
           {/* Monthly Trend */}
           <Card>
             <CardHeader>
-              <CardTitle>Monatlicher Trend</CardTitle>
+              <CardTitle>{t('charts.monthlyTrend')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80">
@@ -177,7 +181,7 @@ export default function StatisticsPage() {
                     <Line
                       type="monotone"
                       dataKey="participants"
-                      name="Teilnehmer"
+                      name={t('charts.participants')}
                       stroke="#3b82f6"
                       strokeWidth={2}
                       dot={{ fill: '#3b82f6' }}
@@ -185,7 +189,7 @@ export default function StatisticsPage() {
                     <Line
                       type="monotone"
                       dataKey="submissions"
-                      name="Einreichungen"
+                      name={t('charts.submissions')}
                       stroke="#10b981"
                       strokeWidth={2}
                       dot={{ fill: '#10b981' }}
@@ -199,7 +203,7 @@ export default function StatisticsPage() {
           {/* Category Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Challenges nach Kategorie</CardTitle>
+              <CardTitle>{t('charts.challengesByCategory')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80">
@@ -234,7 +238,7 @@ export default function StatisticsPage() {
           {/* Submission Status */}
           <Card>
             <CardHeader>
-              <CardTitle>Einreichungsstatus</CardTitle>
+              <CardTitle>{t('charts.submissionStatus')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -262,7 +266,7 @@ export default function StatisticsPage() {
           {/* Duration Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Zeitaufwand Verteilung</CardTitle>
+              <CardTitle>{t('charts.durationDistribution')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -277,7 +281,7 @@ export default function StatisticsPage() {
                       fontSize={12}
                     />
                     <Tooltip />
-                    <Bar dataKey="value" name="Challenges" fill="#3b82f6" radius={4} />
+                    <Bar dataKey="value" name={t('charts.challenges')} fill="#3b82f6" radius={4} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -287,7 +291,7 @@ export default function StatisticsPage() {
           {/* Weekly Activity */}
           <Card>
             <CardHeader>
-              <CardTitle>Wochenaktivität</CardTitle>
+              <CardTitle>{t('charts.weeklyActivity')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -299,13 +303,13 @@ export default function StatisticsPage() {
                     <Tooltip />
                     <Bar
                       dataKey="submissions"
-                      name="Einreichungen"
+                      name={t('charts.submissions')}
                       fill="#3b82f6"
                       radius={[4, 4, 0, 0]}
                     />
                     <Bar
                       dataKey="approved"
-                      name="Genehmigt"
+                      name={t('charts.approved')}
                       fill="#10b981"
                       radius={[4, 4, 0, 0]}
                     />
@@ -319,7 +323,7 @@ export default function StatisticsPage() {
         {/* Top Performing Challenges */}
         <Card>
           <CardHeader>
-            <CardTitle>Top Challenges nach Teilnahme</CardTitle>
+            <CardTitle>{t('topChallenges.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -356,7 +360,7 @@ export default function StatisticsPage() {
                         </div>
                       </div>
                       <Badge variant="outline">
-                        {CATEGORY_LABELS[challenge.category]}
+                        {t(`categories.${challenge.category}`)}
                       </Badge>
                     </div>
                   );

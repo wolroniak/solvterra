@@ -1,0 +1,62 @@
+{
+  "page": {
+    "title": "Support",
+    "description": "Kontaktieren Sie uns oder sehen Sie Ihre Anfragen ein"
+  },
+  "ticketTypes": {
+    "appeal": "Einspruch",
+    "support": "Support-Anfrage",
+    "feedback": "Feedback",
+    "other": "Sonstiges"
+  },
+  "status": {
+    "open": "Offen",
+    "inProgress": "In Bearbeitung",
+    "resolved": "Beantwortet",
+    "closed": "Geschlossen"
+  },
+  "rejection": {
+    "title": "Verifizierung abgelehnt",
+    "defaultMessage": "Ihre Organisation wurde leider abgelehnt. Sie koennen einen Einspruch einreichen.",
+    "fileAppeal": "Einspruch einreichen",
+    "appealSubject": "Einspruch gegen Ablehnung"
+  },
+  "tickets": {
+    "title": "Ihre Tickets",
+    "empty": "Keine Tickets",
+    "emptyDescription": "Sie haben noch keine Support-Anfragen gestellt",
+    "createdAt": "erstellt am {{date}}",
+    "response": "Antwort"
+  },
+  "newTicket": {
+    "button": "Neues Ticket",
+    "title": "Neues Ticket erstellen",
+    "description": "Beschreiben Sie Ihr Anliegen und wir melden uns schnellstmoeglich zurueck.",
+    "typeLabel": "Ticket-Typ *",
+    "typeSupport": "Support-Anfrage",
+    "typeAppeal": "Einspruch (Verifizierung)",
+    "typeFeedback": "Feedback",
+    "typeOther": "Sonstiges",
+    "subjectLabel": "Betreff *",
+    "subjectPlaceholder": "Kurze Zusammenfassung Ihres Anliegens",
+    "messageLabel": "Nachricht *",
+    "messagePlaceholder": "Beschreiben Sie Ihr Anliegen im Detail...",
+    "submit": "Absenden",
+    "cancel": "Abbrechen"
+  },
+  "viewTicket": {
+    "createdAt": "Erstellt am {{date}}",
+    "statusLabel": "Status",
+    "yourMessage": "Ihre Nachricht",
+    "supportResponse": "Antwort vom Support",
+    "respondedAt": "Beantwortet am {{date}}",
+    "close": "Schliessen"
+  },
+  "notifications": {
+    "errorTitle": "Fehler",
+    "loadError": "Tickets konnten nicht geladen werden",
+    "createError": "Ticket konnte nicht erstellt werden",
+    "createSuccess": "Ticket erstellt",
+    "createSuccessDescription": "Ihr Ticket wurde erfolgreich eingereicht"
+  }
+}

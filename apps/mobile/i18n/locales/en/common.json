@@ -1,0 +1,47 @@
+{
+  "loading": "Loading...",
+  "error": "Error",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "done": "Done",
+  "next": "Next",
+  "back": "Back",
+  "close": "Close",
+  "search": "Search",
+  "searchPlaceholder": "Search...",
+  "noResults": "No results",
+  "seeAll": "See all",
+  "minutes": "min",
+  "hours": "hrs",
+  "xp": "XP",
+  "level": "Level",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "duration": {
+    "5": "5 min",
+    "10": "10 min",
+    "15": "15 min",
+    "30": "30 min"
+  },
+  "category": {
+    "environment": "Environment",
+    "social": "Social",
+    "education": "Education",
+    "health": "Health",
+    "animals": "Animals",
+    "culture": "Culture",
+    "other": "Other"
+  },
+  "type": {
+    "digital": "Digital",
+    "onsite": "On-site"
+  }
+}

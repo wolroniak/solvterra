@@ -1,0 +1,66 @@
+{
+  "header": {
+    "title": "Dashboard",
+    "description": "Overview of your challenges and submissions"
+  },
+  "actions": {
+    "newChallenge": "New Challenge",
+    "viewAll": "View all"
+  },
+  "stats": {
+    "activeChallenges": "Active Challenges",
+    "ofTotal": "of {{total}} total",
+    "participants": "Participants",
+    "participantsThisWeek": "+23 this week",
+    "pendingReviews": "Pending Reviews",
+    "requiresAttention": "Requires attention",
+    "volunteerHours": "Volunteer Hours",
+    "totalContribution": "Total contribution"
+  },
+  "chart": {
+    "weeklyActivity": "Weekly Activity",
+    "submissions": "Submissions",
+    "approved": "Approved"
+  },
+  "pendingSubmissions": {
+    "title": "Pending Submissions",
+    "allProcessed": "All submissions have been processed!",
+    "pending": "Pending"
+  },
+  "activeChallenges": {
+    "title": "Active Challenges",
+    "minutesXp": "{{duration}} min · {{xp}} XP"
+  },
+  "approvalRate": {
+    "title": "Approval Rate",
+    "basedOnLast30Days": "Based on the last 30 days"
+  },
+  "activityFeed": {
+    "title": "Community Activity",
+    "empty": "No community activity yet",
+    "viewAll": "View all"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "createChallenge": "Create new challenge",
+    "reviewSubmissions": "Review submissions",
+    "viewStatistics": "View statistics"
+  },
+  "categories": {
+    "environment": "Environment",
+    "social": "Social",
+    "education": "Education",
+    "health": "Health",
+    "animals": "Animal Welfare",
+    "culture": "Culture"
+  },
+  "statusLabels": {
+    "draft": "Draft",
+    "active": "Active",
+    "paused": "Paused",
+    "completed": "Completed",
+    "submitted": "Submitted",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}

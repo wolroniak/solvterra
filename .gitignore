@@ -1,5 +1,11 @@
 .claude
 .bmad
+.worktrees
 node_modules
 .expo
 .next
+
+# Environment variables
+.env
+.env.local
+.env*.local

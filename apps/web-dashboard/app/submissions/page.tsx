@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   FileText,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,17 +19,43 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSubmissionStore } from '@/store';
 import { formatRelativeTime, formatDateTime } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useIsRejected } from '@/components/verification-banner';
 
-const STATUS_CONFIG = {
-  submitted: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50', label: 'Ausstehend' },
-  approved: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', label: 'Genehmigt' },
-  rejected: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', label: 'Abgelehnt' },
-};
+function SubmissionsSkeleton() {
+  return (
+    <div className="p-6 space-y-4">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Card key={i}>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5 w-36" />
+                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
 
 export default function SubmissionsPage() {
-  const { submissions, pendingCount, approveSubmission, rejectSubmission } = useSubmissionStore();
+  const { t } = useTranslation('submissions');
+  const { submissions, loading, pendingCount, approveSubmission, rejectSubmission } = useSubmissionStore();
   const [activeTab, setActiveTab] = useState('submitted');
   const [selectedSubmission, setSelectedSubmission] = useState<string | null>(null);
+  const isRejected = useIsRejected();
+
+  const STATUS_CONFIG = {
+    submitted: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50', label: t('status.pending') },
+    approved: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', label: t('status.approved') },
+    rejected: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', label: t('status.rejected') },
+  };
 
   const filteredSubmissions = submissions.filter((s) => s.status === activeTab);
 
@@ -39,22 +66,34 @@ export default function SubmissionsPage() {
   };
 
   const handleApprove = (id: string) => {
-    approveSubmission(id, 5, 'Toll gemacht! Weiter so.');
+    approveSubmission(id, 5, t('actions.defaultApprovalFeedback'));
     setSelectedSubmission(null);
   };
 
   const handleReject = (id: string) => {
-    rejectSubmission(id, 'Die Einreichung entspricht leider nicht den Anforderungen. Bitte versuche es erneut.');
+    rejectSubmission(id, t('actions.defaultRejectionFeedback'));
     setSelectedSubmission(null);
   };
 
   const selected = submissions.find((s) => s.id === selectedSubmission);
 
+  if (loading) {
+    return (
+      <div className="flex flex-col">
+        <Header
+          title={t('page.title')}
+          description={t('page.description')}
+        />
+        <SubmissionsSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
       <Header
-        title="Einreichungen"
-        description="Prüfe und bewerte Studenteneinreichungen"
+        title={t('page.title')}
+        description={t('page.description')}
       />
 
       <div className="p-6">
@@ -65,15 +104,15 @@ export default function SubmissionsPage() {
               <TabsList>
                 <TabsTrigger value="submitted" className="gap-2">
                   <Clock className="h-4 w-4" />
-                  Ausstehend ({counts.submitted})
+                  {t('tabs.pending', { count: counts.submitted })}
                 </TabsTrigger>
                 <TabsTrigger value="approved" className="gap-2">
                   <CheckCircle className="h-4 w-4" />
-                  Genehmigt ({counts.approved})
+                  {t('tabs.approved', { count: counts.approved })}
                 </TabsTrigger>
                 <TabsTrigger value="rejected" className="gap-2">
                   <XCircle className="h-4 w-4" />
-                  Abgelehnt ({counts.rejected})
+                  {t('tabs.rejected', { count: counts.rejected })}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -85,14 +124,14 @@ export default function SubmissionsPage() {
                     {activeTab === 'submitted' ? (
                       <>
                         <CheckCircle className="h-12 w-12 mb-4 text-green-500" />
-                        <p className="text-lg font-medium">Alles erledigt!</p>
-                        <p className="text-sm">Keine ausstehenden Einreichungen</p>
+                        <p className="text-lg font-medium">{t('empty.allDone')}</p>
+                        <p className="text-sm">{t('empty.noPending')}</p>
                       </>
                     ) : (
                       <>
                         <FileText className="h-12 w-12 mb-4 text-slate-300" />
-                        <p className="text-lg font-medium">Keine Einreichungen</p>
-                        <p className="text-sm">In dieser Kategorie gibt es noch keine Einreichungen</p>
+                        <p className="text-lg font-medium">{t('empty.noSubmissions')}</p>
+                        <p className="text-sm">{t('empty.noSubmissionsInCategory')}</p>
                       </>
                     )}
                   </div>
@@ -157,7 +196,7 @@ export default function SubmissionsPage() {
             {selected ? (
               <Card className="sticky top-6">
                 <CardHeader>
-                  <CardTitle className="text-lg">Einreichung Details</CardTitle>
+                  <CardTitle className="text-lg">{t('detail.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Student Info */}
@@ -186,7 +225,7 @@ export default function SubmissionsPage() {
                   {/* Proof */}
                   <div>
                     <p className="text-sm font-medium text-slate-700 mb-2">
-                      Nachweis
+                      {t('detail.proof')}
                     </p>
                     {selected.proofType === 'photo' ? (
                       <img
@@ -205,22 +244,31 @@ export default function SubmissionsPage() {
 
                   {/* Actions */}
                   {selected.status === 'submitted' && (
-                    <div className="flex gap-2 pt-4">
-                      <Button
-                        variant="outline"
-                        className="flex-1 text-red-600 hover:bg-red-50"
-                        onClick={() => handleReject(selected.id)}
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Ablehnen
-                      </Button>
-                      <Button
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handleApprove(selected.id)}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Genehmigen
-                      </Button>
+                    <div className="space-y-3 pt-4">
+                      {isRejected && (
+                        <p className="text-xs text-red-600 bg-red-50 p-2 rounded">
+                          {t('detail.rejectedWarning')}
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1 text-red-600 hover:bg-red-50"
+                          onClick={() => handleReject(selected.id)}
+                          disabled={isRejected}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          {t('actions.reject')}
+                        </Button>
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleApprove(selected.id)}
+                          disabled={isRejected}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          {t('actions.approve')}
+                        </Button>
+                      </div>
                     </div>
                   )}
 
@@ -228,7 +276,7 @@ export default function SubmissionsPage() {
                   {selected.status !== 'submitted' && (
                     <div className="pt-4 border-t">
                       <p className="text-sm font-medium text-slate-700 mb-2">
-                        Bewertung
+                        {t('detail.review')}
                       </p>
                       {selected.rating && (
                         <div className="flex gap-1 mb-2">
@@ -260,7 +308,7 @@ export default function SubmissionsPage() {
                 <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">
                   <FileText className="h-12 w-12 mb-4 text-slate-300" />
                   <p className="text-sm">
-                    Wähle eine Einreichung aus der Liste
+                    {t('empty.selectSubmission')}
                   </p>
                 </CardContent>
               </Card>

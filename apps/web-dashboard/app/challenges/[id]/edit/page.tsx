@@ -15,13 +15,13 @@ import {
   MapPin,
   Laptop,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useChallengeStore } from '@/store';
 import {
-  CATEGORY_LABELS,
   type ChallengeLocation,
   type ChallengeSchedule,
   type ChallengeContact,
@@ -34,29 +34,30 @@ import {
   TagsSection,
 } from '@/components/challenge-form';
 
-const CATEGORIES = [
-  { value: 'environment', label: 'Umwelt', icon: '🌱' },
-  { value: 'social', label: 'Soziales', icon: '❤️' },
-  { value: 'education', label: 'Bildung', icon: '📚' },
-  { value: 'health', label: 'Gesundheit', icon: '🏥' },
-  { value: 'animals', label: 'Tierschutz', icon: '🐾' },
-  { value: 'culture', label: 'Kultur', icon: '🎨' },
-];
+const CATEGORY_ICONS: Record<string, string> = {
+  environment: '\u{1F331}',
+  social: '\u{2764}\u{FE0F}',
+  education: '\u{1F4DA}',
+  health: '\u{1F3E5}',
+  animals: '\u{1F43E}',
+  culture: '\u{1F3A8}',
+};
 
 const DURATIONS = [
-  { value: 5, label: '5 Min', description: '10 XP' },
-  { value: 10, label: '10 Min', description: '20 XP' },
-  { value: 15, label: '15 Min', description: '25 XP' },
-  { value: 30, label: '30 Min', description: '50 XP' },
+  { value: 5, description: '10 XP' },
+  { value: 10, description: '20 XP' },
+  { value: 15, description: '25 XP' },
+  { value: 30, description: '50 XP' },
 ];
 
 const VERIFICATION_METHODS = [
-  { value: 'photo', label: 'Foto hochladen', icon: Camera, description: 'Studenten laden ein Foto als Beweis hoch' },
-  { value: 'text', label: 'Text einreichen', icon: FileText, description: 'Studenten beschreiben ihre Aktivität' },
-  { value: 'ngo_confirmation', label: 'NGO Bestätigung', icon: UserCheck, description: 'Du bestätigst die Teilnahme manuell' },
+  { value: 'photo', icon: Camera },
+  { value: 'text', icon: FileText },
+  { value: 'ngo_confirmation', icon: UserCheck },
 ];
 
 export default function EditChallengePage() {
+  const { t } = useTranslation('challenges');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -144,13 +145,13 @@ export default function EditChallengePage() {
     return (
       <div className="flex flex-col">
         <Header
-          title="Challenge nicht gefunden"
-          description="Die angeforderte Challenge existiert nicht"
+          title={t('edit.notFoundTitle')}
+          description={t('edit.notFoundDescription')}
           action={
             <Link href="/challenges">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Zurück
+                {t('actions.back', { ns: 'common' })}
               </Button>
             </Link>
           }
@@ -158,8 +159,8 @@ export default function EditChallengePage() {
         <div className="p-6">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">
-              <p className="text-lg font-medium">Challenge nicht gefunden</p>
-              <p className="text-sm">Die Challenge mit ID "{id}" existiert nicht.</p>
+              <p className="text-lg font-medium">{t('edit.notFoundMessage')}</p>
+              <p className="text-sm">{t('edit.notFoundDetail', { id })}</p>
             </CardContent>
           </Card>
         </div>
@@ -225,22 +226,31 @@ export default function EditChallengePage() {
     router.push(`/challenges/${challenge.id}`);
   };
 
+  const CATEGORIES = [
+    { value: 'environment' },
+    { value: 'social' },
+    { value: 'education' },
+    { value: 'health' },
+    { value: 'animals' },
+    { value: 'culture' },
+  ];
+
   return (
     <div className="flex flex-col">
       <Header
-        title="Challenge bearbeiten"
-        description={`${challenge.title} bearbeiten`}
+        title={t('edit.pageTitle')}
+        description={t('edit.pageDescription', { title: challenge.title })}
         action={
           <div className="flex items-center gap-2">
             <Link href={`/challenges/${challenge.id}`}>
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Abbrechen
+                {t('edit.cancel')}
               </Button>
             </Link>
             <Button onClick={handleSave} disabled={isSaving || !formData.title}>
               <Save className="h-4 w-4 mr-2" />
-              {isSaving ? 'Speichern...' : 'Speichern'}
+              {isSaving ? t('edit.saving') : t('edit.save')}
             </Button>
           </div>
         }
@@ -253,12 +263,12 @@ export default function EditChallengePage() {
             {/* Basic Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Grundinformationen</CardTitle>
+                <CardTitle>{t('edit.basicInfo')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Titel *
+                    {t('edit.titleLabel')}
                   </label>
                   <input
                     type="text"
@@ -266,14 +276,14 @@ export default function EditChallengePage() {
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="z.B. Vogelzählung im Stadtpark"
+                    placeholder={t('edit.titlePlaceholder')}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Beschreibung *
+                    {t('edit.descriptionLabel')}
                   </label>
                   <textarea
                     value={formData.description}
@@ -281,14 +291,14 @@ export default function EditChallengePage() {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     rows={3}
-                    placeholder="Was sollen die Teilnehmer tun? Warum ist es wichtig?"
+                    placeholder={t('edit.descriptionPlaceholder')}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Anleitung *
+                    {t('edit.instructionsLabel')}
                   </label>
                   <textarea
                     value={formData.instructions}
@@ -296,14 +306,14 @@ export default function EditChallengePage() {
                       setFormData({ ...formData, instructions: e.target.value })
                     }
                     rows={5}
-                    placeholder="Schritt-für-Schritt Anleitung für die Teilnehmer..."
+                    placeholder={t('edit.instructionsPlaceholder')}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Bild-URL
+                    {t('edit.imageUrlLabel')}
                   </label>
                   <input
                     type="url"
@@ -321,13 +331,13 @@ export default function EditChallengePage() {
             {/* Settings */}
             <Card>
               <CardHeader>
-                <CardTitle>Einstellungen</CardTitle>
+                <CardTitle>{t('edit.settings')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Kategorie
+                    {t('edit.categoryLabel')}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {CATEGORIES.map((cat) => (
@@ -343,8 +353,8 @@ export default function EditChallengePage() {
                             : 'hover:border-slate-300'
                         }`}
                       >
-                        <span className="text-xl mb-1 block">{cat.icon}</span>
-                        <span className="text-sm font-medium">{cat.label}</span>
+                        <span className="text-xl mb-1 block">{CATEGORY_ICONS[cat.value]}</span>
+                        <span className="text-sm font-medium">{t(`categories.${cat.value}`)}</span>
                       </button>
                     ))}
                   </div>
@@ -353,7 +363,7 @@ export default function EditChallengePage() {
                 {/* Type */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Art der Challenge
+                    {t('edit.challengeType')}
                   </label>
                   <div className="flex gap-2">
                     <button
@@ -366,9 +376,9 @@ export default function EditChallengePage() {
                       }`}
                     >
                       <Laptop className="h-5 w-5 mx-auto mb-1 text-slate-500" />
-                      <span className="text-sm font-medium block">Digital</span>
+                      <span className="text-sm font-medium block">{t('edit.digital')}</span>
                       <p className="text-xs text-slate-500 mt-1">
-                        Von überall aus
+                        {t('edit.digitalDescription')}
                       </p>
                     </button>
                     <button
@@ -381,9 +391,9 @@ export default function EditChallengePage() {
                       }`}
                     >
                       <MapPin className="h-5 w-5 mx-auto mb-1 text-slate-500" />
-                      <span className="text-sm font-medium block">Vor Ort</span>
+                      <span className="text-sm font-medium block">{t('edit.onsite')}</span>
                       <p className="text-xs text-slate-500 mt-1">
-                        Physische Anwesenheit
+                        {t('edit.onsiteDescription')}
                       </p>
                     </button>
                   </div>
@@ -392,7 +402,7 @@ export default function EditChallengePage() {
                 {/* Duration */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Zeitaufwand
+                    {t('edit.timeEffort')}
                   </label>
                   <div className="flex gap-2">
                     {DURATIONS.map((dur) => (
@@ -409,7 +419,7 @@ export default function EditChallengePage() {
                         }`}
                       >
                         <Clock className="h-5 w-5 mx-auto mb-1 text-slate-400" />
-                        <span className="text-sm font-medium block">{dur.label}</span>
+                        <span className="text-sm font-medium block">{t('durationMinutes', { count: dur.value })}</span>
                         <span className="text-xs text-slate-500">{dur.description}</span>
                       </button>
                     ))}
@@ -419,7 +429,7 @@ export default function EditChallengePage() {
                 {/* Verification */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Nachweismethode
+                    {t('edit.verificationMethod')}
                   </label>
                   <div className="space-y-2">
                     {VERIFICATION_METHODS.map((method) => (
@@ -441,10 +451,10 @@ export default function EditChallengePage() {
                         <method.icon className="h-5 w-5 text-slate-400" />
                         <div>
                           <span className="text-sm font-medium block">
-                            {method.label}
+                            {t(`verification.${method.value}`)}
                           </span>
                           <span className="text-xs text-slate-500">
-                            {method.description}
+                            {t(`verification.${method.value}Description`)}
                           </span>
                         </div>
                       </button>
@@ -455,7 +465,7 @@ export default function EditChallengePage() {
                 {/* Max Participants */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Maximale Teilnehmer
+                    {t('edit.maxParticipants')}
                   </label>
                   <input
                     type="number"
@@ -506,7 +516,7 @@ export default function EditChallengePage() {
             {/* Preview */}
             <Card className="sticky top-6">
               <CardHeader>
-                <CardTitle>Vorschau</CardTitle>
+                <CardTitle>{t('edit.preview')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="border rounded-lg overflow-hidden">
@@ -518,10 +528,10 @@ export default function EditChallengePage() {
                   <div className="p-4">
                     <div className="flex flex-wrap gap-2 mb-2">
                       <Badge variant="outline">
-                        {CATEGORY_LABELS[formData.category]}
+                        {t(`categories.${formData.category}`)}
                       </Badge>
                       <Badge variant="outline">
-                        {formData.type === 'digital' ? 'Digital' : 'Vor Ort'}
+                        {formData.type === 'digital' ? t('type.digital') : t('type.onsite')}
                       </Badge>
                       {teamData.isMultiPerson && (
                         <Badge variant="success">
@@ -530,15 +540,15 @@ export default function EditChallengePage() {
                       )}
                     </div>
                     <h3 className="font-semibold text-slate-900 mb-1">
-                      {formData.title || 'Titel der Challenge'}
+                      {formData.title || t('edit.previewTitlePlaceholder')}
                     </h3>
                     <p className="text-sm text-slate-500 line-clamp-2">
-                      {formData.description || 'Beschreibung der Challenge...'}
+                      {formData.description || t('edit.previewDescriptionPlaceholder')}
                     </p>
                     <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
                       <span className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {formData.duration} Min
+                        {t('durationMinutes', { count: formData.duration })}
                       </span>
                       <span className="flex items-center gap-1">
                         <Star className="h-4 w-4 text-amber-500" />
@@ -578,11 +588,11 @@ export default function EditChallengePage() {
                   disabled={isSaving || !formData.title || !formData.description}
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {isSaving ? 'Speichern...' : 'Änderungen speichern'}
+                  {isSaving ? t('edit.saving') : t('edit.saveChanges')}
                 </Button>
                 <Link href={`/challenges/${challenge.id}`} className="block">
                   <Button variant="outline" className="w-full">
-                    Abbrechen
+                    {t('edit.cancelButton')}
                   </Button>
                 </Link>
               </CardContent>

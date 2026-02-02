@@ -1,0 +1,135 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "verification": "NGO Verifizierung",
+    "tickets": "Support Tickets",
+    "logout": "Abmelden"
+  },
+  "login": {
+    "title": "Admin Portal",
+    "subtitle": "Nur fuer SolvTerra-Mitarbeiter",
+    "email": "E-Mail",
+    "emailPlaceholder": "admin@solvterra.com",
+    "password": "Passwort",
+    "passwordPlaceholder": "Passwort eingeben",
+    "submit": "Anmelden",
+    "submitting": "Wird angemeldet...",
+    "loginFailed": "Anmeldung fehlgeschlagen",
+    "ngoPrompt": "Bist du eine NGO?",
+    "ngoLogin": "Zum NGO-Login"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Uebersicht ueber die SolvTerra Plattform",
+    "organizations": "Organisationen",
+    "activity": "Aktivitaet",
+    "quickAccess": "Schnellzugriff",
+    "stats": {
+      "total": "Gesamt",
+      "registeredNgos": "Registrierte NGOs",
+      "verified": "Verifiziert",
+      "activeNgos": "Aktive NGOs",
+      "pending": "Ausstehend",
+      "awaitingReview": "Warten auf Pruefung",
+      "rejected": "Abgelehnt",
+      "notApproved": "Nicht zugelassen",
+      "challenges": "Challenges",
+      "createdTasks": "Erstellte Aufgaben",
+      "activeChallenges": "Aktive Challenges",
+      "currentlyAvailable": "Aktuell verfuegbar",
+      "submissions": "Einreichungen",
+      "processedTasks": "Bearbeitete Aufgaben",
+      "users": "Nutzer",
+      "registeredStudents": "Registrierte Studenten"
+    },
+    "pendingVerifications": "{{count}} ausstehende Verifizierung",
+    "pendingVerifications_plural": "{{count}} ausstehende Verifizierungen",
+    "newOrgsAwaitingReview": "Neue Organisationen warten auf Pruefung",
+    "platformStatus": "Plattform Status",
+    "allSystemsNormal": "Alle Systeme funktionieren normal"
+  },
+  "verifications": {
+    "title": "NGO Verifizierung",
+    "description": "Pruefe und verifiziere neue Organisationen",
+    "refresh": "Aktualisieren",
+    "noPending": "Keine ausstehenden Verifizierungen",
+    "allReviewed": "Alle Organisationen wurden geprueft",
+    "waitingCount_one": "{{count}} Organisation wartet auf Verifizierung",
+    "waitingCount_other": "{{count}} Organisationen warten auf Verifizierung",
+    "registeredOn": "Registriert am {{date}}",
+    "reject": "Ablehnen",
+    "verify": "Verifizieren",
+    "rejectDialog": {
+      "title": "Organisation ablehnen",
+      "description": "Bitte gib einen Grund fuer die Ablehnung an. Dieser wird der Organisation mitgeteilt.",
+      "reasonLabel": "Ablehnungsgrund *",
+      "reasonPlaceholder": "z.B. Fehlende Nachweise, unvollstaendige Angaben...",
+      "reasonHint": "Der Grund wird der Organisation angezeigt, damit sie das Problem beheben kann.",
+      "cancel": "Abbrechen",
+      "confirm": "Ablehnen"
+    },
+    "notifications": {
+      "loadErrorTitle": "Fehler beim Laden",
+      "loadError": "Organisationen konnten nicht geladen werden",
+      "verifyError": "Organisation konnte nicht verifiziert werden",
+      "verifySuccess": "Erfolgreich verifiziert",
+      "verifySuccessDescription": "{{name}} wurde erfolgreich verifiziert",
+      "rejectError": "Organisation konnte nicht abgelehnt werden",
+      "rejectSuccess": "Abgelehnt",
+      "rejectSuccessDescription": "{{name}} wurde abgelehnt",
+      "errorTitle": "Fehler"
+    }
+  },
+  "tickets": {
+    "title": "Support Tickets",
+    "description": "{{count}} offene Anfragen",
+    "refresh": "Aktualisieren",
+    "filterAll": "Alle",
+    "filterOpen": "Offen ({{count}})",
+    "filterInProgress": "In Bearbeitung",
+    "filterResolved": "Beantwortet",
+    "noTickets": "Keine Tickets",
+    "noTicketsOpen": "Keine offenen Tickets vorhanden",
+    "noTicketsCategory": "Keine Tickets in dieser Kategorie",
+    "unknown": "Unbekannt",
+    "ticketTypes": {
+      "appeal": "Einspruch",
+      "support": "Support",
+      "feedback": "Feedback",
+      "other": "Sonstiges"
+    },
+    "status": {
+      "open": "Offen",
+      "inProgress": "In Bearbeitung",
+      "resolved": "Beantwortet",
+      "closed": "Geschlossen"
+    },
+    "dialog": {
+      "from": "von {{name}} am {{date}}",
+      "messageLabel": "Nachricht",
+      "responseLabel": "Ihre Antwort",
+      "responsePlaceholder": "Antwort verfassen...",
+      "statusLabel": "Neuer Status",
+      "statusResolved": "Beantwortet",
+      "statusInProgress": "In Bearbeitung",
+      "statusClosed": "Geschlossen",
+      "cancel": "Abbrechen",
+      "send": "Antwort senden"
+    },
+    "notifications": {
+      "errorTitle": "Fehler",
+      "loadError": "Tickets konnten nicht geladen werden",
+      "respondError": "Antwort konnte nicht gesendet werden",
+      "respondSuccess": "Antwort gesendet",
+      "respondSuccessDescription": "Das Ticket wurde beantwortet"
+    }
+  },
+  "verification_banner": {
+    "pendingTitle": "Verifizierung ausstehend",
+    "pendingDescription": "Deine Organisation wird geprueft. Du kannst Challenges vorbereiten, aber noch nicht veroeffentlichen.",
+    "rejectedTitle": "Verifizierung abgelehnt",
+    "rejectedDefault": "Bitte kontaktiere uns fuer weitere Informationen.",
+    "tooltipPending": "Warte auf Verifizierung",
+    "tooltipNotVerified": "Organisation nicht verifiziert"
+  }
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { Users, UserPlus, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +28,8 @@ export function TeamSection({
   allowSoloJoin,
   onChange,
 }: TeamSectionProps) {
+  const { t } = useTranslation('challengeForm');
+
   const handleMultiPersonToggle = (enabled: boolean) => {
     onChange({
       isMultiPerson: enabled,
@@ -42,10 +45,10 @@ export function TeamSection({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary-500" />
-          Team-Challenge
+          {t('team.title')}
           {isMultiPerson && (
             <Badge variant="success" className="ml-2">
-              Aktiviert
+              {t('team.enabled')}
             </Badge>
           )}
         </CardTitle>
@@ -62,11 +65,10 @@ export function TeamSection({
           />
           <div>
             <label htmlFor="isMultiPerson" className="text-sm font-medium text-slate-900 cursor-pointer">
-              Dies ist eine Team-Challenge
+              {t('team.toggleLabel')}
             </label>
             <p className="text-xs text-slate-500 mt-1">
-              Teilnehmer müssen ein Team bilden, um diese Challenge zu absolvieren.
-              Studien zeigen: 62% würden mehr helfen, wenn sie es mit Freunden tun könnten!
+              {t('team.toggleHint')}
             </p>
           </div>
         </div>
@@ -77,7 +79,7 @@ export function TeamSection({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Minimale Teamgröße *
+                  {t('team.minSizeLabel')}
                 </label>
                 <select
                   value={minTeamSize}
@@ -94,14 +96,14 @@ export function TeamSection({
                 >
                   {[2, 3, 4, 5].map((n) => (
                     <option key={n} value={n}>
-                      {n} Personen
+                      {t('team.personsOption', { count: n })}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Maximale Teamgröße *
+                  {t('team.maxSizeLabel')}
                 </label>
                 <select
                   value={maxTeamSize}
@@ -118,7 +120,7 @@ export function TeamSection({
                 >
                   {[2, 3, 4, 5, 6, 8, 10].filter((n) => n >= minTeamSize).map((n) => (
                     <option key={n} value={n}>
-                      {n} Personen
+                      {t('team.personsOption', { count: n })}
                     </option>
                   ))}
                 </select>
@@ -128,7 +130,7 @@ export function TeamSection({
             {/* Team Description */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Team-Beschreibung
+                {t('team.descriptionLabel')}
               </label>
               <textarea
                 value={teamDescription}
@@ -142,11 +144,11 @@ export function TeamSection({
                   })
                 }
                 rows={2}
-                placeholder="z.B. Lade Freunde ein oder finde neue Teammitglieder über unsere Matching-Funktion!"
+                placeholder={t('team.descriptionPlaceholder')}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <p className="text-xs text-slate-500 mt-1">
-                Motivierender Text, der Teilnehmern erklärt, warum ein Team besser ist
+                {t('team.descriptionHint')}
               </p>
             </div>
 
@@ -170,11 +172,10 @@ export function TeamSection({
               <div>
                 <label htmlFor="allowSoloJoin" className="text-sm font-medium text-blue-900 cursor-pointer flex items-center gap-2">
                   <UserPlus className="h-4 w-4" />
-                  Einzelanmeldung erlauben (Matchmaking)
+                  {t('team.soloJoinLabel')}
                 </label>
                 <p className="text-xs text-blue-700 mt-1">
-                  Teilnehmer ohne Team können sich alleine anmelden und werden mit anderen
-                  Interessenten verbunden. Das erhöht die Teilnahme deutlich!
+                  {t('team.soloJoinHint')}
                 </p>
               </div>
             </div>
@@ -183,11 +184,9 @@ export function TeamSection({
             <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div className="text-xs text-amber-800">
-                <p className="font-medium mb-1">Team-Challenges in der App</p>
+                <p className="font-medium mb-1">{t('team.infoTitle')}</p>
                 <p>
-                  In der mobilen App sehen Teilnehmer eine Liste von Personen, die ebenfalls
-                  nach Teammitgliedern suchen. Sie können direkt Kontakt aufnehmen und
-                  gemeinsam teilnehmen.
+                  {t('team.infoText')}
                 </p>
               </div>
             </div>

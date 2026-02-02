@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -18,29 +18,38 @@ import {
   ExternalLink,
   Clock,
   TrendingUp,
+  Send,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCommunityStore, useChallengeStore } from '@/store';
-import { REACTION_CONFIG, type CommunityPost } from '@/lib/mock-data';
+import { type CommunityPost } from '@/lib/mock-data';
+import { useIsRejected } from '@/components/verification-banner';
 
 // Format time ago
-const formatTimeAgo = (date: Date) => {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+const useFormatTimeAgo = () => {
+  const { t } = useTranslation('community');
 
-  if (diffHours < 1) {
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    return `vor ${diffMins} Min`;
-  }
-  if (diffHours < 24) {
-    return `vor ${diffHours} Std`;
-  }
-  const diffDays = Math.floor(diffHours / 24);
-  return `vor ${diffDays} ${diffDays === 1 ? 'Tag' : 'Tagen'}`;
+  return (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 1) {
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      return t('timeAgo.minutes', { count: diffMins });
+    }
+    if (diffHours < 24) {
+      return t('timeAgo.hours', { count: diffHours });
+    }
+    const diffDays = Math.floor(diffHours / 24);
+    return t('timeAgo.day', { count: diffDays });
+  };
 };
 
 // Post Card Component
@@ -51,6 +60,10 @@ function PostCard({
   onPin,
   onHighlight,
   onDelete,
+  onToggleLike,
+  onAddComment,
+  onLoadComments,
+  comments,
 }: {
   post: CommunityPost;
   onPublish: () => void;
@@ -58,28 +71,49 @@ function PostCard({
   onPin: () => void;
   onHighlight: () => void;
   onDelete: () => void;
+  onToggleLike: () => void;
+  onAddComment: (content: string) => void;
+  onLoadComments: () => void;
+  comments?: { id: string; content: string; userName: string; userAvatarUrl?: string; createdAt: Date }[];
 }) {
+  const { t } = useTranslation('community');
   const [showMenu, setShowMenu] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const formatTimeAgo = useFormatTimeAgo();
+
+  const handleToggleComments = () => {
+    if (!showComments) {
+      onLoadComments();
+    }
+    setShowComments(!showComments);
+  };
+
+  const handleSendComment = () => {
+    if (!commentText.trim()) return;
+    onAddComment(commentText.trim());
+    setCommentText('');
+  };
 
   return (
     <Card className={`relative ${post.isPinned ? 'border-primary-300 bg-primary-50/30' : ''}`}>
       {/* Status badges */}
-      <div className="absolute top-3 right-3 flex items-center gap-2">
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
         {post.isPinned && (
           <Badge variant="outline" className="bg-primary-100 border-primary-300 text-primary-700">
             <Pin className="w-3 h-3 mr-1" />
-            Angepinnt
+            {t('postCard.pinned')}
           </Badge>
         )}
         {post.isHighlighted && (
           <Badge variant="outline" className="bg-amber-100 border-amber-300 text-amber-700">
             <Sparkles className="w-3 h-3 mr-1" />
-            Hervorgehoben
+            {t('postCard.highlighted')}
           </Badge>
         )}
         {post.status === 'draft' && (
           <Badge variant="outline" className="bg-slate-100 border-slate-300 text-slate-700">
-            Entwurf
+            {t('postCard.draft')}
           </Badge>
         )}
         <div className="relative">
@@ -96,7 +130,7 @@ function PostCard({
                 className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"
               >
                 <Edit className="w-4 h-4" />
-                Bearbeiten
+                {t('postCard.edit')}
               </Link>
               {post.status === 'draft' ? (
                 <button
@@ -104,7 +138,7 @@ function PostCard({
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 text-left"
                 >
                   <Eye className="w-4 h-4" />
-                  Veröffentlichen
+                  {t('postCard.publish')}
                 </button>
               ) : (
                 <button
@@ -112,7 +146,7 @@ function PostCard({
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 text-left"
                 >
                   <EyeOff className="w-4 h-4" />
-                  Zurückziehen
+                  {t('postCard.unpublish')}
                 </button>
               )}
               <button
@@ -120,14 +154,14 @@ function PostCard({
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 text-left"
               >
                 <Pin className="w-4 h-4" />
-                {post.isPinned ? 'Nicht mehr anpinnen' : 'Anpinnen'}
+                {post.isPinned ? t('postCard.unpin') : t('postCard.pin')}
               </button>
               <button
                 onClick={() => { onHighlight(); setShowMenu(false); }}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50 text-left"
               >
                 <Sparkles className="w-4 h-4" />
-                {post.isHighlighted ? 'Nicht mehr hervorheben' : 'Hervorheben'}
+                {post.isHighlighted ? t('postCard.unhighlight') : t('postCard.highlight')}
               </button>
               <hr className="my-1" />
               <button
@@ -135,7 +169,7 @@ function PostCard({
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-red-50 text-red-600 text-left"
               >
                 <Trash2 className="w-4 h-4" />
-                Löschen
+                {t('postCard.delete')}
               </button>
             </div>
           )}
@@ -186,7 +220,7 @@ function PostCard({
                 {post.linkedChallenge.title}
               </p>
               <p className="text-xs text-slate-500">
-                {post.linkedChallenge.xpReward} XP · {post.linkedChallenge.durationMinutes} Min
+                {post.linkedChallenge.xpReward} XP · {post.linkedChallenge.durationMinutes} {t('postCard.minutes')}
               </p>
             </div>
             <ExternalLink className="w-4 h-4 text-slate-400" />
@@ -196,53 +230,114 @@ function PostCard({
         {/* Engagement Stats */}
         <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex items-center gap-4">
-            {/* Reactions */}
-            <div className="flex items-center gap-1">
-              {Object.entries(post.reactions).map(([type, count]) => {
-                if (count === 0) return null;
-                const config = REACTION_CONFIG[type as keyof typeof REACTION_CONFIG];
-                return (
-                  <span key={type} className="flex items-center gap-1 text-sm">
-                    <span>{config.emoji}</span>
-                    <span className="text-slate-500">{count}</span>
-                  </span>
-                );
-              })}
-              {post.totalReactions === 0 && (
-                <span className="text-sm text-slate-400">Keine Reaktionen</span>
+            {/* Like Button */}
+            <button
+              onClick={onToggleLike}
+              className="flex items-center gap-1.5 text-sm group"
+            >
+              <Heart
+                className={`w-5 h-5 transition-colors ${
+                  post.userHasLiked
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-slate-400 group-hover:text-red-400'
+                }`}
+              />
+              <span className={post.userHasLiked ? 'text-red-500 font-medium' : 'text-slate-500'}>
+                {post.likesCount}
+              </span>
+            </button>
+
+            {/* Comment toggle */}
+            <button
+              onClick={handleToggleComments}
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700"
+            >
+              <MessageCircle className="w-5 h-5" />
+              <span>{post.commentsCount}</span>
+              {showComments ? (
+                <ChevronUp className="w-3 h-3" />
+              ) : (
+                <ChevronDown className="w-3 h-3" />
               )}
-            </div>
+            </button>
           </div>
-          <div className="flex items-center gap-4 text-sm text-slate-500">
-            <span className="flex items-center gap-1">
-              <MessageCircle className="w-4 h-4" />
-              {post.commentsCount}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              {formatTimeAgo(post.createdAt)}
-            </span>
-          </div>
+          <span className="flex items-center gap-1 text-sm text-slate-500">
+            <Clock className="w-4 h-4" />
+            {formatTimeAgo(post.createdAt)}
+          </span>
         </div>
 
-        {/* Recent Comments Preview */}
-        {post.comments && post.comments.length > 0 && (
+        {/* Comments Section */}
+        {showComments && (
+          <div className="mt-4 pt-4 border-t space-y-3">
+            {/* Comment list */}
+            {comments && comments.length > 0 ? (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="flex items-start gap-2">
+                    <Avatar className="w-6 h-6">
+                      {comment.userAvatarUrl && <AvatarImage src={comment.userAvatarUrl} />}
+                      <AvatarFallback>{comment.userName?.[0] || '?'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs">
+                        <span className="font-medium">{comment.userName || t('postCard.anonymous')}:</span>{' '}
+                        <span className="text-slate-600">{comment.content}</span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400">{t('postCard.noComments')}</p>
+            )}
+
+            {/* Comment input */}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSendComment(); }}
+                placeholder={t('postCard.writeComment')}
+                className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <button
+                onClick={handleSendComment}
+                disabled={!commentText.trim()}
+                className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg disabled:opacity-40 disabled:hover:bg-transparent"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Comments Preview (only when comments section is collapsed) */}
+        {!showComments && post.comments && post.comments.length > 0 && (
           <div className="mt-4 pt-4 border-t space-y-2">
-            <p className="text-xs font-medium text-slate-500 uppercase">Neueste Kommentare</p>
+            <p className="text-xs font-medium text-slate-500 uppercase">{t('postCard.recentComments')}</p>
             {post.comments.slice(0, 2).map((comment) => (
               <div key={comment.id} className="flex items-start gap-2">
                 <Avatar className="w-6 h-6">
-                  <AvatarImage src={comment.userAvatarUrl} />
-                  <AvatarFallback>{comment.userName[0]}</AvatarFallback>
+                  <AvatarFallback>{comment.userName?.[0] || '?'}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs">
-                    <span className="font-medium">{comment.userName}:</span>{' '}
+                    <span className="font-medium">{comment.userName || t('postCard.anonymous')}:</span>{' '}
                     <span className="text-slate-600">{comment.content}</span>
                   </p>
                 </div>
               </div>
             ))}
+            {post.commentsCount > 2 && (
+              <button
+                onClick={handleToggleComments}
+                className="text-xs text-primary-600 hover:underline"
+              >
+                {t('postCard.showAllComments', { count: post.commentsCount })}
+              </button>
+            )}
           </div>
         )}
       </CardContent>
@@ -251,9 +346,19 @@ function PostCard({
 }
 
 export default function CommunityPage() {
-  const { posts, stats, publishPost, unpublishPost, pinPost, highlightPost, deletePost } = useCommunityStore();
+  const { t } = useTranslation('community');
+  const {
+    posts, stats, loading, loadPosts,
+    publishPost, unpublishPost, pinPost, highlightPost, deletePost,
+    toggleLike, addComment, loadComments, postComments,
+  } = useCommunityStore();
   const { challenges } = useChallengeStore();
   const [filter, setFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const isRejected = useIsRejected();
+
+  useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
 
   const filteredPosts = posts.filter((post) => {
     if (filter === 'all') return true;
@@ -274,18 +379,33 @@ export default function CommunityPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <Users className="h-7 w-7 text-primary-600" />
-            Community
+            {t('page.title')}
           </h1>
           <p className="text-slate-500 mt-1">
-            Erstelle Posts, um deine Challenges in der Community zu bewerben
+            {t('page.description')}
           </p>
         </div>
-        <Link href="/community/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Neuer Post
-          </Button>
-        </Link>
+        <div className="relative group">
+          {isRejected ? (
+            <Button disabled className="gap-2 opacity-50 cursor-not-allowed">
+              <Plus className="h-4 w-4" />
+              {t('newPost')}
+            </Button>
+          ) : (
+            <Link href="/community/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                {t('newPost')}
+              </Button>
+            </Link>
+          )}
+          {isRejected && (
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              {t('rejectedTooltip')}
+              <div className="absolute top-full right-4 border-4 border-transparent border-t-slate-900" />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -294,7 +414,7 @@ export default function CommunityPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Veröffentlicht</p>
+                <p className="text-sm text-slate-500">{t('stats.published')}</p>
                 <p className="text-2xl font-bold text-slate-900">{stats.publishedPosts}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
@@ -307,7 +427,7 @@ export default function CommunityPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Entwürfe</p>
+                <p className="text-sm text-slate-500">{t('stats.drafts')}</p>
                 <p className="text-2xl font-bold text-slate-900">{stats.draftPosts}</p>
               </div>
               <div className="p-3 bg-slate-100 rounded-full">
@@ -320,8 +440,8 @@ export default function CommunityPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Reaktionen</p>
-                <p className="text-2xl font-bold text-slate-900">{stats.totalReactions}</p>
+                <p className="text-sm text-slate-500">{t('stats.likes')}</p>
+                <p className="text-2xl font-bold text-slate-900">{stats.totalLikes}</p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
                 <Heart className="h-5 w-5 text-red-600" />
@@ -333,7 +453,7 @@ export default function CommunityPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Kommentare</p>
+                <p className="text-sm text-slate-500">{t('stats.comments')}</p>
                 <p className="text-2xl font-bold text-slate-900">{stats.totalComments}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
@@ -353,12 +473,10 @@ export default function CommunityPage() {
             </div>
             <div>
               <h3 className="font-semibold text-slate-900 mb-1">
-                Erreiche mehr Teilnehmer mit Community-Posts
+                {t('infoBox.title')}
               </h3>
               <p className="text-sm text-slate-600">
-                Deine Posts erscheinen im Community-Feed der mobilen App. Nutzer können direkt
-                auf verlinkte Challenges klicken und teilnehmen. Posts mit Bildern erhalten
-                durchschnittlich 3x mehr Reaktionen!
+                {t('infoBox.description')}
               </p>
             </div>
           </div>
@@ -375,7 +493,7 @@ export default function CommunityPage() {
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          Alle ({posts.length})
+          {t('filter.all', { count: posts.length })}
         </button>
         <button
           onClick={() => setFilter('published')}
@@ -385,7 +503,7 @@ export default function CommunityPage() {
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          Veröffentlicht ({posts.filter((p) => p.status === 'published').length})
+          {t('filter.published', { count: posts.filter((p) => p.status === 'published').length })}
         </button>
         <button
           onClick={() => setFilter('draft')}
@@ -395,7 +513,7 @@ export default function CommunityPage() {
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
-          Entwürfe ({posts.filter((p) => p.status === 'draft').length})
+          {t('filter.drafts', { count: posts.filter((p) => p.status === 'draft').length })}
         </button>
       </div>
 
@@ -405,15 +523,15 @@ export default function CommunityPage() {
           <CardContent className="py-12 text-center">
             <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-900 mb-2">
-              Noch keine Posts vorhanden
+              {t('emptyState.title')}
             </h3>
             <p className="text-slate-500 mb-4">
-              Erstelle deinen ersten Post, um deine Challenges in der Community zu bewerben.
+              {t('emptyState.description')}
             </p>
             <Link href="/community/new">
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Ersten Post erstellen
+                {t('emptyState.createFirst')}
               </Button>
             </Link>
           </CardContent>
@@ -429,10 +547,14 @@ export default function CommunityPage() {
               onPin={() => pinPost(post.id, !post.isPinned)}
               onHighlight={() => highlightPost(post.id, !post.isHighlighted)}
               onDelete={() => {
-                if (confirm('Möchtest du diesen Post wirklich löschen?')) {
+                if (confirm(t('postCard.confirmDelete'))) {
                   deletePost(post.id);
                 }
               }}
+              onToggleLike={() => toggleLike(post.id)}
+              onAddComment={(content) => addComment(post.id, content)}
+              onLoadComments={() => loadComments(post.id)}
+              comments={postComments[post.id]}
             />
           ))}
         </div>

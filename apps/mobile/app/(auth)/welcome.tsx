@@ -1,13 +1,16 @@
 // Welcome Screen
 // First screen users see - introduces the app
 
-import { View, StyleSheet, Image, Dimensions } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View, StyleSheet, Image, Dimensions, Animated } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
-import { useUserStore } from '@/store';
+import LanguageToggle from '@/components/LanguageToggle';
+import OnboardingProgress from '@/components/OnboardingProgress';
 
 const { width } = Dimensions.get('window');
 
@@ -15,21 +18,70 @@ const { width } = Dimensions.get('window');
 const SolvTerraLogo = require('@/assets/logo.png');
 
 export default function WelcomeScreen() {
-  const { resetToExistingUser } = useUserStore();
+  const { t } = useTranslation('auth');
 
-  const handleGetStarted = () => {
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const featureAnims = useRef([
+    new Animated.Value(0),
+    new Animated.Value(0),
+    new Animated.Value(0),
+  ]).current;
+
+  useEffect(() => {
+    // Animate content in
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Stagger feature items
+    Animated.stagger(100, featureAnims.map(anim =>
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      })
+    )).start();
+  }, []);
+
+  const handleSignUp = () => {
     router.push('/(auth)/sign-up');
   };
 
-  // Demo shortcut: Skip to main app with existing user
-  const handleDemoLogin = () => {
-    resetToExistingUser();
-    router.replace('/(tabs)');
+  const handleLogin = () => {
+    router.push('/(auth)/sign-in');
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      {/* Header with Language Toggle and Progress */}
+      <View style={styles.header}>
+        <View style={{ width: 60 }} />
+        <OnboardingProgress currentStep={1} totalSteps={4} />
+        <View style={styles.languageToggleContainer}>
+          <LanguageToggle />
+        </View>
+      </View>
+
+      <Animated.View
+        style={[
+          styles.content,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
         {/* SolvTerra Logo */}
         <View style={styles.logoContainer}>
           <Image
@@ -41,45 +93,54 @@ export default function WelcomeScreen() {
 
         {/* Subtitle */}
         <Text variant="titleMedium" style={styles.subtitle}>
-          Micro-Volunteering für Studierende
+          {t('welcome.subtitle')}
         </Text>
 
-        {/* Features */}
+        {/* Features - with staggered animation */}
         <View style={styles.features}>
-          <FeatureItem
-            icon="clock-outline"
-            text="Helfe in nur 5-30 Minuten"
-          />
-          <FeatureItem
-            icon="trophy-outline"
-            text="Sammle Punkte und Badges"
-          />
-          <FeatureItem
-            icon="account-group-outline"
-            text="Unterstütze echte NGOs"
-          />
+          {[
+            { icon: 'clock-outline', text: t('welcome.features.time') },
+            { icon: 'trophy-outline', text: t('welcome.features.points') },
+            { icon: 'account-group-outline', text: t('welcome.features.support') },
+          ].map((feature, index) => (
+            <Animated.View
+              key={index}
+              style={{
+                opacity: featureAnims[index],
+                transform: [{
+                  translateX: featureAnims[index].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-20, 0],
+                  }),
+                }],
+              }}
+            >
+              <FeatureItem icon={feature.icon} text={feature.text} />
+            </Animated.View>
+          ))}
         </View>
-      </View>
+      </Animated.View>
 
       {/* Buttons */}
       <View style={styles.buttons}>
         <Button
           mode="contained"
-          onPress={handleGetStarted}
+          onPress={handleSignUp}
           style={styles.primaryButton}
           contentStyle={styles.buttonContent}
           labelStyle={styles.buttonLabel}
         >
-          Jetzt starten
+          {t('welcome.signupButton')}
         </Button>
 
         <Button
-          mode="text"
-          onPress={handleDemoLogin}
-          style={styles.textButton}
-          textColor={Colors.textSecondary}
+          mode="outlined"
+          onPress={handleLogin}
+          style={styles.secondaryButton}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.secondaryButtonLabel}
         >
-          Demo-Modus (als bestehender Nutzer)
+          {t('welcome.loginButton')}
         </Button>
       </View>
     </SafeAreaView>
@@ -106,6 +167,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: spacing.lg,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: spacing.sm,
+  },
+  languageToggleContainer: {
+    width: 60,
+    alignItems: 'flex-end',
   },
   content: {
     flex: 1,
@@ -149,6 +220,10 @@ const styles = StyleSheet.create({
   primaryButton: {
     borderRadius: 12,
   },
+  secondaryButton: {
+    borderRadius: 12,
+    borderColor: Colors.primary[600],
+  },
   buttonContent: {
     paddingVertical: spacing.sm,
   },
@@ -156,7 +231,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  textButton: {
-    marginTop: spacing.xs,
+  secondaryButtonLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary[600],
   },
 });

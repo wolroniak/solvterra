@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Save, Building2, Mail, Globe, Shield, Bell } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import { useAuthStore } from '@/store';
 
 export default function SettingsPage() {
   const { organization } = useAuthStore();
+  const { t } = useTranslation('settings');
   const [saved, setSaved] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -29,8 +31,8 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col">
       <Header
-        title="Einstellungen"
-        description="Verwalte dein Organisationsprofil und Einstellungen"
+        title={t('page.title')}
+        description={t('page.description')}
       />
 
       <div className="p-6 max-w-4xl space-y-6">
@@ -39,10 +41,10 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
-              Organisationsprofil
+              {t('profile.title')}
             </CardTitle>
             <CardDescription>
-              Diese Informationen werden Studenten in der App angezeigt
+              {t('profile.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -56,10 +58,10 @@ export default function SettingsPage() {
               </Avatar>
               <div>
                 <Button variant="outline" size="sm">
-                  Logo ändern
+                  {t('profile.changeLogo')}
                 </Button>
                 <p className="text-xs text-slate-500 mt-1">
-                  JPG, PNG oder SVG. Max 1MB.
+                  {t('profile.logoHint')}
                 </p>
               </div>
             </div>
@@ -67,7 +69,7 @@ export default function SettingsPage() {
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Organisationsname
+                {t('profile.name')}
               </label>
               <input
                 type="text"
@@ -80,7 +82,7 @@ export default function SettingsPage() {
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Beschreibung
+                {t('profile.descriptionLabel')}
               </label>
               <textarea
                 value={formData.description}
@@ -91,14 +93,14 @@ export default function SettingsPage() {
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <p className="text-xs text-slate-500 mt-1">
-                Kurze Beschreibung eurer Mission und Arbeit
+                {t('profile.descriptionHint')}
               </p>
             </div>
 
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Kontakt-E-Mail
+                {t('profile.contactEmail')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -116,7 +118,7 @@ export default function SettingsPage() {
             {/* Website */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                Website
+                {t('profile.website')}
               </label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -138,7 +140,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Verifizierungsstatus
+              {t('verification.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -148,13 +150,13 @@ export default function SettingsPage() {
                   <Shield className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-green-900">Verifizierte Organisation</p>
+                  <p className="font-medium text-green-900">{t('verification.verified')}</p>
                   <p className="text-sm text-green-700">
-                    Deine Organisation wurde vom SolvTerra Team überprüft
+                    {t('verification.verifiedDescription')}
                   </p>
                 </div>
               </div>
-              <Badge className="bg-green-600">Verifiziert</Badge>
+              <Badge className="bg-green-600">{t('verification.badge')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -164,27 +166,27 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Benachrichtigungen
+              {t('notifications.title')}
             </CardTitle>
             <CardDescription>
-              Wähle, worüber du informiert werden möchtest
+              {t('notifications.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {[
               {
-                title: 'Neue Einreichungen',
-                description: 'Benachrichtigung bei neuen Einreichungen zur Überprüfung',
+                title: t('notifications.newSubmissions'),
+                description: t('notifications.newSubmissionsDescription'),
                 enabled: true,
               },
               {
-                title: 'Challenge-Kapazität',
-                description: 'Warnung wenn eine Challenge fast voll ist',
+                title: t('notifications.challengeCapacity'),
+                description: t('notifications.challengeCapacityDescription'),
                 enabled: true,
               },
               {
-                title: 'Wöchentlicher Report',
-                description: 'Zusammenfassung der Wochenaktivitäten per E-Mail',
+                title: t('notifications.weeklyReport'),
+                description: t('notifications.weeklyReportDescription'),
                 enabled: false,
               },
             ].map((setting, index) => (
@@ -216,11 +218,11 @@ export default function SettingsPage() {
         <div className="flex justify-end">
           <Button onClick={handleSave} disabled={saved}>
             {saved ? (
-              <>Gespeichert!</>
+              <>{t('save.saved')}</>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Änderungen speichern
+                {t('save.saveChanges')}
               </>
             )}
           </Button>

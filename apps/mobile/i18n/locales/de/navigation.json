@@ -1,0 +1,14 @@
+{
+  "tabs": {
+    "discover": "Entdecken",
+    "community": "Community",
+    "challenges": "Challenges",
+    "profile": "Profil"
+  },
+  "headers": {
+    "challengeDetail": "Challenge Details",
+    "settings": "Einstellungen",
+    "badges": "Badges",
+    "notifications": "Benachrichtigungen"
+  }
+}

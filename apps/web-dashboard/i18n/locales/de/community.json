@@ -1,0 +1,110 @@
+{
+  "page": {
+    "title": "Community",
+    "description": "Erstelle Posts, um deine Challenges in der Community zu bewerben"
+  },
+  "newPost": "Neuer Post",
+  "rejectedTooltip": "Organisation wurde abgelehnt",
+  "stats": {
+    "published": "Veröffentlicht",
+    "drafts": "Entwürfe",
+    "likes": "Likes",
+    "comments": "Kommentare"
+  },
+  "infoBox": {
+    "title": "Erreiche mehr Teilnehmer mit Community-Posts",
+    "description": "Deine Posts erscheinen im Community-Feed der mobilen App. Nutzer können direkt auf verlinkte Challenges klicken und teilnehmen. Posts mit Bildern erhalten durchschnittlich 3x mehr Likes!"
+  },
+  "filter": {
+    "all": "Alle ({{count}})",
+    "published": "Veröffentlicht ({{count}})",
+    "drafts": "Entwürfe ({{count}})"
+  },
+  "emptyState": {
+    "title": "Noch keine Posts vorhanden",
+    "description": "Erstelle deinen ersten Post, um deine Challenges in der Community zu bewerben.",
+    "createFirst": "Ersten Post erstellen"
+  },
+  "postCard": {
+    "pinned": "Angepinnt",
+    "highlighted": "Hervorgehoben",
+    "draft": "Entwurf",
+    "edit": "Bearbeiten",
+    "publish": "Veröffentlichen",
+    "unpublish": "Zurückziehen",
+    "pin": "Anpinnen",
+    "unpin": "Nicht mehr anpinnen",
+    "highlight": "Hervorheben",
+    "unhighlight": "Nicht mehr hervorheben",
+    "delete": "Löschen",
+    "like": "Gefällt mir",
+    "unlike": "Gefällt mir nicht mehr",
+    "recentComments": "Neueste Kommentare",
+    "showAllComments": "Alle {{count}} Kommentare anzeigen",
+    "writeComment": "Kommentar schreiben...",
+    "sendComment": "Senden",
+    "noComments": "Noch keine Kommentare",
+    "anonymous": "Anonym",
+    "minutes": "Min",
+    "confirmDelete": "Möchtest du diesen Post wirklich löschen?"
+  },
+  "timeAgo": {
+    "minutes": "vor {{count}} Min",
+    "hours": "vor {{count}} Std",
+    "dayOne": "vor {{count}} Tag",
+    "dayOther": "vor {{count}} Tagen"
+  },
+  "newPostPage": {
+    "title": "Neuer Post",
+    "heading": "Neuer Community-Post",
+    "description": "Erstelle einen Post, um deine Challenge in der Community zu bewerben",
+    "restricted": {
+      "title": "Zugang eingeschraenkt",
+      "description": "Deine Organisation wurde abgelehnt und kann keine neuen Posts erstellen.",
+      "reason": "Grund:"
+    },
+    "form": {
+      "titleLabel": "Titel",
+      "titlePlaceholder": "z.B. 🌿 Gemeinsam für saubere Parks!",
+      "titleHint": "Ein einprägsamer Titel mit Emoji erregt mehr Aufmerksamkeit",
+      "contentLabel": "Nachricht",
+      "contentPlaceholder": "Beschreibe die Challenge und warum Nutzer teilnehmen sollten...",
+      "contentHint": "Tipp: Erwähne XP-Belohnungen und Zeitaufwand",
+      "imageLabel": "Bild",
+      "selectImage": "Bild auswählen",
+      "uploadImage": "Hochladen",
+      "enterUrl": "URL eingeben",
+      "dragDrop": "Bild hierher ziehen oder klicken zum Auswählen",
+      "imageHint": "Posts mit Bildern erhalten 3x mehr Likes",
+      "removeImage": "Entfernen",
+      "linkChallenge": "Challenge verlinken",
+      "noChallengeLinked": "Keine Challenge verlinken",
+      "linkHint": "Nutzer können direkt auf die Challenge klicken, um teilzunehmen"
+    },
+    "options": {
+      "title": "Optionen",
+      "highlight": "Hervorheben",
+      "highlightDescription": "Der Post erscheint prominent im Feed",
+      "pin": "Anpinnen",
+      "pinDescription": "Der Post bleibt oben im Feed"
+    },
+    "preview": {
+      "title": "Vorschau",
+      "justNow": "Gerade eben",
+      "emptyPlaceholder": "Füge einen Titel und Inhalt hinzu...",
+      "commentsCount": "0 Kommentare"
+    },
+    "publishButton": "Veröffentlichen",
+    "uploading": "Wird hochgeladen...",
+    "saveDraft": "Als Entwurf speichern"
+  },
+  "editPostPage": {
+    "heading": "Post bearbeiten",
+    "description": "Bearbeite deinen Community-Post",
+    "notFound": "Post nicht gefunden",
+    "notFoundDescription": "Der Post konnte nicht gefunden werden. Möglicherweise wurde er gelöscht.",
+    "backToCommunity": "Zurück zur Community",
+    "saveChanges": "Änderungen speichern",
+    "saving": "Wird gespeichert..."
+  }
+}

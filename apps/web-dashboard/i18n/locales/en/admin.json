@@ -1,0 +1,135 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "verification": "NGO Verification",
+    "tickets": "Support Tickets",
+    "logout": "Log out"
+  },
+  "login": {
+    "title": "Admin Portal",
+    "subtitle": "For SolvTerra staff only",
+    "email": "Email",
+    "emailPlaceholder": "admin@solvterra.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "submit": "Log in",
+    "submitting": "Logging in...",
+    "loginFailed": "Login failed",
+    "ngoPrompt": "Are you an NGO?",
+    "ngoLogin": "Go to NGO Login"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of the SolvTerra platform",
+    "organizations": "Organizations",
+    "activity": "Activity",
+    "quickAccess": "Quick Access",
+    "stats": {
+      "total": "Total",
+      "registeredNgos": "Registered NGOs",
+      "verified": "Verified",
+      "activeNgos": "Active NGOs",
+      "pending": "Pending",
+      "awaitingReview": "Awaiting review",
+      "rejected": "Rejected",
+      "notApproved": "Not approved",
+      "challenges": "Challenges",
+      "createdTasks": "Created tasks",
+      "activeChallenges": "Active Challenges",
+      "currentlyAvailable": "Currently available",
+      "submissions": "Submissions",
+      "processedTasks": "Processed tasks",
+      "users": "Users",
+      "registeredStudents": "Registered students"
+    },
+    "pendingVerifications": "{{count}} pending verification",
+    "pendingVerifications_plural": "{{count}} pending verifications",
+    "newOrgsAwaitingReview": "New organizations awaiting review",
+    "platformStatus": "Platform Status",
+    "allSystemsNormal": "All systems operating normally"
+  },
+  "verifications": {
+    "title": "NGO Verification",
+    "description": "Review and verify new organizations",
+    "refresh": "Refresh",
+    "noPending": "No pending verifications",
+    "allReviewed": "All organizations have been reviewed",
+    "waitingCount_one": "{{count}} organization awaiting verification",
+    "waitingCount_other": "{{count}} organizations awaiting verification",
+    "registeredOn": "Registered on {{date}}",
+    "reject": "Reject",
+    "verify": "Verify",
+    "rejectDialog": {
+      "title": "Reject Organization",
+      "description": "Please provide a reason for the rejection. This will be shared with the organization.",
+      "reasonLabel": "Rejection Reason *",
+      "reasonPlaceholder": "e.g. Missing documentation, incomplete information...",
+      "reasonHint": "The reason will be shown to the organization so they can address the issue.",
+      "cancel": "Cancel",
+      "confirm": "Reject"
+    },
+    "notifications": {
+      "loadErrorTitle": "Loading Error",
+      "loadError": "Failed to load organizations",
+      "verifyError": "Failed to verify organization",
+      "verifySuccess": "Successfully Verified",
+      "verifySuccessDescription": "{{name}} has been successfully verified",
+      "rejectError": "Failed to reject organization",
+      "rejectSuccess": "Rejected",
+      "rejectSuccessDescription": "{{name}} has been rejected",
+      "errorTitle": "Error"
+    }
+  },
+  "tickets": {
+    "title": "Support Tickets",
+    "description": "{{count}} open requests",
+    "refresh": "Refresh",
+    "filterAll": "All",
+    "filterOpen": "Open ({{count}})",
+    "filterInProgress": "In Progress",
+    "filterResolved": "Resolved",
+    "noTickets": "No Tickets",
+    "noTicketsOpen": "No open tickets available",
+    "noTicketsCategory": "No tickets in this category",
+    "unknown": "Unknown",
+    "ticketTypes": {
+      "appeal": "Appeal",
+      "support": "Support",
+      "feedback": "Feedback",
+      "other": "Other"
+    },
+    "status": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "dialog": {
+      "from": "from {{name}} on {{date}}",
+      "messageLabel": "Message",
+      "responseLabel": "Your Response",
+      "responsePlaceholder": "Write your response...",
+      "statusLabel": "New Status",
+      "statusResolved": "Resolved",
+      "statusInProgress": "In Progress",
+      "statusClosed": "Closed",
+      "cancel": "Cancel",
+      "send": "Send Response"
+    },
+    "notifications": {
+      "errorTitle": "Error",
+      "loadError": "Failed to load tickets",
+      "respondError": "Failed to send response",
+      "respondSuccess": "Response Sent",
+      "respondSuccessDescription": "The ticket has been answered"
+    }
+  },
+  "verification_banner": {
+    "pendingTitle": "Verification Pending",
+    "pendingDescription": "Your organization is being reviewed. You can prepare challenges, but cannot publish them yet.",
+    "rejectedTitle": "Verification Rejected",
+    "rejectedDefault": "Please contact us for more information.",
+    "tooltipPending": "Awaiting verification",
+    "tooltipNotVerified": "Organization not verified"
+  }
+}

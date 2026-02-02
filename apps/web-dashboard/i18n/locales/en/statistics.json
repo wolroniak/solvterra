@@ -1,0 +1,49 @@
+{
+  "page": {
+    "title": "Statistics",
+    "description": "Analyze your challenge performance and impact"
+  },
+  "summary": {
+    "totalParticipants": "Total Participants",
+    "participantsGrowth": "+18% compared to last month",
+    "volunteerHours": "Volunteer Hours",
+    "workDaysDonated": "≈ 8.6 work days donated",
+    "approvalRate": "Approval Rate",
+    "approvalRateStat": "{{approved}} of {{total}} submissions",
+    "activeChallenges": "Active Challenges",
+    "draftsCount": "{{count}} in draft"
+  },
+  "charts": {
+    "monthlyTrend": "Monthly Trend",
+    "participants": "Participants",
+    "submissions": "Submissions",
+    "challengesByCategory": "Challenges by Category",
+    "submissionStatus": "Submission Status",
+    "durationDistribution": "Duration Distribution",
+    "weeklyActivity": "Weekly Activity",
+    "challenges": "Challenges",
+    "approved": "Approved"
+  },
+  "statusLabels": {
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "pending": "Pending"
+  },
+  "durationLabels": {
+    "5min": "5 min",
+    "10min": "10 min",
+    "15min": "15 min",
+    "30min": "30 min"
+  },
+  "topChallenges": {
+    "title": "Top Challenges by Participation"
+  },
+  "categories": {
+    "environment": "Environment",
+    "social": "Social",
+    "education": "Education",
+    "health": "Health",
+    "animals": "Animal welfare",
+    "culture": "Culture"
+  }
+}

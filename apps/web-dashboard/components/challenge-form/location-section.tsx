@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { MapPin, Navigation, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { ChallengeLocation } from '@/lib/mock-data';
@@ -11,6 +12,8 @@ interface LocationSectionProps {
 }
 
 export function LocationSection({ location, onChange, isOnsite }: LocationSectionProps) {
+  const { t } = useTranslation('challengeForm');
+
   if (!isOnsite) {
     return null;
   }
@@ -20,35 +23,35 @@ export function LocationSection({ location, onChange, isOnsite }: LocationSectio
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary-500" />
-          Ort & Treffpunkt
+          {t('location.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            Ortsname *
+            {t('location.nameLabel')}
           </label>
           <input
             type="text"
             value={location.name || ''}
             onChange={(e) => onChange({ ...location, name: e.target.value })}
-            placeholder="z.B. Stadtpark Frankfurt, Tierheim Darmstadt"
+            placeholder={t('location.namePlaceholder')}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <p className="text-xs text-slate-500 mt-1">
-            Der Name wird den Teilnehmern prominent angezeigt
+            {t('location.nameHint')}
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            Vollständige Adresse
+            {t('location.addressLabel')}
           </label>
           <input
             type="text"
             value={location.address || ''}
             onChange={(e) => onChange({ ...location, address: e.target.value })}
-            placeholder="z.B. Musterstraße 123, 60123 Frankfurt am Main"
+            placeholder={t('location.addressPlaceholder')}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
@@ -56,30 +59,30 @@ export function LocationSection({ location, onChange, isOnsite }: LocationSectio
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
             <Navigation className="h-4 w-4" />
-            Treffpunkt
+            {t('location.meetingPointLabel')}
           </label>
           <input
             type="text"
             value={location.meetingPoint || ''}
             onChange={(e) => onChange({ ...location, meetingPoint: e.target.value })}
-            placeholder="z.B. Am Haupteingang, Parkplatz B, Hintereingang"
+            placeholder={t('location.meetingPointPlaceholder')}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <p className="text-xs text-slate-500 mt-1">
-            Präzise Angabe, wo sich die Teilnehmer treffen sollen
+            {t('location.meetingPointHint')}
           </p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
             <Info className="h-4 w-4" />
-            Zusätzliche Informationen
+            {t('location.additionalInfoLabel')}
           </label>
           <textarea
             value={location.additionalInfo || ''}
             onChange={(e) => onChange({ ...location, additionalInfo: e.target.value })}
             rows={2}
-            placeholder="z.B. Parkplätze vorhanden, bequeme Kleidung tragen, Ausrüstung wird gestellt"
+            placeholder={t('location.additionalInfoPlaceholder')}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
@@ -87,7 +90,7 @@ export function LocationSection({ location, onChange, isOnsite }: LocationSectio
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Breitengrad (optional)
+              {t('location.latitudeLabel')}
             </label>
             <input
               type="number"
@@ -102,13 +105,13 @@ export function LocationSection({ location, onChange, isOnsite }: LocationSectio
                   },
                 })
               }
-              placeholder="z.B. 50.1109"
+              placeholder={t('location.latitudePlaceholder')}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Längengrad (optional)
+              {t('location.longitudeLabel')}
             </label>
             <input
               type="number"
@@ -123,13 +126,13 @@ export function LocationSection({ location, onChange, isOnsite }: LocationSectio
                   },
                 })
               }
-              placeholder="z.B. 8.6821"
+              placeholder={t('location.longitudePlaceholder')}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </div>
         <p className="text-xs text-slate-500">
-          GPS-Koordinaten ermöglichen die Kartenanzeige in der App
+          {t('location.coordinatesHint')}
         </p>
       </CardContent>
     </Card>

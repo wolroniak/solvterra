@@ -1,0 +1,97 @@
+{
+  "title": "Profil",
+  "level": "Level",
+  "progress": {
+    "title": "Dein Fortschritt",
+    "xpLabel": "{{current}} / {{needed}} XP",
+    "nextLevel": "Nächstes Level: {{level}}"
+  },
+  "stats": {
+    "challenges": "Challenges",
+    "contributed": "Beigetragen",
+    "badges": "Badges"
+  },
+  "badges": {
+    "title": "Meine Badges",
+    "seeAll": "Alle anzeigen",
+    "empty": "Noch keine Badges verdient",
+    "earnedOn": "Verdient am {{date}}"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "notifications": "Benachrichtigungen",
+    "account": "Konto verwalten",
+    "privacy": "Datenschutz",
+    "help": "Hilfe & FAQ",
+    "language": "Sprache",
+    "languageGerman": "Deutsch",
+    "languageEnglish": "English"
+  },
+  "logout": "Abmelden",
+  "version": "SolvTerra v{{version}} (Demo)",
+  "levels": {
+    "starter": "Einsteiger",
+    "helper": "Helfer",
+    "supporter": "Unterstützer",
+    "champion": "Champion",
+    "legend": "Legende"
+  },
+  "badgeNames": {
+    "first-challenge": "Erste Schritte",
+    "five-challenges": "Durchstarter",
+    "ten-challenges": "Auf Kurs",
+    "twentyfive-challenges": "Champion",
+    "eco-warrior": "Öko-Krieger",
+    "social-butterfly": "Sozialheld",
+    "knowledge-seeker": "Wissensdurst",
+    "health-hero": "Gesundheitsheld",
+    "early-bird": "Frühaufsteher",
+    "night-owl": "Nachteule",
+    "five-star": "Fünf Sterne",
+    "week-streak": "Wochenkrieger"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "challengeUpdates": "Challenge-Updates",
+    "submissionReviewed": {
+      "title": "Einreichung geprüft",
+      "description": "Benachrichtigung wenn deine Einreichung bewertet wurde"
+    },
+    "challengeReminders": {
+      "title": "Challenge-Erinnerungen",
+      "description": "Erinnerungen an aktive Challenges und Fristen"
+    },
+    "discovery": "Entdecken",
+    "newChallenges": {
+      "title": "Neue Challenges",
+      "description": "Benachrichtigung über neue Challenges in deinen Interessengebieten"
+    },
+    "achievements": "Erfolge",
+    "levelUps": {
+      "title": "Level-Aufstiege",
+      "description": "Benachrichtigung wenn du ein neues Level erreichst"
+    },
+    "badgesEarned": {
+      "title": "Badges verdient",
+      "description": "Benachrichtigung wenn du einen neuen Badge erhältst"
+    },
+    "streakAlerts": {
+      "title": "Streak-Erinnerungen",
+      "description": "Erinnerung um deine tägliche Serie aufrechtzuerhalten"
+    },
+    "community": "Community",
+    "comments": {
+      "title": "Kommentare",
+      "description": "Benachrichtigung wenn jemand deinen Beitrag kommentiert"
+    },
+    "likes": {
+      "title": "Likes",
+      "description": "Benachrichtigung wenn jemand deinen Beitrag liked"
+    },
+    "summaries": "Zusammenfassungen",
+    "weeklyDigest": {
+      "title": "Wöchentliche Zusammenfassung",
+      "description": "Wöchentliche Übersicht deiner Aktivitäten und neuer Challenges"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "challenges": "Challenges",
+    "submissions": "Submissions",
+    "community": "Community",
+    "statistics": "Statistics",
+    "support": "Support",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "publish": "Publish",
+    "search": "Search",
+    "filter": "Filter",
+    "back": "Back",
+    "confirm": "Confirm",
+    "close": "Close"
+  },
+  "status": {
+    "active": "Active",
+    "draft": "Draft",
+    "paused": "Paused",
+    "completed": "Completed",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized"
+  },
+  "categories": {
+    "environment": "Environment",
+    "social": "Social",
+    "education": "Education",
+    "health": "Health",
+    "animals": "Animal Welfare",
+    "culture": "Culture"
+  },
+  "notifications": {
+    "studentParticipates": "{{name}} is participating",
+    "newParticipation": "New participation in \"{{challenge}}\"",
+    "proofFrom": "Proof from {{name}}",
+    "proofSubmitted": "Proof for \"{{challenge}}\" submitted",
+    "newParticipant": "New Participant",
+    "someoneTookChallenge": "Someone accepted \"{{challenge}}\"",
+    "verificationSuccess": "Verification successful!",
+    "verificationSuccessDesc": "Your organization has been verified. You can now publish challenges.",
+    "verificationRejected": "Verification rejected",
+    "verificationRejectedDesc": "Please contact us for more information.",
+    "aStudent": "A student",
+    "aTask": "a task"
+  },
+  "language": {
+    "de": "Deutsch",
+    "en": "English",
+    "switch": "Switch language"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "title": "Community",
+  "subtitle": "Discover challenges, celebrate success, inspire others",
+  "filters": {
+    "all": "All",
+    "organizations": "Organizations",
+    "promotions": "NGOs",
+    "stories": "Stories",
+    "activity": "Activity"
+  },
+  "tabs": {
+    "feed": "Feed",
+    "highlights": "Highlights",
+    "stories": "Stories"
+  },
+  "feedHeader": {
+    "posts": "{{count}} posts",
+    "promotions": "{{count}} challenge recommendations",
+    "stories": "{{count}} success stories",
+    "activities": "{{count}} activities"
+  },
+  "post": {
+    "promotedBy": "Promoted by {{name}}",
+    "completedChallenge": "completed a challenge",
+    "earnedBadge": "earned a badge",
+    "leveledUp": "leveled up to {{level}}",
+    "achievedStreak": "achieved a {{days}}-day streak",
+    "teamCompleted": "completed a team challenge with {{names}}"
+  },
+  "reactions": {
+    "heart": "Like",
+    "celebrate": "Celebrate",
+    "inspiring": "Inspiring",
+    "thanks": "Thanks",
+    "added": "Reaction added"
+  },
+  "comments": {
+    "title": "Comments",
+    "placeholder": "Write a comment...",
+    "send": "Send",
+    "viewAll": "View all {{count}} comments",
+    "comingSoon": "Comments - Coming soon!"
+  },
+  "empty": {
+    "title": "No posts yet",
+    "subtitle": "Posts from NGOs and the community will appear here soon",
+    "organizations": "No posts from organizations yet",
+    "promotions": "No NGO posts in this category yet",
+    "stories": "No success stories shared yet",
+    "activity": "No activities to see yet"
+  },
+  "infoBanner": {
+    "storiesVerified": "Success stories can only be shared after verified challenge participation"
+  },
+  "successStory": {
+    "shareButton": "Share success",
+    "earned": "+{{xp}} XP earned"
+  }
+}

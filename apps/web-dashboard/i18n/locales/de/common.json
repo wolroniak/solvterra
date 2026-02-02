@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "challenges": "Challenges",
+    "submissions": "Einreichungen",
+    "community": "Community",
+    "statistics": "Statistiken",
+    "support": "Support",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "actions": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "publish": "Veröffentlichen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "back": "Zurück",
+    "confirm": "Bestätigen",
+    "close": "Schließen"
+  },
+  "status": {
+    "active": "Aktiv",
+    "draft": "Entwurf",
+    "paused": "Pausiert",
+    "completed": "Abgeschlossen",
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt"
+  },
+  "errors": {
+    "generic": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+    "notFound": "Nicht gefunden",
+    "unauthorized": "Nicht autorisiert"
+  },
+  "categories": {
+    "environment": "Umwelt",
+    "social": "Soziales",
+    "education": "Bildung",
+    "health": "Gesundheit",
+    "animals": "Tierschutz",
+    "culture": "Kultur"
+  },
+  "notifications": {
+    "studentParticipates": "{{name}} nimmt teil",
+    "newParticipation": "Neue Teilnahme an \"{{challenge}}\"",
+    "proofFrom": "Beweis von {{name}}",
+    "proofSubmitted": "Nachweis für \"{{challenge}}\" eingereicht",
+    "newParticipant": "Neuer Teilnehmer",
+    "someoneTookChallenge": "Jemand hat \"{{challenge}}\" angenommen",
+    "verificationSuccess": "Verifizierung erfolgreich!",
+    "verificationSuccessDesc": "Deine Organisation wurde verifiziert. Du kannst jetzt Challenges veröffentlichen.",
+    "verificationRejected": "Verifizierung abgelehnt",
+    "verificationRejectedDesc": "Bitte kontaktiere uns für weitere Informationen.",
+    "aStudent": "Ein Student",
+    "aTask": "eine Aufgabe"
+  },
+  "language": {
+    "de": "Deutsch",
+    "en": "English",
+    "switch": "Sprache wechseln"
+  }
+}

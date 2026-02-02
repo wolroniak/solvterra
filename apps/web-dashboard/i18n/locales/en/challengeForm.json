@@ -1,0 +1,118 @@
+{
+  "location": {
+    "title": "Location & Meeting Point",
+    "nameLabel": "Location Name *",
+    "namePlaceholder": "e.g. Central Park, City Animal Shelter",
+    "nameHint": "The name will be displayed prominently to participants",
+    "addressLabel": "Full Address",
+    "addressPlaceholder": "e.g. 123 Main Street, 60123 Frankfurt am Main",
+    "meetingPointLabel": "Meeting Point",
+    "meetingPointPlaceholder": "e.g. At the main entrance, Parking lot B, Back entrance",
+    "meetingPointHint": "Precise indication of where participants should meet",
+    "additionalInfoLabel": "Additional Information",
+    "additionalInfoPlaceholder": "e.g. Parking available, wear comfortable clothing, equipment provided",
+    "latitudeLabel": "Latitude (optional)",
+    "latitudePlaceholder": "e.g. 50.1109",
+    "longitudeLabel": "Longitude (optional)",
+    "longitudePlaceholder": "e.g. 8.6821",
+    "coordinatesHint": "GPS coordinates enable map display in the app"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "availabilityLabel": "Time Availability",
+    "types": {
+      "anytime": {
+        "label": "Anytime",
+        "description": "Participants can complete the challenge at any time"
+      },
+      "fixed": {
+        "label": "Fixed Date",
+        "description": "One-time event on a specific day and time"
+      },
+      "range": {
+        "label": "Date Range",
+        "description": "Challenge can be completed within a time period"
+      },
+      "recurring": {
+        "label": "Recurring",
+        "description": "Regular time slots (e.g. Mon-Fri 9am-5pm)"
+      }
+    },
+    "startTime": "Start Time *",
+    "endTime": "End Time *",
+    "fixedHint": "The challenge takes place at this fixed date and time",
+    "startDate": "Start Date *",
+    "endDate": "End Date *",
+    "submissionDeadline": "Submission Deadline",
+    "submissionDeadlineHint": "By when must submissions be submitted?",
+    "flexibleScheduling": "Flexible scheduling (participants choose their own time within the period)",
+    "timeSlotsLabel": "Time Slots *",
+    "timeSlotPlaceholder": "e.g. Mon, Wed, Fri: 9am-12pm",
+    "timeSlotExamples": "Examples: \"Mon-Fri: 9am-5pm\", \"Sat: 10am-2pm\", \"Daily: 3pm-6pm\"",
+    "deadlineOptional": "Deadline (optional)",
+    "deadlineHint": "Until when is the challenge available overall?",
+    "anytimeMessage": "This challenge can be completed at any time. Participants have no time constraints and can participate flexibly."
+  },
+  "contact": {
+    "title": "Contact Person",
+    "description": "This information is shown to participants so they can reach out with questions.",
+    "nameLabel": "Name *",
+    "namePlaceholder": "e.g. Jane Smith",
+    "roleLabel": "Role / Position",
+    "rolePlaceholder": "e.g. Volunteer Coordinator",
+    "emailLabel": "Email",
+    "emailPlaceholder": "contact@example.com",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "+1 234 567 8900",
+    "preferredMethodLabel": "Preferred Contact Method *",
+    "methods": {
+      "email": {
+        "label": "Email",
+        "description": "Prefer to be contacted via email"
+      },
+      "phone": {
+        "label": "Phone",
+        "description": "Prefer to be contacted via phone"
+      },
+      "app": {
+        "label": "In-App",
+        "description": "Prefer to be contacted via the SolvTerra app"
+      }
+    },
+    "responseTimeLabel": "Expected Response Time",
+    "responseTimePlaceholder": "Please select...",
+    "responseTimes": {
+      "immediate": "Immediately during business hours",
+      "twoHours": "Within 2 hours",
+      "oneDay": "Within 24 hours",
+      "twoDays": "Within 48 hours",
+      "automatic": "Automatic confirmation"
+    },
+    "responseTimeHint": "Helps participants set realistic expectations"
+  },
+  "tags": {
+    "title": "Tags",
+    "currentLabel": "Current Tags",
+    "emptyState": "No tags added yet",
+    "addLabel": "Add New Tag",
+    "addPlaceholder": "e.g. teamwork, nature, recycling",
+    "suggestionsLabel": "Suggestions",
+    "hint": "Tags help students find relevant challenges. Use meaningful keywords."
+  },
+  "team": {
+    "title": "Team Challenge",
+    "enabled": "Enabled",
+    "toggleLabel": "This is a team challenge",
+    "toggleHint": "Participants need to form a team to complete this challenge. Studies show: 62% would volunteer more if they could do it with friends!",
+    "minSizeLabel": "Minimum Team Size *",
+    "maxSizeLabel": "Maximum Team Size *",
+    "personsOption": "{{count}} people",
+    "descriptionLabel": "Team Description",
+    "descriptionPlaceholder": "e.g. Invite friends or find new teammates through our matching feature!",
+    "descriptionHint": "Motivating text that explains to participants why a team is better",
+    "soloJoinLabel": "Allow Solo Sign-up (Matchmaking)",
+    "soloJoinHint": "Participants without a team can sign up individually and will be matched with other interested participants. This significantly increases participation!",
+    "infoTitle": "Team Challenges in the App",
+    "infoText": "In the mobile app, participants can see a list of people who are also looking for teammates. They can reach out directly and participate together."
+  }
+}

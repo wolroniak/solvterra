@@ -1,0 +1,68 @@
+{
+  "page": {
+    "title": "Einreichungen",
+    "description": "Prüfe und bewerte Studenteneinreichungen"
+  },
+  "status": {
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt"
+  },
+  "tabs": {
+    "pending": "Ausstehend ({{count}})",
+    "approved": "Genehmigt ({{count}})",
+    "rejected": "Abgelehnt ({{count}})"
+  },
+  "empty": {
+    "allDone": "Alles erledigt!",
+    "noPending": "Keine ausstehenden Einreichungen",
+    "noSubmissions": "Keine Einreichungen",
+    "noSubmissionsInCategory": "In dieser Kategorie gibt es noch keine Einreichungen",
+    "selectSubmission": "Wähle eine Einreichung aus der Liste"
+  },
+  "detail": {
+    "title": "Einreichung Details",
+    "proof": "Nachweis",
+    "review": "Bewertung",
+    "rejectedWarning": "Deine Organisation wurde abgelehnt. Du kannst Einreichungen nicht mehr bewerten."
+  },
+  "actions": {
+    "reject": "Ablehnen",
+    "approve": "Genehmigen",
+    "defaultApprovalFeedback": "Toll gemacht! Weiter so.",
+    "defaultRejectionFeedback": "Die Einreichung entspricht leider nicht den Anforderungen. Bitte versuche es erneut."
+  },
+  "detailPage": {
+    "notFound": "Einreichung nicht gefunden",
+    "notFoundDescription": "Die angeforderte Einreichung existiert nicht",
+    "notFoundWithId": "Die Einreichung mit ID \"{{id}}\" existiert nicht.",
+    "back": "Zurück",
+    "reviewTitle": "Einreichung prüfen",
+    "photoProof": "Foto-Nachweis",
+    "textProof": "Text-Nachweis",
+    "proofAlt": "Nachweis",
+    "challengeDetails": "Challenge Details",
+    "minutes": "Min",
+    "reviewSection": "Bewertung",
+    "ratingLabel": "Bewertung (1-5 Sterne)",
+    "feedbackLabel": "Feedback (optional)",
+    "feedbackPlaceholder": "Toll gemacht! Weiter so...",
+    "rejectReasonLabel": "Ablehnungsgrund *",
+    "rejectReasonPlaceholder": "Bitte erkläre, warum die Einreichung abgelehnt wird...",
+    "rejectReasonAlert": "Bitte gib einen Ablehnungsgrund an.",
+    "cancel": "Abbrechen",
+    "rejectSubmission": "Einreichung ablehnen",
+    "stars": "Sterne",
+    "feedback": "Feedback",
+    "reviewedAt": "Bewertet am",
+    "statusTitle": "Status",
+    "student": "Student",
+    "timeline": "Zeitverlauf",
+    "submitted": "Eingereicht",
+    "xpReward": {
+      "earned": "Verdient",
+      "notEarned": "Nicht verdient",
+      "onApproval": "Bei Genehmigung"
+    }
+  }
+}

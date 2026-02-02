@@ -23,13 +23,14 @@ export type VerificationMethod = 'photo' | 'text' | 'ngo_confirmation';
 export type ChallengeStatus = 'draft' | 'active' | 'completed' | 'archived';
 
 export type SubmissionStatus =
-  | 'accepted'
   | 'in_progress'
   | 'submitted'
   | 'approved'
   | 'rejected';
 
 export type UserLevel = 'starter' | 'helper' | 'supporter' | 'champion' | 'legend';
+
+export type VerificationStatus = 'pending' | 'verified' | 'rejected';
 
 // ============================================
 // ORGANIZATION
@@ -38,15 +39,29 @@ export type UserLevel = 'starter' | 'helper' | 'supporter' | 'champion' | 'legen
 export interface Organization {
   id: string;
   name: string;
+  name_en?: string;           // English translation
   description: string;
+  description_en?: string;    // English translation
   mission?: string;
+  mission_en?: string;        // English translation
   logoUrl: string;
   website?: string;
   contactEmail?: string;
-  verified: boolean;
+  category: ChallengeCategory;
+
+  // Verification status
+  verificationStatus: VerificationStatus;
+  rejectionReason?: string;   // Reason if rejected
+  verifiedAt?: Date;          // When verification was approved
+  verifiedBy?: string;        // Admin who verified
+
+  // Legacy field (deprecated, use verificationStatus)
+  verified?: boolean;
+
+  // Stats
   ratingAvg: number;
   ratingCount: number;
-  category: string;
+
   createdAt: Date;
 }
 
@@ -94,13 +109,17 @@ export type ScheduleType = 'anytime' | 'fixed' | 'range' | 'recurring';
 
 export interface ChallengeLocation {
   name: string;                    // e.g., "Stadtpark Frankfurt"
+  name_en?: string;                // English translation
   address?: string;                // Full address
+  address_en?: string;             // English translation
   coordinates?: {
     lat: number;
     lng: number;
   };
   meetingPoint?: string;           // e.g., "Am Haupteingang"
+  meetingPoint_en?: string;        // English translation
   additionalInfo?: string;         // e.g., "Parkplätze vorhanden"
+  additionalInfo_en?: string;      // English translation
 }
 
 export interface ChallengeSchedule {
@@ -116,10 +135,12 @@ export interface ChallengeSchedule {
 export interface ChallengeContact {
   name: string;                    // Contact person name
   role?: string;                   // e.g., "Ehrenamtskoordinator"
+  role_en?: string;                // English translation
   email?: string;
   phone?: string;
   preferredMethod: 'email' | 'phone' | 'app';
   responseTime?: string;           // e.g., "Innerhalb von 24 Stunden"
+  responseTime_en?: string;        // English translation
 }
 
 // Teammate seeker for matchmaking
@@ -136,8 +157,11 @@ export interface Challenge {
   organizationId: string;
   organization: Organization;
   title: string;
+  title_en?: string;               // English translation
   description: string;
+  description_en?: string;         // English translation
   instructions: string;
+  instructions_en?: string;        // English translation
   category: ChallengeCategory;
   type: ChallengeType;
   durationMinutes: ChallengeDuration;
@@ -161,6 +185,7 @@ export interface Challenge {
   minTeamSize?: number;
   maxTeamSize?: number;
   teamDescription?: string;
+  teamDescription_en?: string;     // English translation
 
   // Solo join for team challenges (matchmaking)
   allowSoloJoin?: boolean;          // Can join without bringing team
@@ -207,10 +232,13 @@ export interface Submission {
 export interface Badge {
   id: string;
   name: string;
+  name_en?: string;              // English translation
   description: string;
+  description_en?: string;       // English translation
   iconName: string; // Icon identifier for the app
   category: 'milestone' | 'category' | 'special' | 'streak';
   criteria: string;
+  criteria_en?: string;          // English translation
   xpBonus?: number;
 }
 
@@ -276,14 +304,18 @@ export interface WeeklyDataPoint {
 export interface ChallengeTemplate {
   id: string;
   name: string;
+  name_en?: string;                    // English translation
   description: string;
+  description_en?: string;             // English translation
   icon: string;
   category: ChallengeCategory;
   type: ChallengeType;
   suggestedDuration: ChallengeDuration;
   suggestedVerification: VerificationMethod;
   defaultDescription: string;
+  defaultDescription_en?: string;      // English translation
   defaultInstructions: string;
+  defaultInstructions_en?: string;     // English translation
 }
 
 // ============================================
@@ -295,7 +327,9 @@ export interface Notification {
   userId: string;
   type: 'submission_approved' | 'submission_rejected' | 'badge_earned' | 'level_up' | 'new_challenge';
   title: string;
+  title_en?: string;             // English translation
   message: string;
+  message_en?: string;           // English translation
   read: boolean;
   data?: Record<string, unknown>;
   createdAt: Date;
@@ -338,18 +372,14 @@ export const XP_BY_DURATION: Record<ChallengeDuration, number> = {
 // COMMUNITY FEED & POSTS
 // ============================================
 
-// Reaction types - themed for achievements, not generic social media
-export type ReactionType = 'heart' | 'celebrate' | 'inspiring' | 'thanks';
-
-// Post types - distinction from social media: everything tied to achievements
+// Post types - everything tied to verified achievements
 export type CommunityPostType =
-  | 'ngo_promotion'      // NGO promotes a challenge
-  | 'success_story'      // User shares verified completion story
+  | 'success_story'       // User shares verified completion story
   | 'challenge_completed' // Auto-generated on completion
   | 'badge_earned'        // Auto-generated on badge
   | 'level_up'            // Auto-generated on level up
-  | 'team_challenge'      // Auto-generated team completion
-  | 'streak_achieved';    // Auto-generated streak
+  | 'streak_achieved'     // Auto-generated streak
+  | 'ngo_promotion';      // NGO-authored promotional post
 
 // Comment on a community post
 export interface CommunityComment {
@@ -359,6 +389,7 @@ export interface CommunityComment {
   userName: string;
   userAvatarUrl?: string;
   userLevel?: UserLevel;
+  organizationId?: string;  // Set when comment author is an NGO admin
   content: string;
   createdAt: Date;
 }
@@ -367,8 +398,10 @@ export interface CommunityComment {
 export interface LinkedChallengeInfo {
   id: string;
   title: string;
+  title_en?: string;                   // English translation
   imageUrl?: string;
   organizationName: string;
+  organizationName_en?: string;        // English translation
   category: ChallengeCategory;
   xpReward: number;
   durationMinutes: ChallengeDuration;
@@ -390,7 +423,9 @@ export interface CommunityPost {
 
   // Content
   title?: string;           // For NGO promotions, success stories
+  title_en?: string;        // English translation
   content?: string;         // Post text content
+  content_en?: string;      // English translation
   imageUrl?: string;        // Post image
 
   // Challenge Link (for promotions and success stories)
@@ -404,15 +439,15 @@ export interface CommunityPost {
   // Auto-generated activity fields (backward compatible)
   badgeId?: string;
   badgeName?: string;
+  badgeName_en?: string;    // English translation
   badgeIcon?: string;
   newLevel?: UserLevel;
   teamMemberNames?: string[];
   streakDays?: number;
 
-  // Social interactions - reactions instead of simple likes
-  reactions: Record<ReactionType, number>;  // {heart: 5, celebrate: 3, ...}
-  userReaction?: ReactionType;              // Current user's reaction
-  totalReactions: number;                   // Sum of all reactions
+  // Social interactions - simple like system
+  likesCount: number;
+  userHasLiked: boolean;
   commentsCount: number;
   comments?: CommunityComment[];            // First few comments for preview
 
@@ -423,7 +458,7 @@ export interface CommunityPost {
   createdAt: Date;
 }
 
-// Legacy FeedItem type for backward compatibility
+// Feed Item - simplified view for activity feeds
 export type FeedItemType =
   | 'challenge_completed'
   | 'badge_earned'
@@ -434,33 +469,21 @@ export type FeedItemType =
 export interface FeedItem {
   id: string;
   type: FeedItemType;
-  userId: string;
   userName: string;
   userAvatarUrl?: string;
-  userLevel?: UserLevel;
-  // Content based on type
-  challengeId?: string;
+  userLevel: UserLevel;
   challengeTitle?: string;
   challengeImageUrl?: string;
-  badgeId?: string;
   badgeName?: string;
   badgeIcon?: string;
   newLevel?: UserLevel;
   teamMemberNames?: string[];
   streakDays?: number;
-  // Social
   likesCount: number;
   isLiked: boolean;
   createdAt: Date;
 }
 
-// Reaction icons mapping for UI
-export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string; color: string }> = {
-  heart: { emoji: '❤️', label: 'Gefällt mir', color: '#ef4444' },
-  celebrate: { emoji: '🎉', label: 'Feiern', color: '#f59e0b' },
-  inspiring: { emoji: '💪', label: 'Inspirierend', color: '#8b5cf6' },
-  thanks: { emoji: '🙏', label: 'Danke', color: '#06b6d4' },
-};
 
 // ============================================
 // FRIENDS / SOCIAL

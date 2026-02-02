@@ -1,0 +1,68 @@
+{
+  "page": {
+    "title": "Submissions",
+    "description": "Review and evaluate student submissions"
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "tabs": {
+    "pending": "Pending ({{count}})",
+    "approved": "Approved ({{count}})",
+    "rejected": "Rejected ({{count}})"
+  },
+  "empty": {
+    "allDone": "All done!",
+    "noPending": "No pending submissions",
+    "noSubmissions": "No submissions",
+    "noSubmissionsInCategory": "There are no submissions in this category yet",
+    "selectSubmission": "Select a submission from the list"
+  },
+  "detail": {
+    "title": "Submission Details",
+    "proof": "Proof",
+    "review": "Review",
+    "rejectedWarning": "Your organization has been rejected. You can no longer review submissions."
+  },
+  "actions": {
+    "reject": "Reject",
+    "approve": "Approve",
+    "defaultApprovalFeedback": "Great job! Keep it up.",
+    "defaultRejectionFeedback": "Unfortunately, the submission does not meet the requirements. Please try again."
+  },
+  "detailPage": {
+    "notFound": "Submission not found",
+    "notFoundDescription": "The requested submission does not exist",
+    "notFoundWithId": "The submission with ID \"{{id}}\" does not exist.",
+    "back": "Back",
+    "reviewTitle": "Review submission",
+    "photoProof": "Photo proof",
+    "textProof": "Text proof",
+    "proofAlt": "Proof",
+    "challengeDetails": "Challenge Details",
+    "minutes": "min",
+    "reviewSection": "Review",
+    "ratingLabel": "Rating (1-5 stars)",
+    "feedbackLabel": "Feedback (optional)",
+    "feedbackPlaceholder": "Great job! Keep it up...",
+    "rejectReasonLabel": "Rejection reason *",
+    "rejectReasonPlaceholder": "Please explain why the submission is being rejected...",
+    "rejectReasonAlert": "Please provide a reason for rejection.",
+    "cancel": "Cancel",
+    "rejectSubmission": "Reject submission",
+    "stars": "Stars",
+    "feedback": "Feedback",
+    "reviewedAt": "Reviewed on",
+    "statusTitle": "Status",
+    "student": "Student",
+    "timeline": "Timeline",
+    "submitted": "Submitted",
+    "xpReward": {
+      "earned": "Earned",
+      "notEarned": "Not earned",
+      "onApproval": "Upon approval"
+    }
+  }
+}

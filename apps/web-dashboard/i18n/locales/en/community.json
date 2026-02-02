@@ -1,0 +1,110 @@
+{
+  "page": {
+    "title": "Community",
+    "description": "Create posts to promote your challenges in the community"
+  },
+  "newPost": "New Post",
+  "rejectedTooltip": "Organization has been rejected",
+  "stats": {
+    "published": "Published",
+    "drafts": "Drafts",
+    "likes": "Likes",
+    "comments": "Comments"
+  },
+  "infoBox": {
+    "title": "Reach more participants with community posts",
+    "description": "Your posts appear in the community feed of the mobile app. Users can click directly on linked challenges and participate. Posts with images receive on average 3x more likes!"
+  },
+  "filter": {
+    "all": "All ({{count}})",
+    "published": "Published ({{count}})",
+    "drafts": "Drafts ({{count}})"
+  },
+  "emptyState": {
+    "title": "No posts yet",
+    "description": "Create your first post to promote your challenges in the community.",
+    "createFirst": "Create first post"
+  },
+  "postCard": {
+    "pinned": "Pinned",
+    "highlighted": "Highlighted",
+    "draft": "Draft",
+    "edit": "Edit",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "highlight": "Highlight",
+    "unhighlight": "Remove highlight",
+    "delete": "Delete",
+    "like": "Like",
+    "unlike": "Unlike",
+    "recentComments": "Recent comments",
+    "showAllComments": "Show all {{count}} comments",
+    "writeComment": "Write a comment...",
+    "sendComment": "Send",
+    "noComments": "No comments yet",
+    "anonymous": "Anonymous",
+    "minutes": "min",
+    "confirmDelete": "Are you sure you want to delete this post?"
+  },
+  "timeAgo": {
+    "minutes": "{{count}} min ago",
+    "hours": "{{count}} hrs ago",
+    "dayOne": "{{count}} day ago",
+    "dayOther": "{{count}} days ago"
+  },
+  "newPostPage": {
+    "title": "New Post",
+    "heading": "New Community Post",
+    "description": "Create a post to promote your challenge in the community",
+    "restricted": {
+      "title": "Access restricted",
+      "description": "Your organization has been rejected and cannot create new posts.",
+      "reason": "Reason:"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. 🌿 Together for clean parks!",
+      "titleHint": "A catchy title with an emoji attracts more attention",
+      "contentLabel": "Message",
+      "contentPlaceholder": "Describe the challenge and why users should participate...",
+      "contentHint": "Tip: Mention XP rewards and time commitment",
+      "imageLabel": "Image",
+      "selectImage": "Select image",
+      "uploadImage": "Upload",
+      "enterUrl": "Enter URL",
+      "dragDrop": "Drag image here or click to select",
+      "imageHint": "Posts with images receive 3x more likes",
+      "removeImage": "Remove",
+      "linkChallenge": "Link challenge",
+      "noChallengeLinked": "No challenge linked",
+      "linkHint": "Users can click directly on the challenge to participate"
+    },
+    "options": {
+      "title": "Options",
+      "highlight": "Highlight",
+      "highlightDescription": "The post appears prominently in the feed",
+      "pin": "Pin",
+      "pinDescription": "The post stays at the top of the feed"
+    },
+    "preview": {
+      "title": "Preview",
+      "justNow": "Just now",
+      "emptyPlaceholder": "Add a title and content...",
+      "commentsCount": "0 comments"
+    },
+    "publishButton": "Publish",
+    "uploading": "Uploading...",
+    "saveDraft": "Save as draft"
+  },
+  "editPostPage": {
+    "heading": "Edit Post",
+    "description": "Edit your community post",
+    "notFound": "Post not found",
+    "notFoundDescription": "The post could not be found. It may have been deleted.",
+    "backToCommunity": "Back to Community",
+    "saveChanges": "Save Changes",
+    "saving": "Saving..."
+  }
+}

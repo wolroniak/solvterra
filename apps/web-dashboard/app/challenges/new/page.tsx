@@ -16,17 +16,19 @@ import {
   Laptop,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useChallengeStore } from '@/store';
 import {
-  CATEGORY_LABELS,
   type ChallengeLocation,
   type ChallengeSchedule,
   type ChallengeContact,
 } from '@/lib/mock-data';
+import { useVerificationStatus } from '@/components/verification-banner';
+import { AlertCircle } from 'lucide-react';
 import {
   LocationSection,
   ScheduleSection,
@@ -35,71 +37,80 @@ import {
   TagsSection,
 } from '@/components/challenge-form';
 
+const CATEGORY_ICONS: Record<string, string> = {
+  environment: '\u{1F331}',
+  social: '\u{2764}\u{FE0F}',
+  education: '\u{1F4DA}',
+  health: '\u{1F3E5}',
+  animals: '\u{1F43E}',
+  culture: '\u{1F3A8}',
+};
+
 const CATEGORIES = [
-  { value: 'environment', label: 'Umwelt', icon: '🌱' },
-  { value: 'social', label: 'Soziales', icon: '❤️' },
-  { value: 'education', label: 'Bildung', icon: '📚' },
-  { value: 'health', label: 'Gesundheit', icon: '🏥' },
-  { value: 'animals', label: 'Tierschutz', icon: '🐾' },
-  { value: 'culture', label: 'Kultur', icon: '🎨' },
+  { value: 'environment' },
+  { value: 'social' },
+  { value: 'education' },
+  { value: 'health' },
+  { value: 'animals' },
+  { value: 'culture' },
 ];
 
 const DURATIONS = [
-  { value: 5, label: '5 Min', description: '10 XP' },
-  { value: 10, label: '10 Min', description: '20 XP' },
-  { value: 15, label: '15 Min', description: '25 XP' },
-  { value: 30, label: '30 Min', description: '50 XP' },
+  { value: 5, description: '10 XP' },
+  { value: 10, description: '20 XP' },
+  { value: 15, description: '25 XP' },
+  { value: 30, description: '50 XP' },
 ];
 
 const VERIFICATION_METHODS = [
-  { value: 'photo', label: 'Foto hochladen', icon: Camera, description: 'Studenten laden ein Foto als Beweis hoch' },
-  { value: 'text', label: 'Text einreichen', icon: FileText, description: 'Studenten beschreiben ihre Aktivität' },
-  { value: 'ngo_confirmation', label: 'NGO Bestätigung', icon: UserCheck, description: 'Du bestätigst die Teilnahme manuell' },
+  { value: 'photo', icon: Camera },
+  { value: 'text', icon: FileText },
+  { value: 'ngo_confirmation', icon: UserCheck },
 ];
 
 const TEMPLATES = [
   {
     id: 'social-media',
-    name: 'Social Media Post',
-    description: 'Studenten teilen einen informativen Beitrag',
+    nameKey: 'templates.socialMedia',
+    descriptionKey: 'templates.socialMediaDescription',
     category: 'environment',
     type: 'digital',
     duration: 15,
     verificationMethod: 'photo',
-    instructions: '1. Wähle ein passendes Thema\n2. Erstelle einen informativen Beitrag\n3. Teile ihn auf Social Media\n4. Mache einen Screenshot',
+    instructionsKey: 'templates.socialMediaInstructions',
     tags: ['social-media', 'digital', 'awareness'],
   },
   {
     id: 'research',
-    name: 'Kurze Recherche',
-    description: 'Studenten recherchieren ein Thema und fassen zusammen',
+    nameKey: 'templates.research',
+    descriptionKey: 'templates.researchDescription',
     category: 'education',
     type: 'digital',
     duration: 15,
     verificationMethod: 'text',
-    instructions: '1. Recherchiere zum Thema\n2. Sammle wichtige Informationen\n3. Fasse in 200+ Wörtern zusammen',
+    instructionsKey: 'templates.researchInstructions',
     tags: ['recherche', 'digital', 'bildung'],
   },
   {
     id: 'cleanup',
-    name: 'Aufräumaktion',
-    description: 'Müllsammeln oder Aufräumen in der Umgebung',
+    nameKey: 'templates.cleanup',
+    descriptionKey: 'templates.cleanupDescription',
     category: 'environment',
     type: 'onsite',
     duration: 30,
     verificationMethod: 'photo',
-    instructions: '1. Bringe Handschuhe und Müllbeutel mit\n2. Sammle 30 Minuten Müll\n3. Entsorge alles ordnungsgemäß\n4. Mache ein Vorher/Nachher-Foto',
+    instructionsKey: 'templates.cleanupInstructions',
     tags: ['outdoor', 'umwelt', 'vor-ort'],
   },
   {
     id: 'team-event',
-    name: 'Team-Aktion',
-    description: 'Gemeinsame Aktivität für Gruppen',
+    nameKey: 'templates.teamEvent',
+    descriptionKey: 'templates.teamEventDescription',
     category: 'social',
     type: 'onsite',
     duration: 30,
     verificationMethod: 'photo',
-    instructions: '1. Bildet ein Team von 2-4 Personen\n2. Trefft euch am vereinbarten Ort\n3. Führt die Aktion gemeinsam durch\n4. Macht ein Gruppenfoto',
+    instructionsKey: 'templates.teamEventInstructions',
     tags: ['team', 'vor-ort', 'sozial'],
     isMultiPerson: true,
     minTeamSize: 2,
@@ -108,8 +119,51 @@ const TEMPLATES = [
 ];
 
 export default function NewChallengePage() {
+  const { t } = useTranslation('challenges');
   const router = useRouter();
   const { addChallenge } = useChallengeStore();
+  const { isRejected, rejectionReason } = useVerificationStatus();
+
+  // Block access for rejected organizations
+  if (isRejected) {
+    return (
+      <div className="flex flex-col">
+        <Header
+          title={t('new.rejectedTitle')}
+          description={t('new.rejectedDescription')}
+          action={
+            <Link href="/challenges">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {t('actions.back', { ns: 'common' })}
+              </Button>
+            </Link>
+          }
+        />
+        <div className="p-6">
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="flex items-start gap-4 p-6">
+              <AlertCircle className="h-6 w-6 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-800">{t('new.accessRestricted')}</h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {t('new.accessRestrictedMessage')}
+                </p>
+                {rejectionReason && (
+                  <p className="text-sm text-red-600 mt-2 p-2 bg-red-100 rounded">
+                    <strong>{t('new.rejectionReason')}</strong> {rejectionReason}
+                  </p>
+                )}
+                <p className="text-sm text-red-700 mt-3">
+                  {t('new.contactSupport')}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // Basic form data
   const [formData, setFormData] = useState({
@@ -146,8 +200,8 @@ export default function NewChallengePage() {
     setFormData({
       ...formData,
       title: '',
-      description: template.description,
-      instructions: template.instructions,
+      description: t(template.descriptionKey),
+      instructions: t(template.instructionsKey),
       category: template.category as any,
       type: template.type as any,
       duration: template.duration as any,
@@ -218,13 +272,13 @@ export default function NewChallengePage() {
   return (
     <div className="flex flex-col">
       <Header
-        title="Neue Challenge erstellen"
-        description="Erstelle eine neue Micro-Volunteering Challenge für Studenten"
+        title={t('new.pageTitle')}
+        description={t('new.pageDescription')}
         action={
           <Link href="/challenges">
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Zurück
+              {t('actions.back', { ns: 'common' })}
             </Button>
           </Link>
         }
@@ -236,11 +290,11 @@ export default function NewChallengePage() {
             {/* Template Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Vorlage wählen</CardTitle>
+                <CardTitle>{t('new.chooseTemplate')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-slate-500 mb-4">
-                  Wähle eine Vorlage als Ausgangspunkt oder starte von Grund auf
+                  {t('new.templateHint')}
                 </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {TEMPLATES.map((template) => (
@@ -251,7 +305,7 @@ export default function NewChallengePage() {
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="outline">
-                          {CATEGORY_LABELS[template.category]}
+                          {t(`categories.${template.category}`)}
                         </Badge>
                         {template.isMultiPerson && (
                           <Badge variant="success" className="text-xs">
@@ -260,15 +314,15 @@ export default function NewChallengePage() {
                         )}
                       </div>
                       <h3 className="font-medium text-slate-900 mb-1">
-                        {template.name}
+                        {t(template.nameKey)}
                       </h3>
                       <p className="text-sm text-slate-500">
-                        {template.description}
+                        {t(template.descriptionKey)}
                       </p>
                       <div className="flex gap-2 mt-3 text-xs text-slate-400">
-                        <span>{template.duration} Min</span>
+                        <span>{t('durationMinutes', { count: template.duration })}</span>
                         <span>·</span>
-                        <span>{template.type === 'digital' ? 'Digital' : 'Vor Ort'}</span>
+                        <span>{template.type === 'digital' ? t('type.digital') : t('type.onsite')}</span>
                       </div>
                     </button>
                   ))}
@@ -278,7 +332,7 @@ export default function NewChallengePage() {
                   className="w-full mt-4"
                   onClick={() => setShowTemplates(false)}
                 >
-                  Ohne Vorlage starten
+                  {t('new.startWithoutTemplate')}
                 </Button>
               </CardContent>
             </Card>
@@ -290,12 +344,12 @@ export default function NewChallengePage() {
               {/* Basic Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Grundinformationen</CardTitle>
+                  <CardTitle>{t('new.basicInfo')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Titel *
+                      {t('new.titleLabel')}
                     </label>
                     <input
                       type="text"
@@ -303,14 +357,14 @@ export default function NewChallengePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, title: e.target.value })
                       }
-                      placeholder="z.B. Vogelzählung im Stadtpark"
+                      placeholder={t('new.titlePlaceholder')}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Beschreibung *
+                      {t('new.descriptionLabel')}
                     </label>
                     <textarea
                       value={formData.description}
@@ -318,14 +372,14 @@ export default function NewChallengePage() {
                         setFormData({ ...formData, description: e.target.value })
                       }
                       rows={3}
-                      placeholder="Was sollen die Teilnehmer tun? Warum ist es wichtig?"
+                      placeholder={t('new.descriptionPlaceholder')}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Anleitung *
+                      {t('new.instructionsLabel')}
                     </label>
                     <textarea
                       value={formData.instructions}
@@ -333,14 +387,14 @@ export default function NewChallengePage() {
                         setFormData({ ...formData, instructions: e.target.value })
                       }
                       rows={5}
-                      placeholder="Schritt-für-Schritt Anleitung für die Teilnehmer..."
+                      placeholder={t('new.instructionsPlaceholder')}
                       className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Bild-URL
+                      {t('new.imageUrlLabel')}
                     </label>
                     <input
                       type="url"
@@ -358,13 +412,13 @@ export default function NewChallengePage() {
               {/* Settings */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Einstellungen</CardTitle>
+                  <CardTitle>{t('new.settings')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Category */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Kategorie
+                      {t('new.categoryLabel')}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {CATEGORIES.map((cat) => (
@@ -380,8 +434,8 @@ export default function NewChallengePage() {
                               : 'hover:border-slate-300'
                           }`}
                         >
-                          <span className="text-xl mb-1 block">{cat.icon}</span>
-                          <span className="text-sm font-medium">{cat.label}</span>
+                          <span className="text-xl mb-1 block">{CATEGORY_ICONS[cat.value]}</span>
+                          <span className="text-sm font-medium">{t(`categories.${cat.value}`)}</span>
                         </button>
                       ))}
                     </div>
@@ -390,7 +444,7 @@ export default function NewChallengePage() {
                   {/* Type */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Art der Challenge
+                      {t('new.challengeType')}
                     </label>
                     <div className="flex gap-2">
                       <button
@@ -403,9 +457,9 @@ export default function NewChallengePage() {
                         }`}
                       >
                         <Laptop className="h-5 w-5 mx-auto mb-1 text-slate-500" />
-                        <span className="text-sm font-medium block">Digital</span>
+                        <span className="text-sm font-medium block">{t('new.digital')}</span>
                         <p className="text-xs text-slate-500 mt-1">
-                          Von überall aus
+                          {t('new.digitalDescription')}
                         </p>
                       </button>
                       <button
@@ -418,9 +472,9 @@ export default function NewChallengePage() {
                         }`}
                       >
                         <MapPin className="h-5 w-5 mx-auto mb-1 text-slate-500" />
-                        <span className="text-sm font-medium block">Vor Ort</span>
+                        <span className="text-sm font-medium block">{t('new.onsite')}</span>
                         <p className="text-xs text-slate-500 mt-1">
-                          Physische Anwesenheit
+                          {t('new.onsiteDescription')}
                         </p>
                       </button>
                     </div>
@@ -429,7 +483,7 @@ export default function NewChallengePage() {
                   {/* Duration */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Zeitaufwand
+                      {t('new.timeEffort')}
                     </label>
                     <div className="flex gap-2">
                       {DURATIONS.map((dur) => (
@@ -446,7 +500,7 @@ export default function NewChallengePage() {
                           }`}
                         >
                           <Clock className="h-5 w-5 mx-auto mb-1 text-slate-400" />
-                          <span className="text-sm font-medium block">{dur.label}</span>
+                          <span className="text-sm font-medium block">{t('durationMinutes', { count: dur.value })}</span>
                           <span className="text-xs text-slate-500">{dur.description}</span>
                         </button>
                       ))}
@@ -456,7 +510,7 @@ export default function NewChallengePage() {
                   {/* Verification */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Nachweismethode
+                      {t('new.verificationMethod')}
                     </label>
                     <div className="space-y-2">
                       {VERIFICATION_METHODS.map((method) => (
@@ -478,10 +532,10 @@ export default function NewChallengePage() {
                           <method.icon className="h-5 w-5 text-slate-400" />
                           <div>
                             <span className="text-sm font-medium block">
-                              {method.label}
+                              {t(`verification.${method.value}`)}
                             </span>
                             <span className="text-xs text-slate-500">
-                              {method.description}
+                              {t(`verification.${method.value}Description`)}
                             </span>
                           </div>
                         </button>
@@ -492,7 +546,7 @@ export default function NewChallengePage() {
                   {/* Max Participants */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Maximale Teilnehmer
+                      {t('new.maxParticipants')}
                     </label>
                     <input
                       type="number"
@@ -543,7 +597,7 @@ export default function NewChallengePage() {
               {/* Preview */}
               <Card className="sticky top-6">
                 <CardHeader>
-                  <CardTitle>Vorschau</CardTitle>
+                  <CardTitle>{t('new.preview')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="border rounded-lg overflow-hidden">
@@ -555,10 +609,10 @@ export default function NewChallengePage() {
                     <div className="p-4">
                       <div className="flex flex-wrap gap-2 mb-2">
                         <Badge variant="outline">
-                          {CATEGORY_LABELS[formData.category]}
+                          {t(`categories.${formData.category}`)}
                         </Badge>
                         <Badge variant="outline">
-                          {formData.type === 'digital' ? 'Digital' : 'Vor Ort'}
+                          {formData.type === 'digital' ? t('type.digital') : t('type.onsite')}
                         </Badge>
                         {teamData.isMultiPerson && (
                           <Badge variant="success">
@@ -567,15 +621,15 @@ export default function NewChallengePage() {
                         )}
                       </div>
                       <h3 className="font-semibold text-slate-900 mb-1">
-                        {formData.title || 'Titel der Challenge'}
+                        {formData.title || t('new.previewTitlePlaceholder')}
                       </h3>
                       <p className="text-sm text-slate-500 line-clamp-2">
-                        {formData.description || 'Beschreibung der Challenge...'}
+                        {formData.description || t('new.previewDescriptionPlaceholder')}
                       </p>
                       <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          {formData.duration} Min
+                          {t('durationMinutes', { count: formData.duration })}
                         </span>
                         <span className="flex items-center gap-1">
                           <Star className="h-4 w-4 text-amber-500" />
@@ -615,7 +669,7 @@ export default function NewChallengePage() {
                     disabled={!formData.title || !formData.description}
                   >
                     <Send className="h-4 w-4 mr-2" />
-                    Veröffentlichen
+                    {t('new.publishButton')}
                   </Button>
                   <Button
                     variant="outline"
@@ -624,14 +678,14 @@ export default function NewChallengePage() {
                     disabled={!formData.title}
                   >
                     <Save className="h-4 w-4 mr-2" />
-                    Als Entwurf speichern
+                    {t('new.saveDraft')}
                   </Button>
                   <Button
                     variant="ghost"
                     className="w-full"
                     onClick={() => setShowTemplates(true)}
                   >
-                    Vorlage wählen
+                    {t('new.chooseTemplateButton')}
                   </Button>
                 </CardContent>
               </Card>

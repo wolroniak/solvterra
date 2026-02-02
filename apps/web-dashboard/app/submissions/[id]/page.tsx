@@ -15,6 +15,7 @@ import {
   Calendar,
   MessageSquare,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,16 +24,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSubmissionStore, useChallengeStore } from '@/store';
 import { formatDateTime, formatRelativeTime } from '@/lib/utils';
 
-const STATUS_CONFIG = {
-  submitted: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50', label: 'Ausstehend', variant: 'warning' as const },
-  approved: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', label: 'Genehmigt', variant: 'success' as const },
-  rejected: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', label: 'Abgelehnt', variant: 'destructive' as const },
-};
-
 export default function SubmissionDetailPage() {
+  const { t } = useTranslation('submissions');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+
+  const STATUS_CONFIG = {
+    submitted: { icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50', label: t('status.pending'), variant: 'warning' as const },
+    approved: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', label: t('status.approved'), variant: 'success' as const },
+    rejected: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-50', label: t('status.rejected'), variant: 'destructive' as const },
+  };
 
   const { submissions, approveSubmission, rejectSubmission } = useSubmissionStore();
   const { challenges } = useChallengeStore();
@@ -49,13 +51,13 @@ export default function SubmissionDetailPage() {
     return (
       <div className="flex flex-col">
         <Header
-          title="Einreichung nicht gefunden"
-          description="Die angeforderte Einreichung existiert nicht"
+          title={t('detailPage.notFound')}
+          description={t('detailPage.notFoundDescription')}
           action={
             <Link href="/submissions">
               <Button variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Zurück
+                {t('detailPage.back')}
               </Button>
             </Link>
           }
@@ -63,8 +65,8 @@ export default function SubmissionDetailPage() {
         <div className="p-6">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 text-slate-500">
-              <p className="text-lg font-medium">Einreichung nicht gefunden</p>
-              <p className="text-sm">Die Einreichung mit ID "{id}" existiert nicht.</p>
+              <p className="text-lg font-medium">{t('detailPage.notFound')}</p>
+              <p className="text-sm">{t('detailPage.notFoundWithId', { id })}</p>
             </CardContent>
           </Card>
         </div>
@@ -76,13 +78,13 @@ export default function SubmissionDetailPage() {
   const StatusIcon = status.icon;
 
   const handleApprove = () => {
-    approveSubmission(submission.id, rating, feedback || 'Toll gemacht! Weiter so.');
+    approveSubmission(submission.id, rating, feedback || t('actions.defaultApprovalFeedback'));
     router.push('/submissions');
   };
 
   const handleReject = () => {
     if (!rejectReason.trim()) {
-      alert('Bitte gib einen Ablehnungsgrund an.');
+      alert(t('detailPage.rejectReasonAlert'));
       return;
     }
     rejectSubmission(submission.id, rejectReason);
@@ -92,13 +94,13 @@ export default function SubmissionDetailPage() {
   return (
     <div className="flex flex-col">
       <Header
-        title="Einreichung prüfen"
+        title={t('detailPage.reviewTitle')}
         description={`${submission.studentName} · ${submission.challengeTitle}`}
         action={
           <Link href="/submissions">
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Zurück
+              {t('detailPage.back')}
             </Button>
           </Link>
         }
@@ -115,12 +117,12 @@ export default function SubmissionDetailPage() {
                   {submission.proofType === 'photo' ? (
                     <>
                       <ImageIcon className="h-5 w-5" />
-                      Foto-Nachweis
+                      {t('detailPage.photoProof')}
                     </>
                   ) : (
                     <>
                       <FileText className="h-5 w-5" />
-                      Text-Nachweis
+                      {t('detailPage.textProof')}
                     </>
                   )}
                 </CardTitle>
@@ -129,7 +131,7 @@ export default function SubmissionDetailPage() {
                 {submission.proofType === 'photo' ? (
                   <img
                     src={submission.proofUrl}
-                    alt="Nachweis"
+                    alt={t('detailPage.proofAlt')}
                     className="w-full max-h-[500px] object-contain rounded-lg bg-slate-100"
                   />
                 ) : (
@@ -146,7 +148,7 @@ export default function SubmissionDetailPage() {
             {challenge && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Challenge Details</CardTitle>
+                  <CardTitle>{t('detailPage.challengeDetails')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Link
@@ -168,7 +170,7 @@ export default function SubmissionDetailPage() {
                       <div className="flex gap-4 text-sm text-slate-400">
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          {challenge.duration} Min
+                          {challenge.duration} {t('detailPage.minutes')}
                         </span>
                         <span className="flex items-center gap-1">
                           <Star className="h-4 w-4 text-amber-500" />
@@ -185,7 +187,7 @@ export default function SubmissionDetailPage() {
             {submission.status === 'submitted' && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Bewertung</CardTitle>
+                  <CardTitle>{t('detailPage.reviewSection')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {!showRejectForm ? (
@@ -193,7 +195,7 @@ export default function SubmissionDetailPage() {
                       {/* Rating */}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Bewertung (1-5 Sterne)
+                          {t('detailPage.ratingLabel')}
                         </label>
                         <div className="flex gap-2">
                           {[1, 2, 3, 4, 5].map((star) => (
@@ -215,13 +217,13 @@ export default function SubmissionDetailPage() {
                       {/* Feedback */}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">
-                          Feedback (optional)
+                          {t('detailPage.feedbackLabel')}
                         </label>
                         <textarea
                           value={feedback}
                           onChange={(e) => setFeedback(e.target.value)}
                           rows={3}
-                          placeholder="Toll gemacht! Weiter so..."
+                          placeholder={t('detailPage.feedbackPlaceholder')}
                           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
@@ -234,14 +236,14 @@ export default function SubmissionDetailPage() {
                           onClick={() => setShowRejectForm(true)}
                         >
                           <XCircle className="h-4 w-4 mr-2" />
-                          Ablehnen
+                          {t('actions.reject')}
                         </Button>
                         <Button
                           className="flex-1 bg-green-600 hover:bg-green-700"
                           onClick={handleApprove}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Genehmigen
+                          {t('actions.approve')}
                         </Button>
                       </div>
                     </>
@@ -250,13 +252,13 @@ export default function SubmissionDetailPage() {
                       {/* Reject Form */}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">
-                          Ablehnungsgrund *
+                          {t('detailPage.rejectReasonLabel')}
                         </label>
                         <textarea
                           value={rejectReason}
                           onChange={(e) => setRejectReason(e.target.value)}
                           rows={4}
-                          placeholder="Bitte erkläre, warum die Einreichung abgelehnt wird..."
+                          placeholder={t('detailPage.rejectReasonPlaceholder')}
                           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
                       </div>
@@ -267,7 +269,7 @@ export default function SubmissionDetailPage() {
                           className="flex-1"
                           onClick={() => setShowRejectForm(false)}
                         >
-                          Abbrechen
+                          {t('detailPage.cancel')}
                         </Button>
                         <Button
                           className="flex-1 bg-red-600 hover:bg-red-700"
@@ -275,7 +277,7 @@ export default function SubmissionDetailPage() {
                           disabled={!rejectReason.trim()}
                         >
                           <XCircle className="h-4 w-4 mr-2" />
-                          Einreichung ablehnen
+                          {t('detailPage.rejectSubmission')}
                         </Button>
                       </div>
                     </>
@@ -290,13 +292,13 @@ export default function SubmissionDetailPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
-                    Bewertung
+                    {t('detailPage.reviewSection')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {submission.rating && (
                     <div>
-                      <p className="text-sm text-slate-500 mb-1">Sterne</p>
+                      <p className="text-sm text-slate-500 mb-1">{t('detailPage.stars')}</p>
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <span
@@ -315,13 +317,13 @@ export default function SubmissionDetailPage() {
                   )}
                   {submission.feedback && (
                     <div>
-                      <p className="text-sm text-slate-500 mb-1">Feedback</p>
+                      <p className="text-sm text-slate-500 mb-1">{t('detailPage.feedback')}</p>
                       <p className="text-slate-700">{submission.feedback}</p>
                     </div>
                   )}
                   {submission.reviewedAt && (
                     <div>
-                      <p className="text-sm text-slate-500 mb-1">Bewertet am</p>
+                      <p className="text-sm text-slate-500 mb-1">{t('detailPage.reviewedAt')}</p>
                       <p className="text-slate-700">{formatDateTime(submission.reviewedAt)}</p>
                     </div>
                   )}
@@ -335,7 +337,7 @@ export default function SubmissionDetailPage() {
             {/* Status */}
             <Card>
               <CardHeader>
-                <CardTitle>Status</CardTitle>
+                <CardTitle>{t('detailPage.statusTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className={`flex items-center gap-3 p-4 rounded-lg ${status.bg}`}>
@@ -355,7 +357,7 @@ export default function SubmissionDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  Student
+                  {t('detailPage.student')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -370,7 +372,7 @@ export default function SubmissionDetailPage() {
                     <p className="font-semibold text-slate-900">
                       {submission.studentName}
                     </p>
-                    <p className="text-sm text-slate-500">Student</p>
+                    <p className="text-sm text-slate-500">{t('detailPage.student')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -381,7 +383,7 @@ export default function SubmissionDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  Zeitverlauf
+                  {t('detailPage.timeline')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -389,7 +391,7 @@ export default function SubmissionDetailPage() {
                   <div className="flex gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary-500 mt-2" />
                     <div>
-                      <p className="font-medium text-slate-900">Eingereicht</p>
+                      <p className="font-medium text-slate-900">{t('detailPage.submitted')}</p>
                       <p className="text-sm text-slate-500">
                         {formatDateTime(submission.submittedAt)}
                       </p>
@@ -402,7 +404,7 @@ export default function SubmissionDetailPage() {
                       }`} />
                       <div>
                         <p className="font-medium text-slate-900">
-                          {submission.status === 'approved' ? 'Genehmigt' : 'Abgelehnt'}
+                          {submission.status === 'approved' ? t('status.approved') : t('status.rejected')}
                         </p>
                         <p className="text-sm text-slate-500">
                           {formatDateTime(submission.reviewedAt)}
@@ -426,10 +428,10 @@ export default function SubmissionDetailPage() {
                       </p>
                       <p className="text-sm text-amber-600">
                         {submission.status === 'approved'
-                          ? 'Verdient'
+                          ? t('detailPage.xpReward.earned')
                           : submission.status === 'rejected'
-                          ? 'Nicht verdient'
-                          : 'Bei Genehmigung'}
+                          ? t('detailPage.xpReward.notEarned')
+                          : t('detailPage.xpReward.onApproval')}
                       </p>
                     </div>
                   </div>

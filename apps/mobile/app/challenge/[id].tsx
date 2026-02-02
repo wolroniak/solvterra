@@ -7,66 +7,14 @@ import { Text, Button, Chip, Portal, Modal, Surface } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
-import { useChallengeStore, useUserStore } from '@/store';
+import { useChallengeStore, useUserStore, useLanguageStore } from '@/store';
+import { useTranslatedChallenge } from '@/hooks';
 import { CATEGORIES, MOCK_FRIENDS, MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
 import type { ChallengeSchedule, ChallengeLocation, ChallengeContact, TeammateSeeker } from '@solvterra/shared';
 import InviteFriendsModal from '@/components/InviteFriendsModal';
-
-// Format schedule for display
-const formatSchedule = (schedule?: ChallengeSchedule): { label: string; detail: string; icon: string; urgent?: boolean } => {
-  if (!schedule) return { label: 'Jederzeit', detail: 'Flexibel durchführbar', icon: 'calendar-check' };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('de-DE', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatDateOnly = (date: Date) => {
-    return new Date(date).toLocaleDateString('de-DE', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
-  // Check if deadline is approaching (within 3 days)
-  const isUrgent = schedule.deadline &&
-    (new Date(schedule.deadline).getTime() - Date.now()) < 3 * 24 * 60 * 60 * 1000;
-
-  switch (schedule.type) {
-    case 'fixed':
-      return {
-        label: 'Fester Termin',
-        detail: schedule.startDate ? formatDate(schedule.startDate) : 'Termin wird bekannt gegeben',
-        icon: 'calendar-clock',
-        urgent: isUrgent,
-      };
-    case 'range':
-      return {
-        label: schedule.deadline ? 'Deadline' : 'Zeitraum',
-        detail: schedule.deadline
-          ? `Bis ${formatDateOnly(schedule.deadline)}`
-          : `${formatDateOnly(schedule.startDate!)} - ${formatDateOnly(schedule.endDate!)}`,
-        icon: 'calendar-range',
-        urgent: isUrgent,
-      };
-    case 'recurring':
-      return {
-        label: 'Regelmäßig',
-        detail: schedule.timeSlots?.join('\n') || 'Zeiten auf Anfrage',
-        icon: 'calendar-sync',
-        urgent: isUrgent,
-      };
-    default:
-      return { label: 'Jederzeit', detail: 'Flexibel durchführbar', icon: 'calendar-check' };
-  }
-};
+import PhotoSubmissionModal from '@/components/PhotoSubmissionModal';
 
 // Get days until deadline
 const getDaysUntilDeadline = (deadline?: Date): number | null => {
@@ -92,19 +40,14 @@ const getCategoryConfig = (categoryId: string) => {
   return {
     icon: CATEGORY_ICONS[categoryId] || 'dots-horizontal',
     color: category?.color || Colors.neutral[500],
-    label: category?.labelDe || 'Sonstiges',
   };
-};
-
-const VERIFICATION_LABELS: Record<string, string> = {
-  photo: 'Foto hochladen',
-  text: 'Text einreichen',
-  ngo_confirmation: 'NGO Bestätigung',
 };
 
 export default function ChallengeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { challenges, submissions, acceptChallenge, submitProof, simulateApproval, getActiveCount, canAcceptChallenge } = useChallengeStore();
+  const { t } = useTranslation('challenges');
+  const { language } = useLanguageStore();
+  const { challenges, submissions, acceptChallenge, submitProof, getActiveCount, canAcceptChallenge } = useChallengeStore();
   const { user } = useUserStore();
 
   const activeCount = getActiveCount();
@@ -113,25 +56,100 @@ export default function ChallengeDetailScreen() {
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamInvited, setTeamInvited] = useState(false);
   const [invitedFriends, setInvitedFriends] = useState<string[]>([]);
 
-  const challenge = challenges.find(c => c.id === id);
+  const rawChallenge = challenges.find(c => c.id === id);
   const existingSubmission = submissions.find(
     s => s.challengeId === id && (s.status === 'in_progress' || s.status === 'submitted')
   );
 
-  if (!challenge) {
+  // Translate challenge content based on language
+  const challenge = useTranslatedChallenge(rawChallenge);
+
+  // Helper to get category label based on language
+  const getCategoryLabel = (categoryId: string) => {
+    const category = CATEGORIES.find(c => c.id === categoryId);
+    if (!category) return t('categories.other');
+    return language === 'de' ? category.labelDe : category.label;
+  };
+
+  // Helper to format schedule with translations
+  const getScheduleDisplay = (schedule?: ChallengeSchedule): { label: string; detail: string; icon: string; urgent?: boolean } => {
+    if (!schedule) return { label: t('schedule.anytime'), detail: t('schedule.flexible'), icon: 'calendar-check' };
+
+    const locale = language === 'de' ? 'de-DE' : 'en-US';
+    const formatDate = (date: Date) => {
+      return new Date(date).toLocaleDateString(locale, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+
+    const formatDateOnly = (date: Date) => {
+      return new Date(date).toLocaleDateString(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    };
+
+    const isUrgent = schedule.deadline &&
+      (new Date(schedule.deadline).getTime() - Date.now()) < 3 * 24 * 60 * 60 * 1000;
+
+    switch (schedule.type) {
+      case 'fixed':
+        return {
+          label: t('schedule.fixedDate'),
+          detail: schedule.startDate ? formatDate(schedule.startDate) : t('schedule.dateToBeAnnounced'),
+          icon: 'calendar-clock',
+          urgent: isUrgent,
+        };
+      case 'range':
+        return {
+          label: schedule.deadline ? t('schedule.deadline') : t('schedule.dateRange'),
+          detail: schedule.deadline
+            ? t('schedule.until', { date: formatDateOnly(schedule.deadline) })
+            : `${formatDateOnly(schedule.startDate!)} - ${formatDateOnly(schedule.endDate!)}`,
+          icon: 'calendar-range',
+          urgent: isUrgent,
+        };
+      case 'recurring':
+        return {
+          label: t('schedule.recurring'),
+          detail: schedule.timeSlots?.join('\n') || t('schedule.timesOnRequest'),
+          icon: 'calendar-sync',
+          urgent: isUrgent,
+        };
+      default:
+        return { label: t('schedule.anytime'), detail: t('schedule.flexible'), icon: 'calendar-check' };
+    }
+  };
+
+  // Get days until deadline display
+  const getDeadlineText = (daysLeft: number | null) => {
+    if (daysLeft === null) return '';
+    if (daysLeft <= 0) return t('schedule.dueToday');
+    return daysLeft > 1
+      ? t('schedule.daysLeftPlural', { count: daysLeft })
+      : t('schedule.daysLeft', { count: daysLeft });
+  };
+
+  if (!rawChallenge || !challenge) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorState}>
           <MaterialCommunityIcons name="alert-circle" size={64} color={Colors.neutral[300]} />
           <Text variant="titleMedium" style={styles.errorTitle}>
-            Challenge nicht gefunden
+            {t('detail.notFound')}
           </Text>
           <Button mode="contained" onPress={() => router.back()}>
-            Zurück
+            {t('detail.back')}
           </Button>
         </View>
       </SafeAreaView>
@@ -146,9 +164,9 @@ export default function ChallengeDetailScreen() {
     acceptChallenge(challenge.id);
     setShowAcceptModal(false);
     Alert.alert(
-      'Challenge angenommen!',
-      'Du findest sie jetzt unter "Meine Challenges".',
-      [{ text: 'OK' }]
+      t('alerts.challengeAccepted'),
+      t('alerts.challengeAcceptedMessage'),
+      [{ text: t('alerts.ok') }]
     );
   };
 
@@ -159,45 +177,37 @@ export default function ChallengeDetailScreen() {
     // After invite, accept the challenge
     acceptChallenge(challenge.id);
     Alert.alert(
-      'Team-Challenge gestartet!',
-      'Sobald deine Freunde zusagen, könnt ihr gemeinsam loslegen.',
-      [{ text: 'Super!' }]
+      t('alerts.teamChallengeStarted'),
+      t('alerts.teamChallengeStartedMessage'),
+      [{ text: t('alerts.great') }]
     );
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (!existingSubmission) return;
 
-    if (existingSubmission) {
-      submitProof(existingSubmission.id, {
-        type: challenge.verificationMethod === 'photo' ? 'photo' : 'text',
-        url: 'https://picsum.photos/800/600',
-        text: 'Demo-Einreichung für die Präsentation.',
+    if (challenge.verificationMethod === 'photo') {
+      // Open the photo submission modal
+      setShowSubmitModal(false);
+      setShowPhotoModal(true);
+    } else {
+      // Text-based submission
+      setIsSubmitting(true);
+      await submitProof(existingSubmission.id, {
+        type: 'text',
+        text: 'Demo submission for presentation.',
       });
+      setIsSubmitting(false);
+      setShowSubmitModal(false);
+      Alert.alert(t('alerts.submitted'), t('alerts.submittedMessage'), [{ text: t('alerts.ok') }]);
     }
+  };
 
-    setIsSubmitting(false);
-    setShowSubmitModal(false);
-
-    // Simulate automatic approval for demo
-    setTimeout(() => {
-      if (existingSubmission) {
-        simulateApproval(existingSubmission.id, 5);
-        Alert.alert(
-          'Glückwunsch!',
-          `Deine Einreichung wurde genehmigt! Du hast ${challenge.xpReward} XP verdient.`,
-          [{ text: 'Super!' }]
-        );
-      }
-    }, 2000);
-
-    Alert.alert(
-      'Eingereicht!',
-      'Deine Einreichung wird überprüft. Du erhältst eine Benachrichtigung.',
-      [{ text: 'OK' }]
-    );
+  const handlePhotoSubmit = async (data: { type: 'photo'; url: string; caption?: string }) => {
+    if (!existingSubmission) return;
+    await submitProof(existingSubmission.id, data);
+    setShowPhotoModal(false);
+    Alert.alert(t('alerts.submitted'), t('alerts.submittedMessage'), [{ text: t('alerts.ok') }]);
   };
 
   return (
@@ -225,12 +235,12 @@ export default function ChallengeDetailScreen() {
                 />
               )}
             >
-              {categoryConfig.label}
+              {getCategoryLabel(challenge.category)}
             </Chip>
 
             <View style={styles.durationBadge}>
               <MaterialCommunityIcons name="clock-outline" size={16} color={Colors.textSecondary} />
-              <Text style={styles.durationText}>{challenge.durationMinutes} Min</Text>
+              <Text style={styles.durationText}>{t('durations.minutes', { count: challenge.durationMinutes })}</Text>
             </View>
 
             <Chip
@@ -238,7 +248,7 @@ export default function ChallengeDetailScreen() {
               compact
               style={styles.typeChip}
             >
-              {challenge.type === 'digital' ? 'Digital' : 'Vor Ort'}
+              {challenge.type === 'digital' ? t('filters.digital') : t('filters.onsite')}
             </Chip>
           </View>
 
@@ -275,7 +285,7 @@ export default function ChallengeDetailScreen() {
           {/* Description */}
           <View style={styles.section}>
             <Text variant="titleMedium" style={styles.sectionTitle}>
-              Beschreibung
+              {t('detail.description')}
             </Text>
             <Text variant="bodyLarge" style={styles.description}>
               {challenge.description}
@@ -285,7 +295,7 @@ export default function ChallengeDetailScreen() {
           {/* Instructions */}
           <View style={styles.section}>
             <Text variant="titleMedium" style={styles.sectionTitle}>
-              Anleitung
+              {t('detail.instructions')}
             </Text>
             <Text variant="bodyLarge" style={styles.description}>
               {challenge.instructions}
@@ -298,13 +308,13 @@ export default function ChallengeDetailScreen() {
               <View style={styles.whenWhereHeader}>
                 <MaterialCommunityIcons name="calendar-clock" size={22} color={Colors.primary[600]} />
                 <Text variant="titleMedium" style={styles.whenWhereTitle}>
-                  Wann & Wo
+                  {t('detail.whenAndWhere')}
                 </Text>
               </View>
 
               {/* Schedule Info */}
               {(() => {
-                const scheduleInfo = formatSchedule(challenge.schedule);
+                const scheduleInfo = getScheduleDisplay(challenge.schedule);
                 const daysLeft = getDaysUntilDeadline(challenge.schedule?.deadline);
                 return (
                   <View style={styles.whenWhereItem}>
@@ -325,7 +335,7 @@ export default function ChallengeDetailScreen() {
                           <View style={styles.urgentBadge}>
                             <MaterialCommunityIcons name="alert" size={12} color={Colors.error} />
                             <Text style={styles.urgentText}>
-                              {daysLeft <= 0 ? 'Heute fällig!' : `Noch ${daysLeft} Tag${daysLeft > 1 ? 'e' : ''}`}
+                              {getDeadlineText(daysLeft)}
                             </Text>
                           </View>
                         )}
@@ -345,7 +355,7 @@ export default function ChallengeDetailScreen() {
                       <MaterialCommunityIcons name="map-marker" size={20} color={Colors.primary[600]} />
                     </View>
                     <View style={styles.whenWhereContent}>
-                      <Text style={styles.whenWhereLabel}>Ort</Text>
+                      <Text style={styles.whenWhereLabel}>{t('detail.location')}</Text>
                       <Text style={styles.whenWhereValue}>{challenge.location.name}</Text>
                       {challenge.location.address && (
                         <Text style={styles.whenWhereSubtext}>{challenge.location.address}</Text>
@@ -360,7 +370,7 @@ export default function ChallengeDetailScreen() {
                         <MaterialCommunityIcons name="flag-variant" size={20} color={Colors.secondary[600]} />
                       </View>
                       <View style={styles.whenWhereContent}>
-                        <Text style={styles.whenWhereLabel}>Treffpunkt</Text>
+                        <Text style={styles.whenWhereLabel}>{t('detail.meetingPoint')}</Text>
                         <Text style={styles.whenWhereValue}>{challenge.location.meetingPoint}</Text>
                       </View>
                     </View>
@@ -385,7 +395,7 @@ export default function ChallengeDetailScreen() {
                       }}
                     >
                       <MaterialCommunityIcons name="google-maps" size={18} color={Colors.primary[600]} />
-                      <Text style={styles.mapButtonText}>In Google Maps öffnen</Text>
+                      <Text style={styles.mapButtonText}>{t('detail.openInMaps')}</Text>
                       <MaterialCommunityIcons name="open-in-new" size={14} color={Colors.primary[600]} />
                     </Pressable>
                   )}
@@ -400,7 +410,7 @@ export default function ChallengeDetailScreen() {
               <View style={styles.contactHeader}>
                 <MaterialCommunityIcons name="account-circle" size={22} color={Colors.primary[600]} />
                 <Text variant="titleMedium" style={styles.contactTitle}>
-                  Ansprechpartner
+                  {t('detail.contact')}
                 </Text>
               </View>
 
@@ -443,11 +453,11 @@ export default function ChallengeDetailScreen() {
                       styles.contactActionText,
                       challenge.contact.preferredMethod === 'email' && styles.contactActionTextPreferred
                     ]}>
-                      E-Mail
+                      {t('detail.email')}
                     </Text>
                     {challenge.contact.preferredMethod === 'email' && (
                       <View style={styles.preferredBadge}>
-                        <Text style={styles.preferredBadgeText}>Bevorzugt</Text>
+                        <Text style={styles.preferredBadgeText}>{t('detail.preferred')}</Text>
                       </View>
                     )}
                   </Pressable>
@@ -469,11 +479,11 @@ export default function ChallengeDetailScreen() {
                       styles.contactActionText,
                       challenge.contact.preferredMethod === 'phone' && styles.contactActionTextPreferred
                     ]}>
-                      Anrufen
+                      {t('detail.call')}
                     </Text>
                     {challenge.contact.preferredMethod === 'phone' && (
                       <View style={styles.preferredBadge}>
-                        <Text style={styles.preferredBadgeText}>Bevorzugt</Text>
+                        <Text style={styles.preferredBadgeText}>{t('detail.preferred')}</Text>
                       </View>
                     )}
                   </Pressable>
@@ -482,10 +492,10 @@ export default function ChallengeDetailScreen() {
                   <View style={[styles.contactAction, styles.contactActionPreferred]}>
                     <MaterialCommunityIcons name="chat-outline" size={18} color={Colors.primary[600]} />
                     <Text style={[styles.contactActionText, styles.contactActionTextPreferred]}>
-                      In-App Chat
+                      {t('detail.inAppChat')}
                     </Text>
                     <View style={styles.preferredBadge}>
-                      <Text style={styles.preferredBadgeText}>Bevorzugt</Text>
+                      <Text style={styles.preferredBadgeText}>{t('detail.preferred')}</Text>
                     </View>
                   </View>
                 )}
@@ -502,15 +512,15 @@ export default function ChallengeDetailScreen() {
                 </View>
                 <View style={styles.teamHeaderText}>
                   <Text variant="titleMedium" style={styles.teamTitle}>
-                    Team-Challenge
+                    {t('detail.teamChallenge')}
                   </Text>
                   <Text style={styles.teamSubtitle}>
-                    {challenge.minTeamSize}-{challenge.maxTeamSize} Personen benötigt
+                    {t('detail.teamSizeNeeded', { min: challenge.minTeamSize, max: challenge.maxTeamSize })}
                   </Text>
                 </View>
               </View>
               <Text style={styles.teamDescription}>
-                {challenge.teamDescription || 'Diese Challenge macht ihr gemeinsam! Lade Freunde ein und meistert sie zusammen.'}
+                {challenge.teamDescription || t('detail.teamDefaultDescription')}
               </Text>
 
               {/* Solo Join / Matchmaking Section */}
@@ -521,9 +531,9 @@ export default function ChallengeDetailScreen() {
                       <MaterialCommunityIcons name="account-search" size={20} color={Colors.accent[600]} />
                     </View>
                     <View style={styles.matchmakingHeaderText}>
-                      <Text style={styles.matchmakingTitle}>Alleine mitmachen</Text>
+                      <Text style={styles.matchmakingTitle}>{t('detail.joinSoloTitle')}</Text>
                       <Text style={styles.matchmakingSubtitle}>
-                        Lerne neue Leute kennen!
+                        {t('detail.joinSoloSubtitle')}
                       </Text>
                     </View>
                   </View>
@@ -532,7 +542,9 @@ export default function ChallengeDetailScreen() {
                   {challenge.teammateSeekers && challenge.teammateSeekers.length > 0 && (
                     <View style={styles.seekersContainer}>
                       <Text style={styles.seekersLabel}>
-                        {challenge.teammateSeekers.length} Person{challenge.teammateSeekers.length > 1 ? 'en' : ''} sucht{challenge.teammateSeekers.length > 1 ? 'en' : ''} Teammates:
+                        {challenge.teammateSeekers.length > 1
+                          ? t('detail.seekersLabelPlural', { count: challenge.teammateSeekers.length })
+                          : t('detail.seekersLabel', { count: challenge.teammateSeekers.length })}
                       </Text>
                       <View style={styles.seekersList}>
                         {challenge.teammateSeekers.slice(0, 4).map((seeker, index) => (
@@ -562,7 +574,7 @@ export default function ChallengeDetailScreen() {
                         {challenge.teammateSeekers.length > 4 && (
                           <View style={styles.moreSeekersContainer}>
                             <Text style={styles.moreSeekers}>
-                              +{challenge.teammateSeekers.length - 4} weitere
+                              {t('detail.moreOthers', { count: challenge.teammateSeekers.length - 4 })}
                             </Text>
                           </View>
                         )}
@@ -575,15 +587,15 @@ export default function ChallengeDetailScreen() {
                     onPress={() => {
                       acceptChallenge(challenge.id);
                       Alert.alert(
-                        'Du bist dabei!',
-                        'Wir benachrichtigen dich, sobald genug Teilnehmer gefunden wurden.',
-                        [{ text: 'Super!' }]
+                        t('detail.youAreIn'),
+                        t('detail.willNotifyWhenTeamReady'),
+                        [{ text: t('alerts.great') }]
                       );
                     }}
                   >
                     <MaterialCommunityIcons name="handshake" size={18} color="#fff" />
                     <Text style={styles.soloJoinButtonText}>
-                      Alleine teilnehmen & Team finden
+                      {t('detail.soloJoinButton')}
                     </Text>
                   </Pressable>
                 </View>
@@ -592,7 +604,7 @@ export default function ChallengeDetailScreen() {
               {/* Team Preview if invited */}
               {teamInvited && invitedFriends.length > 0 && (
                 <View style={styles.invitedTeam}>
-                  <Text style={styles.invitedTeamTitle}>Eingeladene Freunde:</Text>
+                  <Text style={styles.invitedTeamTitle}>{t('detail.invitedFriends')}</Text>
                   <View style={styles.invitedAvatars}>
                     {MOCK_FRIENDS.filter(f => invitedFriends.includes(f.id)).map(friend => (
                       <View key={friend.id} style={styles.invitedAvatarContainer}>
@@ -606,7 +618,7 @@ export default function ChallengeDetailScreen() {
                       </View>
                     ))}
                   </View>
-                  <Text style={styles.waitingText}>Warte auf Bestätigung...</Text>
+                  <Text style={styles.waitingText}>{t('detail.waitingForConfirmation')}</Text>
                 </View>
               )}
             </Surface>
@@ -615,7 +627,7 @@ export default function ChallengeDetailScreen() {
           {/* Requirements */}
           <View style={styles.section}>
             <Text variant="titleMedium" style={styles.sectionTitle}>
-              Anforderungen
+              {t('detail.requirements')}
             </Text>
             <View style={styles.requirementItem}>
               <MaterialCommunityIcons
@@ -624,7 +636,7 @@ export default function ChallengeDetailScreen() {
                 color={Colors.primary[600]}
               />
               <Text variant="bodyMedium" style={styles.requirementText}>
-                Nachweis: {VERIFICATION_LABELS[challenge.verificationMethod]}
+                {t('detail.verificationLabel', { method: t(`detail.verification.${challenge.verificationMethod}`) })}
               </Text>
             </View>
             <View style={styles.requirementItem}>
@@ -634,7 +646,7 @@ export default function ChallengeDetailScreen() {
                 color={Colors.primary[600]}
               />
               <Text variant="bodyMedium" style={styles.requirementText}>
-                {spotsLeft} von {challenge.maxParticipants} Plätzen verfügbar
+                {t('detail.spotsAvailable', { available: spotsLeft, total: challenge.maxParticipants })}
               </Text>
             </View>
             {challenge.isMultiPerson && (
@@ -645,7 +657,7 @@ export default function ChallengeDetailScreen() {
                   color={Colors.secondary[600]}
                 />
                 <Text variant="bodyMedium" style={[styles.requirementText, { color: Colors.secondary[700] }]}>
-                  Teamgröße: {challenge.minTeamSize}-{challenge.maxTeamSize} Personen
+                  {t('detail.teamSize', { min: challenge.minTeamSize, max: challenge.maxTeamSize })}
                 </Text>
               </View>
             )}
@@ -672,12 +684,12 @@ export default function ChallengeDetailScreen() {
                   styles.activeLimitTitle,
                   !canAccept && styles.activeLimitTitleFull
                 ]}>
-                  {activeCount}/{MAX_ACTIVE_CHALLENGES} aktive Challenges
+                  {t('detail.activeChallenges', { current: activeCount, max: MAX_ACTIVE_CHALLENGES })}
                 </Text>
                 <Text style={styles.activeLimitSubtitle}>
                   {canAccept
-                    ? `Du kannst noch ${MAX_ACTIVE_CHALLENGES - activeCount} weitere annehmen`
-                    : 'Schließe zuerst eine Challenge ab'}
+                    ? t('detail.canAcceptMore', { count: MAX_ACTIVE_CHALLENGES - activeCount })
+                    : t('detail.completeOneFirst')}
                 </Text>
               </View>
             </View>
@@ -704,7 +716,7 @@ export default function ChallengeDetailScreen() {
                 +{challenge.xpReward} XP
               </Text>
               <Text variant="bodySmall" style={styles.rewardLabel}>
-                bei erfolgreicher Teilnahme
+                {t('detail.xpOnCompletion')}
               </Text>
             </View>
           </Surface>
@@ -720,7 +732,7 @@ export default function ChallengeDetailScreen() {
             style={styles.actionButton}
             contentStyle={styles.actionButtonContent}
           >
-            Einreichung hochladen
+            {t('detail.uploadProof')}
           </Button>
         ) : existingSubmission?.status === 'submitted' ? (
           <Button
@@ -729,7 +741,7 @@ export default function ChallengeDetailScreen() {
             style={styles.actionButton}
             contentStyle={styles.actionButtonContent}
           >
-            Wird überprüft...
+            {t('detail.underReview')}
           </Button>
         ) : canAcceptThis ? (
           challenge.isMultiPerson ? (
@@ -740,7 +752,7 @@ export default function ChallengeDetailScreen() {
               contentStyle={styles.actionButtonContent}
               icon="account-group"
             >
-              Team zusammenstellen
+              {t('detail.buildTeam')}
             </Button>
           ) : (
             <Button
@@ -749,7 +761,7 @@ export default function ChallengeDetailScreen() {
               style={styles.actionButton}
               contentStyle={styles.actionButtonContent}
             >
-              Challenge annehmen
+              {t('detail.acceptButton')}
             </Button>
           )
         ) : (
@@ -760,10 +772,10 @@ export default function ChallengeDetailScreen() {
             contentStyle={styles.actionButtonContent}
           >
             {!canAccept
-              ? 'Limit erreicht (5/5)'
+              ? t('detail.limitReached', { current: activeCount, max: MAX_ACTIVE_CHALLENGES })
               : spotsLeft === 0
-              ? 'Ausgebucht'
-              : 'Bereits teilgenommen'}
+              ? t('detail.fullyBooked')
+              : t('detail.alreadyParticipated')}
           </Button>
         )}
       </View>
@@ -781,10 +793,10 @@ export default function ChallengeDetailScreen() {
             color={Colors.primary[600]}
           />
           <Text variant="titleLarge" style={styles.modalTitle}>
-            Bereit für die Challenge?
+            {t('modals.readyForChallenge')}
           </Text>
           <Text variant="bodyMedium" style={styles.modalText}>
-            Du hast {challenge.durationMinutes} Minuten Zeit. Nach Abschluss lädst du deinen Nachweis hoch.
+            {t('modals.timeAndProof', { minutes: challenge.durationMinutes })}
           </Text>
           <View style={styles.modalButtons}>
             <Button
@@ -792,14 +804,14 @@ export default function ChallengeDetailScreen() {
               onPress={() => setShowAcceptModal(false)}
               style={styles.modalButton}
             >
-              Abbrechen
+              {t('modals.cancel')}
             </Button>
             <Button
               mode="contained"
               onPress={handleAccept}
               style={styles.modalButton}
             >
-              Los geht's!
+              {t('modals.letsGo')}
             </Button>
           </View>
         </Modal>
@@ -818,15 +830,15 @@ export default function ChallengeDetailScreen() {
             color={Colors.secondary[500]}
           />
           <Text variant="titleLarge" style={styles.modalTitle}>
-            Einreichung hochladen
+            {t('modals.uploadSubmission')}
           </Text>
           <Text variant="bodyMedium" style={styles.modalText}>
             {challenge.verificationMethod === 'photo'
-              ? 'Lade ein Foto als Nachweis hoch.'
-              : 'Beschreibe, was du gemacht hast.'}
+              ? t('modals.uploadPhotoProof')
+              : t('modals.describeWhatYouDid')}
           </Text>
           <Text variant="bodySmall" style={styles.modalNote}>
-            (Demo-Modus: Es wird eine Beispiel-Einreichung erstellt)
+            {t('modals.demoNote')}
           </Text>
           <View style={styles.modalButtons}>
             <Button
@@ -835,7 +847,7 @@ export default function ChallengeDetailScreen() {
               style={styles.modalButton}
               disabled={isSubmitting}
             >
-              Abbrechen
+              {t('modals.cancel')}
             </Button>
             <Button
               mode="contained"
@@ -843,7 +855,7 @@ export default function ChallengeDetailScreen() {
               style={styles.modalButton}
               loading={isSubmitting}
             >
-              Einreichen
+              {t('modals.submit')}
             </Button>
           </View>
         </Modal>
@@ -856,6 +868,16 @@ export default function ChallengeDetailScreen() {
         challenge={challenge}
         onInviteComplete={handleInviteComplete}
       />
+
+      {existingSubmission && (
+        <PhotoSubmissionModal
+          visible={showPhotoModal}
+          onClose={() => setShowPhotoModal(false)}
+          onSubmit={handlePhotoSubmit}
+          submissionId={existingSubmission.id}
+          challengeTitle={challenge.title}
+        />
+      )}
     </SafeAreaView>
   );
 }
