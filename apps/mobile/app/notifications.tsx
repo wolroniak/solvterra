@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/theme';
-import { useNotificationStore, useFriendStore } from '@/store';
+import { useNotificationStore, useFriendStore, useTeamStore } from '@/store';
 import type { AppNotification } from '@solvterra/shared';
 
 const getNotificationIcon = (type: AppNotification['type']) => {
@@ -96,6 +96,7 @@ export default function NotificationsScreen() {
   } = useNotificationStore();
 
   const { acceptRequest, declineRequest } = useFriendStore();
+  const { acceptTeamInvite, declineTeamInvite } = useTeamStore();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -135,6 +136,26 @@ export default function NotificationsScreen() {
       await declineRequest(notification.data.friendshipId);
       markAsRead(notification.id);
       fetchNotifications();
+    }
+  };
+
+  const handleAcceptTeamInvite = async (notification: AppNotification) => {
+    if (notification.data?.teamId) {
+      const success = await acceptTeamInvite(notification.data.teamId);
+      if (success) {
+        markAsRead(notification.id);
+        fetchNotifications();
+      }
+    }
+  };
+
+  const handleDeclineTeamInvite = async (notification: AppNotification) => {
+    if (notification.data?.teamId) {
+      const success = await declineTeamInvite(notification.data.teamId);
+      if (success) {
+        markAsRead(notification.id);
+        fetchNotifications();
+      }
     }
   };
 
@@ -183,6 +204,28 @@ export default function NotificationsScreen() {
               style={styles.declineBtn}
             >
               {t('actions.decline')}
+            </Button>
+          </View>
+        )}
+
+        {/* Action buttons for team invites */}
+        {notification.type === 'team_invite' && !notification.read && (
+          <View style={styles.actionButtons}>
+            <Button
+              mode="contained"
+              onPress={() => handleAcceptTeamInvite(notification)}
+              compact
+              style={styles.acceptBtn}
+            >
+              {t('team.accept')}
+            </Button>
+            <Button
+              mode="outlined"
+              onPress={() => handleDeclineTeamInvite(notification)}
+              compact
+              style={styles.declineBtn}
+            >
+              {t('team.decline')}
             </Button>
           </View>
         )}

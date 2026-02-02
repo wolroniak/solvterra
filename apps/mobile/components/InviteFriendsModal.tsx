@@ -75,21 +75,27 @@ export default function InviteFriendsModal({
     // Create team with selected friends
     const team = await createTeam(challenge.id, selectedFriends);
 
-    if (team) {
-      setTimeout(() => {
-        onInviteComplete(selectedFriends);
-      }, 1500);
-    } else {
+    if (!team) {
       // Handle error
       setInviteSent(false);
       Alert.alert('Fehler', 'Team konnte nicht erstellt werden');
     }
+    // Don't auto-close - let user read the success message and close manually
   };
 
   const handleClose = () => {
+    const wasInviteSent = inviteSent;
+    const invitedIds = [...selectedFriends];
     setSelectedFriends([]);
     setInviteSent(false);
-    onDismiss();
+
+    if (wasInviteSent && invitedIds.length > 0) {
+      // Team was created, notify parent with the invited friend IDs
+      onInviteComplete(invitedIds);
+    } else {
+      // Just dismissed without creating team
+      onDismiss();
+    }
   };
 
   const renderFriendItem = ({ item }: { item: FriendListItem }) => {

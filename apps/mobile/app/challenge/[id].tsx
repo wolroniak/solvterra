@@ -1,7 +1,7 @@
 // Challenge Detail Screen
 // Full challenge info with accept button and team invite flow
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Image, Alert, Linking, Pressable } from 'react-native';
 import { Text, Button, Chip, Portal, Modal, Surface } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
-import { useChallengeStore, useUserStore, useLanguageStore } from '@/store';
+import { useChallengeStore, useUserStore, useLanguageStore, useTeamStore } from '@/store';
 import { useTranslatedChallenge } from '@/hooks';
 import { CATEGORIES, MOCK_FRIENDS, MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
 import type { ChallengeSchedule, ChallengeLocation, ChallengeContact, TeammateSeeker } from '@solvterra/shared';
@@ -49,6 +49,7 @@ export default function ChallengeDetailScreen() {
   const { language } = useLanguageStore();
   const { challenges, submissions, acceptChallenge, submitProof, getActiveCount, canAcceptChallenge } = useChallengeStore();
   const { user } = useUserStore();
+  const { myTeams, fetchMyTeams, getTeamForChallenge } = useTeamStore();
 
   const activeCount = getActiveCount();
   const canAccept = canAcceptChallenge();
@@ -58,8 +59,18 @@ export default function ChallengeDetailScreen() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [teamInvited, setTeamInvited] = useState(false);
-  const [invitedFriends, setInvitedFriends] = useState<string[]>([]);
+
+  // Fetch teams on mount to get current team status
+  useEffect(() => {
+    fetchMyTeams();
+  }, []);
+
+  // Check if user already has a team for this challenge
+  const existingTeam = id ? getTeamForChallenge(id) : undefined;
+  const teamInvited = !!existingTeam;
+  const invitedFriends = existingTeam?.members
+    ?.filter(m => m.role === 'member' && m.status === 'invited')
+    ?.map(m => m.userId) || [];
 
   const rawChallenge = challenges.find(c => c.id === id);
   const existingSubmission = submissions.find(
@@ -171,15 +182,15 @@ export default function ChallengeDetailScreen() {
   };
 
   const handleInviteComplete = (friendIds: string[]) => {
-    setInvitedFriends(friendIds);
-    setTeamInvited(true);
     setShowInviteModal(false);
-    // After invite, accept the challenge
-    acceptChallenge(challenge.id);
+    // Refresh teams to get the new team data
+    fetchMyTeams();
+    // DON'T start the challenge yet - wait for team members to accept
+    // Team stays in 'forming' status until all required members accept
     Alert.alert(
-      t('alerts.teamChallengeStarted'),
-      t('alerts.teamChallengeStartedMessage'),
-      [{ text: t('alerts.great') }]
+      t('alerts.teamInvitesSent'),
+      t('alerts.teamInvitesSentMessage'),
+      [{ text: t('alerts.ok') }]
     );
   };
 
@@ -601,24 +612,41 @@ export default function ChallengeDetailScreen() {
                 </View>
               )}
 
-              {/* Team Preview if invited */}
-              {teamInvited && invitedFriends.length > 0 && (
+              {/* Team Preview if team exists */}
+              {existingTeam && existingTeam.members && (
                 <View style={styles.invitedTeam}>
-                  <Text style={styles.invitedTeamTitle}>{t('detail.invitedFriends')}</Text>
+                  <Text style={styles.invitedTeamTitle}>
+                    {existingTeam.status === 'forming' ? t('detail.invitedFriends') : t('detail.yourTeam')}
+                  </Text>
                   <View style={styles.invitedAvatars}>
-                    {MOCK_FRIENDS.filter(f => invitedFriends.includes(f.id)).map(friend => (
-                      <View key={friend.id} style={styles.invitedAvatarContainer}>
-                        <Image source={{ uri: friend.avatarUrl }} style={styles.invitedAvatar} />
-                        <MaterialCommunityIcons
-                          name="clock-outline"
-                          size={12}
-                          color={Colors.accent[500]}
-                          style={styles.pendingBadge}
-                        />
-                      </View>
-                    ))}
+                    {existingTeam.members
+                      .filter(m => m.role === 'member')
+                      .map(member => (
+                        <View key={member.id} style={styles.invitedAvatarContainer}>
+                          {member.user?.avatarUrl ? (
+                            <Image source={{ uri: member.user.avatarUrl }} style={styles.invitedAvatar} />
+                          ) : (
+                            <View style={[styles.invitedAvatar, styles.avatarPlaceholder]}>
+                              <MaterialCommunityIcons name="account" size={16} color={Colors.neutral[400]} />
+                            </View>
+                          )}
+                          <MaterialCommunityIcons
+                            name={member.status === 'accepted' ? 'check-circle' : 'clock-outline'}
+                            size={12}
+                            color={member.status === 'accepted' ? Colors.success : Colors.accent[500]}
+                            style={styles.pendingBadge}
+                          />
+                        </View>
+                      ))}
                   </View>
-                  <Text style={styles.waitingText}>{t('detail.waitingForConfirmation')}</Text>
+                  {existingTeam.status === 'forming' && (
+                    <Text style={styles.waitingText}>{t('detail.waitingForConfirmation')}</Text>
+                  )}
+                  {existingTeam.status === 'active' && (
+                    <Text style={[styles.waitingText, { color: Colors.success }]}>
+                      {t('detail.teamReady')}
+                    </Text>
+                  )}
                 </View>
               )}
             </Surface>
@@ -742,6 +770,35 @@ export default function ChallengeDetailScreen() {
             contentStyle={styles.actionButtonContent}
           >
             {t('detail.underReview')}
+          </Button>
+        ) : existingTeam?.status === 'forming' ? (
+          // Team exists but waiting for members to accept
+          <Button
+            mode="contained"
+            disabled
+            style={[styles.actionButton, styles.teamActionButton]}
+            contentStyle={styles.actionButtonContent}
+            icon="clock-outline"
+          >
+            {t('detail.waitingForTeam')}
+          </Button>
+        ) : existingTeam?.status === 'active' ? (
+          // Team is ready - user can start the challenge
+          <Button
+            mode="contained"
+            onPress={() => {
+              acceptChallenge(challenge.id);
+              Alert.alert(
+                t('alerts.challengeAccepted'),
+                t('alerts.challengeAcceptedMessage'),
+                [{ text: t('alerts.ok') }]
+              );
+            }}
+            style={[styles.actionButton, styles.teamActionButton]}
+            contentStyle={styles.actionButtonContent}
+            icon="play"
+          >
+            {t('detail.startTeamChallenge')}
           </Button>
         ) : canAcceptThis ? (
           challenge.isMultiPerson ? (
@@ -1110,6 +1167,10 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: Colors.neutral[200],
+  },
+  avatarPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   pendingBadge: {
     position: 'absolute',

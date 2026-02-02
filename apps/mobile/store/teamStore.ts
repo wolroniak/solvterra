@@ -58,7 +58,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         .from('teams')
         .select(`
           *,
-          challenge:challenges(id, title, title_en, deadline, min_team_size, max_team_size, xp_reward),
+          challenge:challenges(id, title, title_en, min_team_size, max_team_size, xp_reward),
           members:team_members(
             id, user_id, role, status, invited_at, accepted_at,
             user:users(id, name, avatar, level)
@@ -76,16 +76,24 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         createdAt: new Date(t.created_at),
         activatedAt: t.activated_at ? new Date(t.activated_at) : undefined,
         challenge: t.challenge,
-        members: t.members?.map((m: Record<string, unknown>) => ({
-          id: m.id,
-          teamId: t.id,
-          userId: m.user_id,
-          role: m.role,
-          status: m.status,
-          invitedAt: new Date(m.invited_at as string),
-          acceptedAt: m.accepted_at ? new Date(m.accepted_at as string) : undefined,
-          user: m.user,
-        } as TeamMember)),
+        members: t.members?.map((m: Record<string, unknown>) => {
+          const userData = m.user as Record<string, unknown> | null;
+          return {
+            id: m.id,
+            teamId: t.id,
+            userId: m.user_id,
+            role: m.role,
+            status: m.status,
+            invitedAt: new Date(m.invited_at as string),
+            acceptedAt: m.accepted_at ? new Date(m.accepted_at as string) : undefined,
+            user: userData ? {
+              id: userData.id as string,
+              name: userData.name as string,
+              avatarUrl: userData.avatar as string | undefined,
+              level: userData.level as number,
+            } : undefined,
+          } as TeamMember;
+        }),
       }));
 
       set({ myTeams: teams, isLoading: false });
@@ -198,7 +206,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         .from('teams')
         .select(`
           *,
-          challenge:challenges(id, title, title_en, deadline, min_team_size, max_team_size, xp_reward),
+          challenge:challenges(id, title, title_en, min_team_size, max_team_size, xp_reward),
           members:team_members(
             id, user_id, role, status, invited_at, accepted_at,
             user:users(id, name, avatar, level),
@@ -218,17 +226,25 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         createdAt: new Date(data.created_at),
         activatedAt: data.activated_at ? new Date(data.activated_at) : undefined,
         challenge: data.challenge,
-        members: data.members?.map((m: Record<string, unknown>) => ({
-          id: m.id,
-          teamId: data.id,
-          userId: m.user_id,
-          role: m.role,
-          status: m.status,
-          invitedAt: new Date(m.invited_at as string),
-          acceptedAt: m.accepted_at ? new Date(m.accepted_at as string) : undefined,
-          user: m.user,
-          submission: m.submission,
-        } as TeamMember)),
+        members: data.members?.map((m: Record<string, unknown>) => {
+          const userData = m.user as Record<string, unknown> | null;
+          return {
+            id: m.id,
+            teamId: data.id,
+            userId: m.user_id,
+            role: m.role,
+            status: m.status,
+            invitedAt: new Date(m.invited_at as string),
+            acceptedAt: m.accepted_at ? new Date(m.accepted_at as string) : undefined,
+            user: userData ? {
+              id: userData.id as string,
+              name: userData.name as string,
+              avatarUrl: userData.avatar as string | undefined,
+              level: userData.level as number,
+            } : undefined,
+            submission: m.submission,
+          } as TeamMember;
+        }),
       } as Team;
     } catch (error) {
       console.error('Failed to fetch team details:', error);
