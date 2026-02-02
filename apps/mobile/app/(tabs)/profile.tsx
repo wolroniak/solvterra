@@ -454,14 +454,14 @@ export default function ProfileScreen() {
           </Text>
 
           <Surface style={styles.settingsCard} elevation={1}>
-            <Pressable style={styles.settingsItem}>
+            <Pressable style={styles.settingsItem} onPress={() => router.push('/profile/notifications')}>
               <MaterialCommunityIcons
                 name="bell-outline"
                 size={22}
                 color={Colors.textPrimary}
               />
               <Text variant="bodyLarge" style={styles.settingsText}>
-                {t('settings.notifications')}
+                {t('notifications.title')}
               </Text>
               <MaterialCommunityIcons
                 name="chevron-right"

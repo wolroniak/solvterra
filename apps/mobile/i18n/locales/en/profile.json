@@ -50,28 +50,48 @@
     "five-star": "Five Star",
     "week-streak": "Week Warrior"
   },
-  "badgeDescriptions": {
-    "first-challenge": "Complete your first challenge",
-    "five-challenges": "Complete 5 challenges",
-    "ten-challenges": "Complete 10 challenges",
-    "twentyfive-challenges": "Complete 25 challenges",
-    "eco-warrior": "5 environment challenges",
-    "social-butterfly": "5 social challenges",
-    "knowledge-seeker": "5 education challenges",
-    "health-hero": "5 health challenges",
-    "early-bird": "Complete a challenge before 8 AM",
-    "night-owl": "Complete a challenge after 10 PM",
-    "five-star": "Receive a 5-star rating",
-    "week-streak": "7 days active in a row"
-  },
-  "badgeCategories": {
-    "milestone": "Milestone",
-    "category": "Category",
-    "special": "Special",
-    "streak": "Streak"
-  },
-  "badgeCollection": {
-    "title": "Badge Collection",
-    "progress": "of {{total}} Badges"
+  "notifications": {
+    "title": "Notifications",
+    "challengeUpdates": "Challenge Updates",
+    "submissionReviewed": {
+      "title": "Submission Reviewed",
+      "description": "Get notified when your submission has been reviewed"
+    },
+    "challengeReminders": {
+      "title": "Challenge Reminders",
+      "description": "Reminders about active challenges and deadlines"
+    },
+    "discovery": "Discovery",
+    "newChallenges": {
+      "title": "New Challenges",
+      "description": "Get notified about new challenges in your areas of interest"
+    },
+    "achievements": "Achievements",
+    "levelUps": {
+      "title": "Level Ups",
+      "description": "Get notified when you reach a new level"
+    },
+    "badgesEarned": {
+      "title": "Badges Earned",
+      "description": "Get notified when you earn a new badge"
+    },
+    "streakAlerts": {
+      "title": "Streak Alerts",
+      "description": "Reminders to maintain your daily streak"
+    },
+    "community": "Community",
+    "comments": {
+      "title": "Comments",
+      "description": "Get notified when someone comments on your post"
+    },
+    "likes": {
+      "title": "Likes",
+      "description": "Get notified when someone likes your post"
+    },
+    "summaries": "Summaries",
+    "weeklyDigest": {
+      "title": "Weekly Digest",
+      "description": "Weekly summary of your activities and new challenges"
+    }
   }
 }
