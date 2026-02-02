@@ -104,7 +104,13 @@ export default function InviteFriendsModal({
         ]}
         onPress={() => !isDisabled && toggleFriend(item.id)}
       >
-        <Image source={{ uri: item.avatarUrl }} style={styles.friendAvatar} />
+        {item.avatarUrl ? (
+          <Image source={{ uri: item.avatarUrl }} style={styles.friendAvatar} />
+        ) : (
+          <View style={[styles.friendAvatar, styles.avatarPlaceholder]}>
+            <MaterialCommunityIcons name="account" size={20} color={Colors.neutral[400]} />
+          </View>
+        )}
         <View style={styles.friendInfo}>
           <Text style={styles.friendName}>{item.name}</Text>
           <View style={styles.friendMeta}>
@@ -313,6 +319,10 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: Colors.neutral[200],
+  },
+  avatarPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   friendInfo: {
     flex: 1,
