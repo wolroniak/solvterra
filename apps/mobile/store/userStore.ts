@@ -13,6 +13,15 @@ import { supabase } from '../lib/supabase';
 // Required for Google OAuth to work properly
 WebBrowser.maybeCompleteAuthSession();
 
+// Badge progress type returned by Supabase function
+interface BadgeProgress {
+  [badgeId: string]: {
+    current: number;
+    required: number;
+    completed: boolean;
+  };
+}
+
 interface UserState {
   // User data
   user: User | null;
@@ -21,6 +30,12 @@ interface UserState {
 
   // Stats
   stats: UserStats | null;
+
+  // Badge achievements queue (for showing modals)
+  pendingAchievements: UserBadge[];
+
+  // Badge progress cache
+  badgeProgress: BadgeProgress | null;
 
   // Auth Actions
   login: (email: string, password: string) => Promise<void>;
@@ -41,6 +56,11 @@ interface UserState {
   addXp: (amount: number) => void;
   refreshStats: () => Promise<void>;
   earnBadge: (badgeId: string) => UserBadge | null;
+
+  // Badge sync (server-authoritative)
+  syncBadges: () => Promise<UserBadge[]>;
+  dismissAchievement: () => void;
+  fetchBadgeProgress: () => Promise<BadgeProgress | null>;
 
   // Saved challenges
   saveChallenge: (challengeId: string) => void;
@@ -171,6 +191,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   isAuthenticated: false,
   isLoading: false,
   stats: null,
+  pendingAchievements: [],
+  badgeProgress: null,
 
   // Check existing session on app start
   checkSession: async () => {
@@ -451,6 +473,120 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
 
     return userBadge;
+  },
+
+  // Sync badges from server (source of truth)
+  syncBadges: async () => {
+    const { user, pendingAchievements } = get();
+    if (!user) return [];
+
+    try {
+      // Fetch user's earned badges from server
+      const { data: serverBadges, error } = await supabase
+        .from('user_badges')
+        .select('badge_id, earned_at')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Failed to sync badges:', error);
+        return [];
+      }
+
+      if (!serverBadges || serverBadges.length === 0) {
+        return [];
+      }
+
+      // Get current local badge IDs
+      const localBadgeIds = user.badges.map(ub => ub.badge.id);
+
+      // Find newly earned badges (on server but not in local state)
+      const newBadgeIds = serverBadges.filter(
+        sb => !localBadgeIds.includes(sb.badge_id)
+      );
+
+      if (newBadgeIds.length === 0) {
+        return [];
+      }
+
+      // Convert to UserBadge objects
+      const newUserBadges: UserBadge[] = newBadgeIds.map(sb => {
+        const badge = AVAILABLE_BADGES.find(b => b.id === sb.badge_id);
+        if (!badge) {
+          // Fallback badge object if not found in constants
+          return {
+            badge: {
+              id: sb.badge_id,
+              name: sb.badge_id,
+              description: '',
+              iconName: 'award',
+              category: 'milestone' as const,
+              criteria: '',
+            },
+            earnedAt: new Date(sb.earned_at),
+          };
+        }
+        return {
+          badge,
+          earnedAt: new Date(sb.earned_at),
+        };
+      });
+
+      // Update local state with all badges
+      const allUserBadges: UserBadge[] = serverBadges.map(sb => {
+        const badge = AVAILABLE_BADGES.find(b => b.id === sb.badge_id);
+        return {
+          badge: badge || {
+            id: sb.badge_id,
+            name: sb.badge_id,
+            description: '',
+            iconName: 'award',
+            category: 'milestone' as const,
+            criteria: '',
+          },
+          earnedAt: new Date(sb.earned_at),
+        };
+      });
+
+      set({
+        user: { ...user, badges: allUserBadges },
+        pendingAchievements: [...pendingAchievements, ...newUserBadges],
+      });
+
+      return newUserBadges;
+    } catch (error) {
+      console.error('Badge sync error:', error);
+      return [];
+    }
+  },
+
+  // Dismiss the first pending achievement (after modal is shown)
+  dismissAchievement: () => {
+    const { pendingAchievements } = get();
+    if (pendingAchievements.length > 0) {
+      set({ pendingAchievements: pendingAchievements.slice(1) });
+    }
+  },
+
+  // Fetch badge progress from server
+  fetchBadgeProgress: async () => {
+    const { user } = get();
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .rpc('get_badge_progress', { p_user_id: user.id });
+
+      if (error) {
+        console.error('Failed to fetch badge progress:', error);
+        return null;
+      }
+
+      set({ badgeProgress: data as BadgeProgress });
+      return data as BadgeProgress;
+    } catch (error) {
+      console.error('Badge progress error:', error);
+      return null;
+    }
   },
 
   // Saved challenges

@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
 import i18n from '../i18n';
+import AchievementProvider from '@/providers/AchievementProvider';
 
 // Inner component that uses translation hook
 function RootLayoutNav() {
@@ -65,7 +66,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <I18nextProvider i18n={i18n}>
         <PaperProvider theme={theme}>
-          <RootLayoutNav />
+          <AchievementProvider>
+            <RootLayoutNav />
+          </AchievementProvider>
         </PaperProvider>
       </I18nextProvider>
     </GestureHandlerRootView>

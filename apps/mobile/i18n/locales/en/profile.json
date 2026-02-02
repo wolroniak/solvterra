@@ -50,6 +50,35 @@
     "five-star": "Five Star",
     "week-streak": "Week Warrior"
   },
+  "badgeDescriptions": {
+    "first-challenge": "Complete your first challenge",
+    "five-challenges": "Complete 5 challenges",
+    "ten-challenges": "Complete 10 challenges",
+    "twentyfive-challenges": "Complete 25 challenges",
+    "eco-warrior": "Complete 5 environment challenges",
+    "social-butterfly": "Complete 5 social challenges",
+    "knowledge-seeker": "Complete 5 education challenges",
+    "health-hero": "Complete 5 health challenges",
+    "early-bird": "Complete a challenge before 8 AM",
+    "night-owl": "Complete a challenge after 10 PM",
+    "five-star": "Receive a 5-star rating",
+    "week-streak": "Maintain a 7-day streak"
+  },
+  "badgeCategories": {
+    "milestone": "Milestones",
+    "category": "Categories",
+    "special": "Special",
+    "streak": "Streaks"
+  },
+  "badgeCollection": {
+    "title": "Badge Collection",
+    "progress": "of {{total}} Badges"
+  },
+  "achievement": {
+    "congratulations": "Congratulations!",
+    "continue": "Continue",
+    "tapToDismiss": "Tap to dismiss"
+  },
   "notifications": {
     "title": "Notifications",
     "challengeUpdates": "Challenge Updates",

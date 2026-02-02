@@ -1,8 +1,9 @@
 // Badges Collection Screen
-// Shows all available badges and user's earned badges
+// Shows all available badges and user's earned badges with progress
 
+import { useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { Text, Surface } from 'react-native-paper';
+import { Text, Surface, ProgressBar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -32,8 +33,19 @@ const CATEGORY_ORDER = ['milestone', 'category', 'special', 'streak'];
 
 export default function BadgesScreen() {
   const { t } = useTranslation('profile');
-  const { user } = useUserStore();
+  const user = useUserStore(state => state.user);
+  const badgeProgress = useUserStore(state => state.badgeProgress);
+  const fetchBadgeProgress = useUserStore(state => state.fetchBadgeProgress);
+
+  // Get earned badge IDs from user state
   const earnedBadgeIds = user?.badges.map(b => b.badge.id) || [];
+
+  // Fetch badge progress on mount
+  useEffect(() => {
+    if (user) {
+      fetchBadgeProgress();
+    }
+  }, [user?.id]);
 
   // Build badges with translated info
   const allBadges = AVAILABLE_BADGES.map(badge => ({
@@ -55,6 +67,11 @@ export default function BadgesScreen() {
   // Sort categories by defined order
   const sortedCategories = CATEGORY_ORDER.filter(cat => badgesByCategory[cat]);
 
+  // Calculate overall progress
+  const earnedCount = earnedBadgeIds.length;
+  const totalCount = allBadges.length;
+  const progressPercent = totalCount > 0 ? (earnedCount / totalCount) * 100 : 0;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -72,17 +89,17 @@ export default function BadgesScreen() {
         <Surface style={styles.progressCard} elevation={1}>
           <View style={styles.progressContent}>
             <Text variant="displaySmall" style={styles.progressNumber}>
-              {allBadges.length} {/* DEMO: was earnedBadgeIds.length */}
+              {earnedCount}
             </Text>
             <Text variant="bodyMedium" style={styles.progressLabel}>
-              {t('badgeCollection.progress', { total: allBadges.length })}
+              {t('badgeCollection.progress', { total: totalCount })}
             </Text>
           </View>
-          <View style={styles.progressBar}>
+          <View style={styles.progressBarContainer}>
             <View
               style={[
                 styles.progressFill,
-                { width: '100%' }, // DEMO: was (earnedBadgeIds.length / allBadges.length) * 100
+                { width: `${progressPercent}%` },
               ]}
             />
           </View>
@@ -99,7 +116,10 @@ export default function BadgesScreen() {
               </Text>
               <View style={styles.badgeGrid}>
                 {badges.map((badge) => {
-                  const isEarned = true; // DEMO: was earnedBadgeIds.includes(badge.id);
+                  const isEarned = earnedBadgeIds.includes(badge.id);
+                  const progress = badgeProgress?.[badge.id];
+                  const hasProgress = progress && !isEarned && progress.required > 1;
+
                   return (
                     <Surface
                       key={badge.id}
@@ -137,6 +157,31 @@ export default function BadgesScreen() {
                       >
                         {badge.description}
                       </Text>
+
+                      {/* Progress bar for unearned badges */}
+                      {hasProgress && (
+                        <View style={styles.badgeProgress}>
+                          <ProgressBar
+                            progress={progress.current / progress.required}
+                            color={Colors.accent[500]}
+                            style={styles.badgeProgressBar}
+                          />
+                          <Text style={styles.badgeProgressText}>
+                            {progress.current}/{progress.required}
+                          </Text>
+                        </View>
+                      )}
+
+                      {/* Checkmark for earned badges */}
+                      {isEarned && (
+                        <View style={styles.earnedBadge}>
+                          <MaterialCommunityIcons
+                            name="check-circle"
+                            size={16}
+                            color={Colors.success}
+                          />
+                        </View>
+                      )}
                     </Surface>
                   );
                 })}
@@ -189,7 +234,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginLeft: spacing.xs,
   },
-  progressBar: {
+  progressBarContainer: {
     height: 8,
     backgroundColor: Colors.neutral[200],
     borderRadius: 4,
@@ -220,6 +265,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#fff',
     alignItems: 'center',
+    position: 'relative',
   },
   badgeCardLocked: {
     backgroundColor: Colors.neutral[50],
@@ -265,6 +311,28 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: 14,
+    fontSize: 10,
+  },
+  badgeProgress: {
+    width: '100%',
+    marginTop: spacing.xs,
+    alignItems: 'center',
+  },
+  badgeProgressBar: {
+    width: '100%',
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.neutral[200],
+  },
+  badgeProgressText: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
+  earnedBadge: {
+    position: 'absolute',
+    top: spacing.xs,
+    right: spacing.xs,
   },
   footer: {
     height: spacing.xxl,

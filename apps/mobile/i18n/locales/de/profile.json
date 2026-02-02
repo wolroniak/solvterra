@@ -50,6 +50,35 @@
     "five-star": "Fünf Sterne",
     "week-streak": "Wochenkrieger"
   },
+  "badgeDescriptions": {
+    "first-challenge": "Schließe deinen ersten Challenge ab",
+    "five-challenges": "Schließe 5 Challenges ab",
+    "ten-challenges": "Schließe 10 Challenges ab",
+    "twentyfive-challenges": "Schließe 25 Challenges ab",
+    "eco-warrior": "Schließe 5 Umwelt-Challenges ab",
+    "social-butterfly": "Schließe 5 Sozial-Challenges ab",
+    "knowledge-seeker": "Schließe 5 Bildungs-Challenges ab",
+    "health-hero": "Schließe 5 Gesundheits-Challenges ab",
+    "early-bird": "Schließe einen Challenge vor 8 Uhr ab",
+    "night-owl": "Schließe einen Challenge nach 22 Uhr ab",
+    "five-star": "Erhalte eine 5-Sterne-Bewertung",
+    "week-streak": "Halte eine 7-Tage-Streak"
+  },
+  "badgeCategories": {
+    "milestone": "Meilensteine",
+    "category": "Kategorien",
+    "special": "Spezial",
+    "streak": "Streaks"
+  },
+  "badgeCollection": {
+    "title": "Badge-Sammlung",
+    "progress": "von {{total}} Badges"
+  },
+  "achievement": {
+    "congratulations": "Glückwunsch!",
+    "continue": "Weiter",
+    "tapToDismiss": "Tippen zum Schließen"
+  },
   "notifications": {
     "title": "Benachrichtigungen",
     "challengeUpdates": "Challenge-Updates",
