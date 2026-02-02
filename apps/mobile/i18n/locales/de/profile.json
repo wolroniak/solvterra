@@ -49,5 +49,49 @@
     "night-owl": "Nachteule",
     "five-star": "Fünf Sterne",
     "week-streak": "Wochenkrieger"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "challengeUpdates": "Challenge-Updates",
+    "submissionReviewed": {
+      "title": "Einreichung geprüft",
+      "description": "Benachrichtigung wenn deine Einreichung bewertet wurde"
+    },
+    "challengeReminders": {
+      "title": "Challenge-Erinnerungen",
+      "description": "Erinnerungen an aktive Challenges und Fristen"
+    },
+    "discovery": "Entdecken",
+    "newChallenges": {
+      "title": "Neue Challenges",
+      "description": "Benachrichtigung über neue Challenges in deinen Interessengebieten"
+    },
+    "achievements": "Erfolge",
+    "levelUps": {
+      "title": "Level-Aufstiege",
+      "description": "Benachrichtigung wenn du ein neues Level erreichst"
+    },
+    "badgesEarned": {
+      "title": "Badges verdient",
+      "description": "Benachrichtigung wenn du einen neuen Badge erhältst"
+    },
+    "streakAlerts": {
+      "title": "Streak-Erinnerungen",
+      "description": "Erinnerung um deine tägliche Serie aufrechtzuerhalten"
+    },
+    "community": "Community",
+    "comments": {
+      "title": "Kommentare",
+      "description": "Benachrichtigung wenn jemand deinen Beitrag kommentiert"
+    },
+    "likes": {
+      "title": "Likes",
+      "description": "Benachrichtigung wenn jemand deinen Beitrag liked"
+    },
+    "summaries": "Zusammenfassungen",
+    "weeklyDigest": {
+      "title": "Wöchentliche Zusammenfassung",
+      "description": "Wöchentliche Übersicht deiner Aktivitäten und neuer Challenges"
+    }
   }
 }

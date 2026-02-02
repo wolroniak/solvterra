@@ -49,5 +49,49 @@
     "night-owl": "Night Owl",
     "five-star": "Five Star",
     "week-streak": "Week Warrior"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "challengeUpdates": "Challenge Updates",
+    "submissionReviewed": {
+      "title": "Submission Reviewed",
+      "description": "Get notified when your submission has been reviewed"
+    },
+    "challengeReminders": {
+      "title": "Challenge Reminders",
+      "description": "Reminders about active challenges and deadlines"
+    },
+    "discovery": "Discovery",
+    "newChallenges": {
+      "title": "New Challenges",
+      "description": "Get notified about new challenges in your areas of interest"
+    },
+    "achievements": "Achievements",
+    "levelUps": {
+      "title": "Level Ups",
+      "description": "Get notified when you reach a new level"
+    },
+    "badgesEarned": {
+      "title": "Badges Earned",
+      "description": "Get notified when you earn a new badge"
+    },
+    "streakAlerts": {
+      "title": "Streak Alerts",
+      "description": "Reminders to maintain your daily streak"
+    },
+    "community": "Community",
+    "comments": {
+      "title": "Comments",
+      "description": "Get notified when someone comments on your post"
+    },
+    "likes": {
+      "title": "Likes",
+      "description": "Get notified when someone likes your post"
+    },
+    "summaries": "Summaries",
+    "weeklyDigest": {
+      "title": "Weekly Digest",
+      "description": "Weekly summary of your activities and new challenges"
+    }
   }
 }
