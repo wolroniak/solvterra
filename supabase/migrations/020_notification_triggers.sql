@@ -31,16 +31,18 @@ BEGIN
     IF v_url IS NOT NULL AND v_service_key IS NOT NULL THEN
       v_payload := jsonb_build_object(
         'type', 'submission_reviewed',
-        'submission_id', NEW.id,
         'user_id', NEW.user_id,
-        'challenge_id', NEW.challenge_id,
-        'status', NEW.status,
-        'reviewed_at', NEW.reviewed_at,
-        'reviewer_notes', NEW.reviewer_notes
+        'payload', jsonb_build_object(
+          'submission_id', NEW.id,
+          'challenge_id', NEW.challenge_id,
+          'status', NEW.status,
+          'reviewed_at', NEW.reviewed_at,
+          'reviewer_notes', NEW.reviewer_notes
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-user',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key
@@ -86,17 +88,19 @@ BEGIN
     IF v_url IS NOT NULL AND v_service_key IS NOT NULL THEN
       v_payload := jsonb_build_object(
         'type', 'new_challenge',
-        'challenge_id', NEW.id,
-        'organization_id', NEW.organization_id,
-        'title', NEW.title,
-        'title_en', NEW.title_en,
-        'category', NEW.category,
-        'xp_reward', NEW.xp_reward,
-        'difficulty', NEW.difficulty
+        'payload', jsonb_build_object(
+          'challenge_id', NEW.id,
+          'organization_id', NEW.organization_id,
+          'title', NEW.title,
+          'title_en', NEW.title_en,
+          'category', NEW.category,
+          'xp_reward', NEW.xp_reward,
+          'difficulty', NEW.difficulty
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-new-challenge',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key
@@ -146,15 +150,17 @@ BEGIN
 
     IF v_url IS NOT NULL AND v_service_key IS NOT NULL THEN
       v_payload := jsonb_build_object(
-        'type', 'level_up',
+        'type', 'xp_milestone',
         'user_id', NEW.id,
-        'old_level', v_old_level,
-        'new_level', v_new_level,
-        'total_xp', NEW.total_xp
+        'payload', jsonb_build_object(
+          'old_level', v_old_level,
+          'new_level', v_new_level,
+          'xp', NEW.xp
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-user',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key
@@ -204,16 +210,18 @@ BEGIN
     v_payload := jsonb_build_object(
       'type', 'badge_earned',
       'user_id', NEW.user_id,
-      'badge_id', NEW.badge_id,
-      'badge_name', v_badge_record.name,
-      'badge_name_en', v_badge_record.name_en,
-      'badge_icon', v_badge_record.icon,
-      'badge_category', v_badge_record.category,
-      'earned_at', NEW.earned_at
+      'payload', jsonb_build_object(
+        'badge_id', NEW.badge_id,
+        'badge_name', v_badge_record.name,
+        'badge_name_en', v_badge_record.name_en,
+        'badge_icon', v_badge_record.icon,
+        'badge_category', v_badge_record.category,
+        'earned_at', NEW.earned_at
+      )
     );
 
     PERFORM net.http_post(
-      url := v_url || '/functions/v1/send-push-notification',
+      url := v_url || '/functions/v1/notify-user',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
         'Authorization', 'Bearer ' || v_service_key
@@ -267,20 +275,22 @@ BEGIN
     WHERE id = NEW.user_id;
 
     v_payload := jsonb_build_object(
-      'type', 'ngo_new_participant',
-      'submission_id', NEW.id,
-      'challenge_id', NEW.challenge_id,
-      'challenge_title', v_challenge_record.title,
-      'challenge_title_en', v_challenge_record.title_en,
+      'type', 'new_participant',
       'organization_id', v_challenge_record.organization_id,
-      'user_id', NEW.user_id,
-      'user_display_name', v_user_record.display_name,
-      'user_avatar_url', v_user_record.avatar_url,
-      'joined_at', NEW.created_at
+      'payload', jsonb_build_object(
+        'submission_id', NEW.id,
+        'challenge_id', NEW.challenge_id,
+        'challenge_title', v_challenge_record.title,
+        'challenge_title_en', v_challenge_record.title_en,
+        'user_id', NEW.user_id,
+        'user_display_name', v_user_record.display_name,
+        'user_avatar_url', v_user_record.avatar_url,
+        'joined_at', NEW.created_at
+      )
     );
 
     PERFORM net.http_post(
-      url := v_url || '/functions/v1/send-push-notification',
+      url := v_url || '/functions/v1/notify-organization',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
         'Authorization', 'Bearer ' || v_service_key
@@ -338,21 +348,23 @@ BEGIN
       WHERE id = NEW.user_id;
 
       v_payload := jsonb_build_object(
-        'type', 'ngo_proof_submitted',
-        'submission_id', NEW.id,
-        'challenge_id', NEW.challenge_id,
-        'challenge_title', v_challenge_record.title,
-        'challenge_title_en', v_challenge_record.title_en,
+        'type', 'proof_submitted',
         'organization_id', v_challenge_record.organization_id,
-        'user_id', NEW.user_id,
-        'user_display_name', v_user_record.display_name,
-        'proof_url', NEW.proof_url,
-        'proof_text', NEW.proof_text,
-        'submitted_at', NEW.submitted_at
+        'payload', jsonb_build_object(
+          'submission_id', NEW.id,
+          'challenge_id', NEW.challenge_id,
+          'challenge_title', v_challenge_record.title,
+          'challenge_title_en', v_challenge_record.title_en,
+          'user_id', NEW.user_id,
+          'user_display_name', v_user_record.display_name,
+          'proof_url', NEW.proof_url,
+          'proof_text', NEW.proof_text,
+          'submitted_at', NEW.submitted_at
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-organization',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key
@@ -396,17 +408,19 @@ BEGIN
 
     IF v_url IS NOT NULL AND v_service_key IS NOT NULL THEN
       v_payload := jsonb_build_object(
-        'type', 'org_verification_status_changed',
+        'type', 'verification_status_changed',
         'organization_id', NEW.id,
-        'organization_name', NEW.name,
-        'old_status', OLD.verification_status,
-        'new_status', NEW.verification_status,
-        'owner_id', NEW.owner_id,
-        'updated_at', NEW.updated_at
+        'payload', jsonb_build_object(
+          'organization_name', NEW.name,
+          'old_status', OLD.verification_status,
+          'new_status', NEW.verification_status,
+          'owner_id', NEW.owner_id,
+          'updated_at', NEW.updated_at
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-organization',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key
@@ -463,19 +477,21 @@ BEGIN
       WHERE id = NEW.user_id;
 
       v_payload := jsonb_build_object(
-        'type', 'post_comment',
-        'comment_id', NEW.id,
-        'post_id', NEW.post_id,
-        'post_author_id', v_post_record.user_id,
-        'commenter_id', NEW.user_id,
-        'commenter_display_name', v_commenter_record.display_name,
-        'commenter_avatar_url', v_commenter_record.avatar_url,
-        'comment_content', LEFT(NEW.content, 200),
-        'commented_at', NEW.created_at
+        'type', 'community_comment',
+        'user_id', v_post_record.user_id,
+        'payload', jsonb_build_object(
+          'comment_id', NEW.id,
+          'post_id', NEW.post_id,
+          'commenter_id', NEW.user_id,
+          'commenter_display_name', v_commenter_record.display_name,
+          'commenter_avatar_url', v_commenter_record.avatar_url,
+          'comment_preview', LEFT(NEW.content, 200),
+          'commented_at', NEW.created_at
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-user',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key
@@ -532,18 +548,20 @@ BEGIN
       WHERE id = NEW.user_id;
 
       v_payload := jsonb_build_object(
-        'type', 'post_like',
-        'like_id', NEW.id,
-        'post_id', NEW.post_id,
-        'post_author_id', v_post_record.user_id,
-        'liker_id', NEW.user_id,
-        'liker_display_name', v_liker_record.display_name,
-        'liker_avatar_url', v_liker_record.avatar_url,
-        'liked_at', NEW.created_at
+        'type', 'community_like',
+        'user_id', v_post_record.user_id,
+        'payload', jsonb_build_object(
+          'like_id', NEW.id,
+          'post_id', NEW.post_id,
+          'liker_id', NEW.user_id,
+          'liker_display_name', v_liker_record.display_name,
+          'liker_avatar_url', v_liker_record.avatar_url,
+          'liked_at', NEW.created_at
+        )
       );
 
       PERFORM net.http_post(
-        url := v_url || '/functions/v1/send-push-notification',
+        url := v_url || '/functions/v1/notify-user',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
           'Authorization', 'Bearer ' || v_service_key

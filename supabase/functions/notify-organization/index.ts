@@ -27,7 +27,7 @@ serve(async (req) => {
     const prefKeyMap: Record<string, string> = {
       new_participant: 'new_participant',
       proof_submitted: 'proof_submitted',
-      verification_update: 'verification_update',
+      verification_status_changed: 'verification_update',
     }
 
     const prefKey = prefKeyMap[type]
@@ -66,17 +66,17 @@ serve(async (req) => {
     const contentMap: Record<string, { title: string; body: string }> = {
       new_participant: {
         title: '👋 New Participant',
-        body: 'Someone accepted your challenge!'
+        body: `${payload.user_display_name || 'Someone'} accepted your challenge!`
       },
       proof_submitted: {
         title: '📸 Proof Submitted',
-        body: 'A participant submitted proof for review'
+        body: `${payload.user_display_name || 'A participant'} submitted proof for review`
       },
-      verification_update: {
-        title: payload.status === 'verified' ? '✅ Verified!' : '⚠️ Verification Update',
-        body: payload.status === 'verified'
+      verification_status_changed: {
+        title: payload.new_status === 'verified' ? '✅ Verified!' : '⚠️ Verification Update',
+        body: payload.new_status === 'verified'
           ? 'Your organization is now verified!'
-          : String(payload.rejection_reason) || 'Check your verification status'
+          : `Verification status changed to ${payload.new_status}`
       },
     }
 

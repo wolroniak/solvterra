@@ -7,19 +7,22 @@ const supabase = createClient(
 )
 
 interface NotifyRequest {
-  challenge_id: string
-  category: string
+  type: string
   payload: {
+    challenge_id: string
     title?: string
     title_en?: string
+    category?: string
     organization_id?: string
     xp_reward?: number
+    difficulty?: string
   }
 }
 
 serve(async (req) => {
   try {
-    const { challenge_id, payload }: NotifyRequest = await req.json()
+    const { payload }: NotifyRequest = await req.json()
+    const challenge_id = payload.challenge_id
 
     // Get all users who want new challenge notifications
     const { data: users } = await supabase
