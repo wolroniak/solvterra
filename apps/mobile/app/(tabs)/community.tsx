@@ -8,13 +8,15 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import { Colors, spacing } from '@/constants/theme';
-import { useCommunityStore, useUserStore } from '@/store';
+import { useCommunityStore, useUserStore, useNotificationStore, useFriendStore } from '@/store';
 import CommunityPostCard from '@/components/CommunityPostCard';
 import ActivityCard from '@/components/ActivityCard';
 import CommentSheet from '@/components/CommentSheet';
@@ -26,7 +28,11 @@ type FilterType = 'all' | 'organizations' | 'stories' | 'activity';
 
 export default function CommunityScreen() {
   const { t } = useTranslation('community');
+  const router = useRouter();
   const { user } = useUserStore();
+  const { unreadCount: unreadNotificationCount } = useNotificationStore();
+  const { getPendingCount } = useFriendStore();
+  const pendingRequestCount = getPendingCount();
   const {
     posts,
     isLoading,
@@ -56,6 +62,16 @@ export default function CommunityScreen() {
 
   useEffect(() => {
     loadPosts();
+  }, []);
+
+  // Fetch notification and friend data on mount
+  useEffect(() => {
+    useFriendStore.getState().fetchPendingRequests();
+    useNotificationStore.getState().fetchNotifications();
+
+    // Subscribe to realtime notifications
+    const unsubscribe = useNotificationStore.getState().subscribeToNotifications();
+    return unsubscribe;
   }, []);
 
   // Load community XP when activity tab becomes active
@@ -228,6 +244,34 @@ export default function CommunityScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.titleBar}>
           <Text style={styles.titleText}>Community</Text>
+          <View style={styles.headerIcons}>
+            <Pressable
+              onPress={() => router.push('/notifications')}
+              style={styles.headerIcon}
+            >
+              <MaterialCommunityIcons name="bell-outline" size={24} color={Colors.textPrimary} />
+              {unreadNotificationCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/friends')}
+              style={styles.headerIcon}
+            >
+              <MaterialCommunityIcons name="account-group-outline" size={24} color={Colors.textPrimary} />
+              {pendingRequestCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {pendingRequestCount > 9 ? '9+' : pendingRequestCount}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
         </View>
         <View style={styles.skeletonContainer}>
           {[1, 2, 3].map(i => (
@@ -253,9 +297,37 @@ export default function CommunityScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Title Bar */}
+      {/* Title Bar with Icons */}
       <View style={styles.titleBar}>
         <Text style={styles.titleText}>Community</Text>
+        <View style={styles.headerIcons}>
+          <Pressable
+            onPress={() => router.push('/notifications')}
+            style={styles.headerIcon}
+          >
+            <MaterialCommunityIcons name="bell-outline" size={24} color={Colors.textPrimary} />
+            {unreadNotificationCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/friends')}
+            style={styles.headerIcon}
+          >
+            <MaterialCommunityIcons name="account-group-outline" size={24} color={Colors.textPrimary} />
+            {pendingRequestCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {pendingRequestCount > 9 ? '9+' : pendingRequestCount}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
       </View>
 
       <FlatList
@@ -303,6 +375,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   titleBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 0.5,
@@ -312,6 +387,31 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: Colors.textPrimary,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerIcon: {
+    padding: 6,
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: Colors.accent[500],
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#fff',
   },
 
   // Header / Filters
