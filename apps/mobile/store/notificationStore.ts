@@ -34,7 +34,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       }
 
       const { data, error } = await supabase
-        .from('notifications')
+        .from('app_notifications')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -65,7 +65,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   markAsRead: async (id: string) => {
     try {
       await supabase
-        .from('notifications')
+        .from('app_notifications')
         .update({ read: true })
         .eq('id', id);
 
@@ -86,7 +86,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       if (!user) return;
 
       await supabase
-        .from('notifications')
+        .from('app_notifications')
         .update({ read: true })
         .eq('user_id', user.id)
         .eq('read', false);
@@ -110,13 +110,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       }
 
       subscription = supabase
-        .channel('notifications')
+        .channel('app_notifications')
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
-            table: 'notifications',
+            table: 'app_notifications',
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
