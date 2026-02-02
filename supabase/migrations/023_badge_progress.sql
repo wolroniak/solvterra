@@ -94,7 +94,7 @@ BEGIN
                             SELECT 1 FROM submissions s
                             WHERE s.user_id = p_user_id
                             AND s.status = 'approved'
-                            AND EXTRACT(HOUR FROM s.updated_at AT TIME ZONE 'Europe/Berlin') < v_time_hour
+                            AND EXTRACT(HOUR FROM s.submitted_at AT TIME ZONE 'Europe/Berlin') < v_time_hour
                         ) THEN 1 ELSE 0 END INTO v_current;
                     ELSIF v_badge.criteria_value ? 'after' THEN
                         v_time_check := v_badge.criteria_value->>'after';
@@ -103,7 +103,7 @@ BEGIN
                             SELECT 1 FROM submissions s
                             WHERE s.user_id = p_user_id
                             AND s.status = 'approved'
-                            AND EXTRACT(HOUR FROM s.updated_at AT TIME ZONE 'Europe/Berlin') >= v_time_hour
+                            AND EXTRACT(HOUR FROM s.submitted_at AT TIME ZONE 'Europe/Berlin') >= v_time_hour
                         ) THEN 1 ELSE 0 END INTO v_current;
                     END IF;
                 END IF;
@@ -120,7 +120,7 @@ BEGIN
                 FROM submissions s
                 WHERE s.user_id = p_user_id
                 AND s.status = 'approved'
-                AND s.rating = (v_badge.criteria_value->>'rating')::INT;
+                AND s.ngo_rating = (v_badge.criteria_value->>'rating')::INT;
 
         END CASE;
 
