@@ -1,5 +1,6 @@
 .claude
 .bmad
+.worktrees
 node_modules
 .expo
 .next
