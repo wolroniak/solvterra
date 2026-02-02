@@ -9,7 +9,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors, spacing } from '@/constants/theme';
-import { useChallengeStore, useCommunityStore, useUserStore } from '@/store';
+import { useChallengeStore, useCommunityStore } from '@/store';
+import { useSyncBadges } from '@/providers/AchievementProvider';
 import { MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
 import type { Submission, Challenge, CommunityPost } from '@solvterra/shared';
 import CreatePostModal from '@/components/CreatePostModal';
@@ -87,16 +88,17 @@ const getTimelineLabel = (challenge: Challenge, submission: Submission): { text:
 export default function MyChallengesScreen() {
   const { submissions, challenges, getActiveCount, updateProof, loadChallenges } = useChallengeStore();
   const { getPostBySubmissionId, deletePost } = useCommunityStore();
-  const { refreshStats } = useUserStore();
+  const syncBadgesAndStats = useSyncBadges();
   const [activeTab, setActiveTab] = useState<TabValue>('active');
   const activeCount = getActiveCount();
 
   // Reload challenges and submissions when screen gains focus
+  // Also sync badges to detect newly earned achievements
   useFocusEffect(
     useCallback(() => {
       loadChallenges();
-      refreshStats();
-    }, [loadChallenges, refreshStats])
+      syncBadgesAndStats();
+    }, [loadChallenges, syncBadgesAndStats])
   );
 
   // Post management state

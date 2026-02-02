@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore, useLanguageStore, useCommunityStore } from '@/store';
+import { useSyncBadges } from '@/providers/AchievementProvider';
 import { supabase } from '@/lib/supabase';
 import type { CommunityPost } from '@solvterra/shared';
 import { XP_LEVELS } from '@solvterra/shared';
@@ -52,6 +53,7 @@ export default function ProfileScreen() {
   const { user, logout, updateProfile } = useUserStore();
   const { language, setLanguage } = useLanguageStore();
   const { getUserPosts, deletePost } = useCommunityStore();
+  const syncBadgesAndStats = useSyncBadges();
 
   const [activeTab, setActiveTab] = useState<ProfileTab>('posts');
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
@@ -66,13 +68,17 @@ export default function ProfileScreen() {
     setIsLoadingPosts(false);
   }, [user, getUserPosts]);
 
-  // Reload posts when the profile tab is focused (e.g. returning from creating a post)
+  // Reload data when the profile tab is focused
+  // Sync badges to detect newly earned achievements
   useFocusEffect(
     useCallback(() => {
-      if (user && activeTab === 'posts') {
-        loadUserPosts();
+      if (user) {
+        syncBadgesAndStats();
+        if (activeTab === 'posts') {
+          loadUserPosts();
+        }
       }
-    }, [user, activeTab, loadUserPosts])
+    }, [user, activeTab, loadUserPosts, syncBadgesAndStats])
   );
 
   useEffect(() => {
