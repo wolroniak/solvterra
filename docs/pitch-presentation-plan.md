@@ -248,6 +248,13 @@ Successful pitches are: **credible, agreeable in tone, interactive, captivating,
 | **Nico** (Student) | [Team Member Name] | Stage LEFT | Phone (mirrored to Screen 1) |
 | **Steffi** (NGO Admin) | [Team Member Name] | Stage RIGHT | Laptop (projected to Screen 2) |
 | **Narrator** | Ron | Center/flexible | No device |
+| **Chuong** (Corporate) | Chuong | Side of stage | No device - spoken role |
+
+**Chuong's Speaking Moments:**
+1. **Slide 3** (Live Persona Delivery): Steps forward with Nico & Steffi, delivers his pain point, ends with "Is there a solution?"
+2. **Slide 13** (Corporate Case Study): Delivers his lines about MobilHessen sponsoring CleanRivers
+
+*Note: Chuong has no live demo interaction (no corporate dashboard in MVP), but his two speaking moments create a narrative arc: introducing his problem → showing how it was solved.*
 
 ### Two-Screen Setup
 - **Screen 1 (Left)**: Nico's phone mirrored - student mobile app
@@ -897,37 +904,71 @@ Turning Intention into Action
 
 ---
 
-### Slide 3: Meet Nico & Steffi `[0:20 - 0:45]` ⭐ **PERSONAS INTRODUCED**
+### Slide 3: Meet the Three Sides `[0:20 - 1:00]` ⭐ **LIVE PERSONA DELIVERY**
 **On Screen:**
 ```
-┌─────────────────────────────┐  ┌─────────────────────────────┐
-│  [Photo of Nico Actor]       │  │  [Photo of Steffi Actor]    │
-│                             │  │                             │
-│  NICO                       │  │  STEFFI                     │
-│  24 years old               │  │  Tierheim Darmstadt         │
-│  TU Darmstadt Student       │  │  Social Media Manager       │
-│  "I want to help but can't  │  │  "We need volunteers but    │
-│   commit to fixed schedules"│  │   can't reach students"     │
-└─────────────────────────────┘  └─────────────────────────────┘
+┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐
+│ [Photo: Nico Actor] │  │ [Photo: Steffi Act] │  │ [Photo: Chuong Actor]  │
+│                     │  │                     │  │                     │
+│  NICO               │  │  STEFFI             │  │  CHO                │
+│  24, Student        │  │  Tierheim Darmstadt │  │  MobilHessen GmbH   │
+│  TU Darmstadt       │  │  Social Media Mgr   │  │  Marketing Lead     │
+│                     │  │                     │  │                     │
+│  "I want to help    │  │  "We need volun-    │  │  "We want to con-   │
+│   but can't commit  │  │   teers but can't   │  │   nect with young   │
+│   to fixed          │  │   reach students"   │  │   people - but our  │
+│   schedules"        │  │                     │  │   small team can't  │
+│                     │  │                     │  │   run big campaigns"│
+└─────────────────────┘  └─────────────────────┘  └─────────────────────┘
 ```
 
 **Visual Style:**
-- Side-by-side persona cards with REAL photos of presenters
-- Nico on LEFT (matches stage position)
-- Steffi on RIGHT (matches stage position)
-- Quotes show their core pain point
-- Warm, approachable design
+- Three persona cards in a row with REAL photos of presenters
+- Nico on LEFT (matches stage position for demo)
+- Steffi in CENTER
+- Chuong on RIGHT (the corporate sponsor angle)
+- Names and roles visible, but quotes delivered LIVE (not written on slide)
+- Consider color-coding: Nico (Teal), Steffi (Forest Green), Chuong (Gold accent)
 
-**Speaker Notes:**
-> "Meet the two sides of this problem. Nico, a student who wants to help but can't commit to fixed schedules. And Steffi, who runs social media for Tierheim Darmstadt - she needs community support but can't reach busy students like Nico. They're stuck."
+**Live Delivery Script:**
 
-💡 *Using real presenter photos creates connection before demo*
+```
+[Slide 3 appears with three persona cards]
 
-**Timing:** 25 seconds | **Cumulative:** 0:45
+Ron: "Meet the three sides of this problem."
+
+Nico (steps forward, gestures to his card):
+     "I want to help - but I can't commit to fixed schedules."
+
+Steffi (steps forward, gestures to her card):
+     "We need volunteers - but we can't reach students."
+
+Chuong (steps forward, gestures to his card):
+     "We want to connect with young people and support local causes -
+      but our small team can't run big campaigns. Is there a solution?"
+
+Ron: "Yes. SolvTerra connects them."
+```
+
+**Why This Works:**
+- Each persona is clearly identified (card visible when they speak)
+- Three voices create a powerful "we're all stuck" moment
+- Chuong's "Is there a solution?" creates natural dramatic hook
+- Audience sees AND hears each side of the marketplace
+
+**Coordination Notes:**
+- Nico, Steffi, and Chuong should rehearse timing together
+- Each person speaks for ~5-7 seconds
+- Brief pause between each speaker for impact
+- Ron's "Yes. SolvTerra connects them." is the payoff
+
+💡 *This is one of the most memorable moments - three voices, three problems, one solution*
+
+**Timing:** 40 seconds | **Cumulative:** 1:00
 
 ---
 
-### Slide 4: The Question `[0:45 - 1:00]` ⭐ **EMOTIONAL BEAT**
+### Slide 4: The Question `[1:00 - 1:15]` ⭐ **EMOTIONAL BEAT**
 **On Screen:**
 ```
 
@@ -956,11 +997,11 @@ Turning Intention into Action
 💡 *This verbal bridge introduces COMPANIES before they appear in next slide*
 💡 *Pause after "SolvTerra" - let the name land*
 
-**Timing:** 15 seconds | **Cumulative:** 1:00
+**Timing:** 15 seconds | **Cumulative:** 1:15
 
 ---
 
-### Slide 5: Our Solution - SolvTerra `[1:00 - 1:30]`
+### Slide 5: Our Solution - SolvTerra `[1:15 - 1:45]`
 **On Screen:**
 ```
          [SolvTerra Logo]
@@ -985,11 +1026,11 @@ Turning Intention into Action
 **Speaker Notes:**
 > "SolvTerra is a micro-volunteering platform. Students like Nico complete bite-sized tasks in 5 to 30 minutes and earn XP. NGOs like Steffi's Tierheim get reliable help, reach more people, and skip the administrative burden. And companies can sponsor challenges for authentic, verified CSR impact."
 
-**Timing:** 30 seconds | **Cumulative:** 1:30
+**Timing:** 30 seconds | **Cumulative:** 1:45
 
 ---
 
-### Slide 6: Our Vision `[1:30 - 1:45]` ⭐ **KEY MESSAGE**
+### Slide 6: Our Vision `[1:45 - 2:00]` ⭐ **KEY MESSAGE**
 **On Screen:**
 ```
 
@@ -1020,11 +1061,11 @@ Turning Intention into Action
 💡 *This is the anchor statement - jury should remember this*
 💡 *"5 minutes" sets up the demo where Nico literally completes a task quickly*
 
-**Timing:** 15 seconds (including pause) | **Cumulative:** 1:45
+**Timing:** 15 seconds (including pause) | **Cumulative:** 2:00
 
 ---
 
-### Slide 7: Demo Transition `[1:45 - 1:55]`
+### Slide 7: Demo Transition `[2:00 - 2:10]`
 **On Screen:**
 ```
 
@@ -1057,7 +1098,7 @@ Turning Intention into Action
 💡 *"Become part of the story" teases participation without spoiling*
 💡 *Presenters move to their stage positions*
 
-**Timing:** 10 seconds | **Cumulative:** 1:55
+**Timing:** 10 seconds | **Cumulative:** 2:10
 
 ---
 
@@ -1065,11 +1106,55 @@ Turning Intention into Action
 
 | Section | Duration |
 |---------|----------|
-| Introduction Slides (1-7) | ~2:00 |
+| Introduction Slides (1-7) with Live Personas | ~2:00 |
 | Live Demo (Scenes 1-12) | ~5:10 |
 | **Ron's Total Section** | **~7:10** |
 
+*Note: Slide 3 now includes live delivery by all three personas (Nico, Steffi, Chuong)*
+
 *Note: Timeline/Roadmap slide moved to Nico/Stefi's Pilot section*
+
+---
+
+## Persona Profiles
+
+### Nico (Student Persona)
+- **Name:** Nico (he/him)
+- **Age:** 24
+- **Occupation:** TU Darmstadt Student
+- **Quote:** "I want to help but can't commit to fixed schedules"
+- **Pain Point:** Wants to volunteer but unpredictable schedule prevents long-term commitment
+- **Demo Role:** Primary mobile app actor (Stage LEFT)
+
+### Steffi (NGO Persona)
+- **Name:** Steffi (she/her)
+- **Organization:** Tierheim Darmstadt e.V.
+- **Role:** Social Media Manager
+- **Quote:** "We need volunteers but can't reach students"
+- **Pain Point:** NGO needs community support but lacks digital reach to young people
+- **Demo Role:** Primary dashboard actor (Stage RIGHT)
+
+### Chuong (Corporate Persona)
+- **Name:** Chuong (he/him)
+- **Played by:** Chuong
+- **Company:** MobilHessen GmbH (regional mobility company)
+- **Role:** Marketing Lead
+- **Quote:** "We want to connect with young people - but our small team can't run big campaigns"
+- **Goals & Motivation:**
+  - Engage with Gen Z demographic
+  - Build positive public image through authentic action
+  - Get verified impact data for ESG/sustainability reporting
+- **Requirements:**
+  - Clear visibility (brand recognition)
+  - Easy onboarding and low administrative effort
+- **Pain Points:**
+  - Small marketing team (3-5 people)
+  - No dedicated CSR department
+  - Hates administrative burden of traditional corporate volunteering
+- **Presentation Role:**
+  1. **Slide 3** (Live Persona Delivery): Steps forward with Nico & Steffi, delivers problem, ends with "Is there a solution?"
+  2. **Slide 13** (Corporate Case Study): Delivers his MobilHessen + CleanRivers story
+- **Character Arc:** Introduces problem alongside Nico & Steffi → Demo shows solution → Slide 13 shows how it worked for him
 
 ---
 
@@ -1343,4 +1428,654 @@ Prepare these screenshots in advance (take after testing full flow):
 - [ ] Nico and Steffi know their positions (LEFT/RIGHT)
 - [ ] Ron ready for narrator bridge
 - [ ] Persona slide ready as demo intro
+
+---
+
+## Post-Demo Slides: Part 2 & 3 (Yiwen & Jenny)
+
+**Total Time: 7-8 minutes | 9 slides**
+**Presenters: Yiwen and Jenny**
+**Starting Point: After Demo Recap slide (Slide 10)**
+
+### Key Objectives
+These slides must answer the two biggest investor questions:
+1. **"How do you make money?"** → Business Model + Corporate Case Study
+2. **"Is the market big enough?"** → Market Opportunity
+
+Plus: Competitive moat, financial credibility, execution plan, team, and the ask.
+
+---
+
+### Slide 11: Market Opportunity `[0:00 - 1:00]`
+
+**On Screen:**
+```
+         THE OPPORTUNITY
+
+    ┌──────────────────────────────────────┐
+    │              TAM                      │
+    │   2.9M Students + 600K NGOs          │
+    │        €20-60B annually              │
+    │   ┌────────────────────────────┐     │
+    │   │           SAM              │     │
+    │   │   50,000 NGOs              │     │
+    │   │   500,000 Students         │     │
+    │   │   (University regions)     │     │
+    │   │   ┌──────────────────┐    │     │
+    │   │   │      SOM         │    │     │
+    │   │   │  1,000 NGOs      │    │     │
+    │   │   │  50,000 Students │    │     │
+    │   │   │  (Darmstadt/     │    │     │
+    │   │   │   Hessen)        │    │     │
+    │   │   └──────────────────┘    │     │
+    │   └────────────────────────────┘     │
+    └──────────────────────────────────────┘
+```
+
+**Visual Style:**
+- Nested circles or boxes showing TAM → SAM → SOM
+- TAM largest, SOM smallest (funnel visualization)
+- Key numbers in bold, large font
+- Forest Green (#2e6417) for emphasis
+
+**Speaker Notes (Yiwen):**
+> "Before we show you how we make money, let's talk about the opportunity.
+>
+> Germany has 2.9 million university students and 600,000 NGOs. Together, that's a market worth €20 to €60 billion annually.
+>
+> We're starting focused: Darmstadt and the Hessen region. 1,000 NGOs. 50,000 students. A beachhead market where we can prove the model, then scale nationally."
+
+**Key Data Points:**
+- TAM: €20-60B (from Chapter 3.1)
+- SAM: 50,000 NGOs + 500,000 students
+- SOM: 1,000 NGOs + 50,000 students
+
+**Timing:** 1 minute | **Cumulative:** 1:00
+
+---
+
+### Slide 12: Business Model - Two Revenue Streams `[1:00 - 2:00]`
+
+**On Screen:**
+```
+         HOW WE MAKE MONEY
+
+    ┌─────────────────────────────┐    ┌─────────────────────┐
+    │         NGO TIERS           │    │  CORPORATE SPONSOR  │
+    │─────────────────────────────│    │─────────────────────│
+    │  FREE (Builds ecosystem)    │    │                     │
+    │  • Post challenges          │    │  €1,500 - €3,000    │
+    │  • Basic reporting          │    │    per mission      │
+    │  • Limited active slots     │    │                     │
+    │             ↓               │    │─────────────────────│
+    │  PREMIUM  €25/month         │    │ • Branded challenges│
+    │  • Unlimited challenges     │    │ • Impact reports    │
+    │  • Advanced analytics       │    │ • ESG documentation │
+    │  • Priority visibility      │    │ • Storytelling      │
+    │  • Priority support         │    │   assets            │
+    └─────────────────────────────┘    └─────────────────────┘
+
+         Students use the platform FREE — they create the value
+```
+
+**Visual Style:**
+- Left column: NGO tiers stacked (FREE smaller/lighter, PREMIUM larger/bolder)
+- Arrow (↓) showing natural upgrade path from Free to Premium
+- Right column: Corporate Sponsor (Forest Green, primary revenue driver)
+- Student note at bottom in gold accent
+- FREE tier in lighter gray, PREMIUM in Teal to show revenue focus
+
+**Speaker Notes (Yiwen):**
+> "We have two revenue streams.
+>
+> For NGOs, we use a freemium model. The basic tier is free: NGOs can post challenges, get basic reporting, and start engaging students immediately. This builds our ecosystem - more NGOs means more challenges, which attracts more students.
+>
+> As their needs grow, NGOs upgrade to Premium at €25 per month for unlimited challenges, advanced analytics, and priority visibility. This price was validated through direct NGO interviews.
+>
+> But our primary revenue driver is Corporate Sponsor Packages: €1,500 to €3,000 per mission. Companies fund real-world sustainability actions and get verified impact data for their ESG reports.
+>
+> Students? Always free. They're the value creators."
+
+**Key Data Points:**
+- Freemium model validated through NGO interviews (Appendix A, B, C)
+- Free tier: limited active challenges, basic reporting
+- Premium: unlimited challenges, advanced analytics, priority support
+- €25/month affordable for nonprofits (interview validated)
+- Corporate pricing benchmarked against European CSR platforms (Chapter 4.2.2)
+
+**Timing:** 1 minute | **Cumulative:** 2:00
+
+---
+
+### Slide 13: Corporate Case Study `[2:00 - 2:45]`
+
+**On Screen:**
+```
+         SPONSORED CHALLENGES IN ACTION
+
+    ┌─────────────────────────────────────────────────┐
+    │                                                 │
+    │  [MobilHessen GmbH Logo]  ←→  [CleanRivers]    │
+    │                                                 │
+    │   CHO from MobilHessen:      CleanRivers Hessen:│
+    │   "We want verified impact   "We need help for  │
+    │    and to connect with       our river cleanup  │
+    │    young people."            campaign."         │
+    │                                                 │
+    └─────────────────────────────────────────────────┘
+                           ↓
+    ┌─────────────────────────────────────────────────┐
+    │                   SOLVTERRA                     │
+    │                                                 │
+    │  MobilHessen sponsors → Students complete →    │
+    │  CleanRivers gets help → Everyone gets proof   │
+    │                                                 │
+    └─────────────────────────────────────────────────┘
+
+         ✓ No coordination burden for sponsor
+         ✓ Verified, communicable impact
+         ✓ Real-world action, not just a donation receipt
+```
+
+**Visual Style:**
+- Two logos/boxes at top (sponsor + NGO)
+- SolvTerra as the connecting bridge
+- Checkmarks in gold accent
+- Clean, professional
+- Consider showing Chuong's photo/avatar to connect back to Slide 3
+
+**Speaker Notes (Jenny):**
+> "Let me show you how sponsored challenges work.
+>
+> Remember Chuong from MobilHessen? He wants his company to engage young people, but his small marketing team can't run complex CSR programs. CleanRivers Hessen is planning a river cleanup but lacks the resources to recruit and coordinate volunteers.
+>
+> Through SolvTerra, MobilHessen sponsors the cleanup challenge. Students discover it organically, complete tasks on their schedules, and submit verified proof. CleanRivers gets immediate support. Chuong gets documented impact for his sustainability report.
+>
+> No coordination burden. Real action. Documented proof. That's our 'Lower-Your-Admin' approach."
+
+**Key Data Points:**
+- 40% of companies want positive public image (survey, Chapter 2.4)
+- Companies struggle with "low-threshold, credible" CSR (Executive Summary)
+- Corporate sponsors have small teams and hate administrative burden
+
+**Timing:** 45 seconds | **Cumulative:** 2:45
+
+---
+
+### Slide 14: Competitive Position `[2:45 - 3:30]`
+
+**On Screen:**
+```
+         WHERE WE WIN
+
+                         HIGH VERIFICATION
+                               ↑
+                               │
+                               │                    ★ SOLVTERRA
+                               │                    High Flexibility +
+                               │                    High Verification
+                               │
+    LOW ───────────────────────┼─────────────────────── HIGH
+    FLEXIBILITY                │                    FLEXIBILITY
+    (weeks/months)             │                    (5-30 min)
+                               │
+         • GoVolunteer         │
+         • Youvo               │         • Betterplace
+                               │         • Vostel
+                               │
+                               ↓
+                         LOW VERIFICATION
+```
+
+**Visual Style:**
+- 2x2 quadrant with clear axes
+- X-axis: FLEXIBILITY (Low = weeks/months, High = 5-30 minutes)
+- Y-axis: VERIFICATION (Low = unverified, High = verified proof)
+- SolvTerra star prominently in **TOP-RIGHT** quadrant (winner's position)
+- Competitors in bottom-left (low flexibility, low verification)
+- SolvTerra highlighted in gold (#f59e0b) or Forest Green (#2e6417)
+- Quadrant labels could be added: "Rigid & Unproven" (bottom-left), "Flexible & Verified" (top-right)
+
+**Speaker Notes (Jenny):**
+> "Here's why we're different.
+>
+> *(Point to bottom-left)*
+> Most platforms like GoVolunteer and Youvo require weeks or months of commitment. That's low flexibility. And that's why 70% of students can't participate.
+>
+> *(Point to bottom area)*
+> Others like Betterplace and Vostel have low verification: anyone can claim they helped. No proof.
+>
+> *(Point to top-right, emphasize)*
+> SolvTerra is the only platform in this quadrant: High flexibility - just 5 to 30 minutes. High verification - photo uploads, timestamps, NGO approval.
+>
+> We're flexible AND proven. That's our competitive moat."
+
+**Key Data Points:**
+- 70% of students deterred by time requirements (survey)
+- 10% volunteer no-show rate at NGOs (interviews)
+- USP: micro-volunteering + gamification + verification (Chapter 3.5.1)
+- Unique quadrant position = defensible differentiation
+
+**Timing:** 45 seconds | **Cumulative:** 3:30
+
+---
+
+### Slide 15: Financial Highlights `[3:30 - 4:30]`
+
+**On Screen:**
+```
+         THE FINANCIAL JOURNEY
+
+    2026                      MONTH 8                      2029
+    ══════●════════════════════════●════════════════════════●══════►
+          │                        │                        │
+          │                        │                        │
+     OPERATIONS               BREAK-EVEN                  €4.4M
+     START                                               PROFIT
+                                                      (after taxes)
+     €62,500
+     initial costs
+
+
+    ─────────────────────────────────────────────────────────────
+         Revenue Growth:  €231K (2027)  →  €8.2M (2030)
+    ─────────────────────────────────────────────────────────────
+```
+
+**Visual Style:**
+- **Primary element:** Horizontal timeline with 3 milestone points
+- Timeline as thick arrow (══►) showing forward momentum
+- Milestone dots (●) at each key point: Start, Break-even, Profit
+- 2026 start on LEFT, 2029 target on RIGHT
+- "MONTH 8" clearly positioned BETWEEN start and end (shows it's early!)
+- Revenue growth as supporting line below timeline
+- Colors: Timeline in Forest Green (#2e6417), Break-even milestone in Gold (#f59e0b)
+- Large, bold numbers at each milestone
+- Clean white space - don't overcrowd
+
+**Alternative Visual (if using slides software):**
+- Animated timeline that "builds" left to right
+- Or: Simple line chart showing the hockey stick curve with Month 8 marked
+
+**Speaker Notes (Jenny):**
+> "Here's our financial journey.
+>
+> *(Point to left)*
+> We start lean. Year 1 costs: just €62,500. Founders on symbolic compensation.
+>
+> *(Point to middle)*
+> Month 8: break-even. That's 8 months from operations start to profitability. Fast.
+>
+> *(Point to right)*
+> By 2029: €4.4 million profit after taxes.
+>
+> *(Point to bottom line)*
+> Revenue scales from €231,000 to over €8 million. Digital platform economics - once the infrastructure is built, margins reach 80%.
+>
+> This is capital-efficient growth."
+
+**Key Data Points:**
+- Break-even: Month 8 (Chapter 7.5)
+- 2029 profit: €4.4M after taxes (Figure 5)
+- 2026 costs: €62,500 (Figure 5)
+- Revenue trajectory: €231K → €8.2M (Chapter 7.6)
+- Gross margins: up to 80% (mention verbally, Chapter 7.2)
+
+**Timing:** 1 minute | **Cumulative:** 4:30
+
+---
+
+### Slide 16: Roadmap `[4:30 - 5:30]`
+
+**On Screen:**
+```
+         OUR ROADMAP
+
+    Q4 2025          Q1-Q4 2026         Q1-Q3 2027        Q4 2027+
+       │                 │                  │                │
+       ▼                 ▼                  ▼                ▼
+    ┌──────┐         ╔══════╗          ┌──────┐         ┌──────┐
+    │RESEARCH│        ║STARTUP║         │MARKET │        │EXPAND │
+    │   ✓   │        ║       ║         │ ENTRY │        │       │
+    └──────┘         ╚══════╝          └──────┘         └──────┘
+       │                 │                  │                │
+       ▼                 ▼                  ▼                ▼
+    • Surveys        • MVP completed    • App Store      • National
+    • Interviews     • Pilot phase        launch           brand
+    • MVP features   • Funding          • Corporate       • Strategic
+      defined          secured            acquisition       partners
+                                        • First revenue   • Team growth
+
+
+                    ↑
+              YOU ARE HERE
+               (Feb 2026)
+```
+
+**Visual Style:**
+- Horizontal timeline with 4 phases
+- Each phase as a box/milestone
+- **STARTUP phase highlighted** (double border ╔══╗ or gold accent)
+- Research phase marked with ✓ (completed)
+- "You are here" marker pointing UP to current phase
+- Key activities under each phase (3 bullets max per phase)
+- Arrow showing left-to-right progression
+- Colors: Completed phases in lighter shade, current phase in gold (#f59e0b), future phases in Forest Green (#2e6417)
+
+**Speaker Notes (Yiwen):**
+> "Here's our roadmap.
+>
+> *(Point to left)*
+> Research phase: completed. Surveys, interviews, MVP feature definition. We've validated demand.
+>
+> *(Point to center - current phase)*
+> Right now, we're in the startup phase. The MVP you just saw is built and working. This summer, we launch our pilot with real NGOs and students.
+>
+> *(Point to right)*
+> In 2027, we enter the market: app store launch, first corporate sponsors, first revenue.
+>
+> By late 2027, we expand: national brand, strategic partnerships, team growth.
+>
+> This is a disciplined, phase-gated approach. We validate before we scale."
+
+**Key Data Points:**
+- Research phase: Q4 2025 (completed ✓)
+- Startup phase: Q1-Q4 2026 (current - MVP done, pilot upcoming)
+- Market entry: Q1 2027
+- Expansion: Q4 2027+ (Chapter 8)
+
+**Timing:** 1 minute | **Cumulative:** 5:30
+
+---
+
+### Slide 17: Pilot Phase `[5:30 - 6:15]`
+
+**On Screen:**
+```
+         PILOT: PROOF OF CONCEPT
+
+    ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+    │  70+        │  │   8-15      │  │   2-4       │
+    │  STUDENTS   │  │    NGOs     │  │ CORPORATES  │
+    │             │  │             │  │             │
+    │  Active     │  │  Diverse    │  │  ESG-       │
+    │  users      │  │  sectors    │  │  focused    │
+    └─────────────┘  └─────────────┘  └─────────────┘
+
+    ─────────────────────────────────────────────────
+                 5 HYPOTHESES WE'RE TESTING:
+
+         H1: Students complete verified tasks
+         H2: Gamification increases engagement
+         H3: NGOs can easily use the dashboard
+         H4: End-to-end workflow functions smoothly
+         H5: Sponsored challenges are accepted
+    ─────────────────────────────────────────────────
+```
+
+**Visual Style:**
+- Three metric boxes at top (student, NGO, corporate targets)
+- Hypotheses as a numbered list below
+- Clean, research-oriented feel
+- Checkboxes or bullet points for hypotheses
+
+**Speaker Notes (Yiwen):**
+> "Our pilot phase launches this summer in Darmstadt.
+>
+> We're targeting 70 active students, 8 to 15 NGOs across diverse sectors, and 2 to 4 corporate partners.
+>
+> We're testing five specific hypotheses: Do students actually complete tasks? Does gamification keep them engaged? Can NGOs use the platform easily? Does the workflow work end-to-end? And critically: do students accept sponsored challenges?
+>
+> This isn't a soft launch. It's a structured validation with clear success metrics. We measure, we learn, we iterate."
+
+**Key Data Points:**
+- Pilot targets: 70 students, 8-15 NGOs, 2-4 corporates (Chapter 9.2)
+- 5 hypotheses from Chapter 9.1
+- KPIs: activation rates, retention, verification success, sponsor acceptance
+
+**Timing:** 45 seconds | **Cumulative:** 6:15
+
+---
+
+### Slide 18: Team `[6:15 - 6:45]`
+
+**On Screen:**
+```
+         8 FOUNDERS. ONE MISSION.
+
+    ┌────────────────────────────────────────────────┐
+    │  [Team Photo - all 8 founders together]        │
+    │                                                │
+    │  or                                            │
+    │                                                │
+    │  [8 small headshots in a row with names]       │
+    └────────────────────────────────────────────────┘
+
+    PLATFORM & AI          MARKETING &         STRATEGY &
+                           PARTNERSHIPS        FINANCE
+    ──────────────         ──────────────      ──────────────
+    Ron, Nico,             Chaimae, Chuong,    Steffi
+    Yiwen, Jiayi           Salma
+
+    ─────────────────────────────────────────────────
+    Interdisciplinary Master's students at TU Darmstadt
+    AI • Marketing • Partnerships • Finance • Engineering
+    ─────────────────────────────────────────────────
+```
+
+**Visual Style:**
+- Team photo or headshots prominently displayed
+- Competency groups below
+- Clean, professional
+- TU Darmstadt affiliation visible
+
+**Speaker Notes (Jenny):**
+> "We're 8 interdisciplinary Master's students from TU Darmstadt.
+>
+> Ron and Nico handle platform architecture and AI. Yiwen and Jiayi manage data and backend systems. Chaimae leads marketing and community. Chuong and Salma drive partnerships and operations. Steffi handles strategy and finance.
+>
+> We're not just building for students. We ARE students. We understand the student's schedule because we live it.
+>
+> And we've built everything you just saw. This isn't a concept. It's a working product."
+
+**Key Data Points:**
+- 8 founders, evenly split ownership (Chapter 6.1)
+- Competency matrix covers all critical areas (Table 2)
+- International backgrounds for scalability
+
+**Timing:** 30 seconds | **Cumulative:** 6:45
+
+---
+
+### Slide 19: The Ask `[6:45 - 7:30]` ⭐ **CLOSING SLIDE**
+
+**On Screen:**
+```
+
+
+         70% of students want to help.
+         70% can't.
+
+
+                  We fix that.
+
+
+
+                  €150,000
+
+
+
+            Turn intention into action.
+
+                 [SolvTerra Logo]
+
+
+```
+
+**Visual Style:**
+- **Ultra-minimal** - let the message breathe
+- Opening statistic in medium weight (reminder of the problem)
+- "We fix that." in bold, confident typography
+- €150,000 LARGE, centered, commanding attention
+- Tagline "Turn intention into action" in elegant italics or accent color
+- Logo at bottom, subtle but present
+- Lots of white space - this slide should feel confident, not cluttered
+- Colors: Text in dark gray/black, €150,000 in Forest Green (#2e6417), tagline in Gold (#f59e0b)
+
+**Why This Works:**
+1. **Bookend effect** - Opens with the problem statistic from Slide 2
+2. **Confidence** - "We fix that" is bold, not begging
+3. **Clear ask** - One number, nothing else to distract
+4. **Tagline callback** - "Turn intention into action" echoes the title slide
+5. **Memorable** - Jury can repeat this to each other: "They fix the 70% problem"
+
+**Speaker Notes (Jenny):**
+> *(Let the slide appear, pause 2 seconds for impact)*
+>
+> "70% of students want to help. 70% can't.
+>
+> We fix that.
+>
+> *(Pause, look at the jury)*
+>
+> €150,000. That's our ask.
+>
+> We're pursuing EXIST-Gründerstipendium and the Prototype Fund - non-dilutive funding designed for university startups like us.
+>
+> 12 months. Platform development. Pilot execution. Initial user acquisition.
+>
+> By the end, we'll have validated revenue, real traction, and a playbook for national scale.
+>
+> *(Final pause, make direct eye contact)*
+>
+> Turn intention into action.
+>
+> Thank you."
+
+**Delivery Notes:**
+- Let the slide do the heavy lifting visually
+- Speak slowly, with confidence
+- The final "Turn intention into action" should land as both the tagline AND a call to action
+- End with "Thank you" - brief, professional, don't linger
+- Maintain eye contact during the final 5 seconds
+
+**Key Data Points:**
+- 70% statistic (callback to Slide 2 and survey data)
+- €150,000 funding ask (Chapter 7.8)
+- EXIST-Gründerstipendium and Prototype Fund targets
+- 12-month runway to market entry
+
+**Timing:** 45 seconds | **Cumulative:** 7:30
+
+---
+
+### ⏱️ POST-DEMO TIMING SUMMARY
+
+| Slide | Topic | Duration | Cumulative |
+|-------|-------|----------|------------|
+| 11 | Market Opportunity | 1:00 | 1:00 |
+| 12 | Business Model | 1:00 | 2:00 |
+| 13 | Corporate Case Study | 0:45 | 2:45 |
+| 14 | Competitive Position | 0:45 | 3:30 |
+| 15 | Financial Highlights | 1:00 | 4:30 |
+| 16 | Roadmap | 1:00 | 5:30 |
+| 17 | Pilot Phase | 0:45 | 6:15 |
+| 18 | Team | 0:30 | 6:45 |
+| 19 | The Ask | 0:45 | 7:30 |
+| **TOTAL** | | **7:30** | |
+
+---
+
+### Handoff Protocol
+
+**Ron → Yiwen (After Demo Recap):**
+> Ron: "That's the complete workflow. Student helped. NGO gained. Everyone wins."
+>
+> *(Pause)*
+>
+> Ron: "Now Yiwen and Jenny will show you the business behind the product."
+>
+> *(Ron steps aside, Yiwen takes center stage)*
+
+**Yiwen → Jenny (After Slide 12):**
+> Yiwen finishes Business Model slide.
+>
+> Yiwen: *(looks at Jenny, subtle nod)*
+>
+> Jenny picks up with Corporate Case Study.
+
+**Internal Split for Yiwen & Jenny:**
+
+| Slides | Presenter | Topics |
+|--------|-----------|--------|
+| 11-12 | Yiwen | Market Opportunity, Business Model |
+| 13-14 | Jenny | Corporate Case Study, Competitive Position |
+| 15 | Jenny | Financial Highlights |
+| 16-17 | Yiwen | Roadmap, Pilot Phase |
+| 18-19 | Jenny | Team, The Ask (closing) |
+
+*Note: This split balances speaking time and gives Jenny the powerful closing moment.*
+
+---
+
+### Key Messages to Memorize
+
+**Market Size:**
+- 2.9M students, 600K NGOs, €20-60B market
+
+**Revenue Model:**
+- €25/month NGO Premium
+- €1,500-3,000 Corporate Sponsor Package
+
+**Financial Milestones:**
+- Break-even: Month 8
+- 2029 Profit: €4.4M
+- Gross margins: up to 80%
+
+**Pilot Targets:**
+- 70 students, 8-15 NGOs, 2-4 corporates
+
+**The Ask:**
+- €150,000 grant funding
+- EXIST + Prototype Fund
+
+**Closing Line:**
+> "Join us in building the future of civic engagement."
+
+---
+
+### Backup Slides (Have Ready, Don't Present Unless Asked)
+
+**B1: Detailed P&L Table** - Full 2026-2030 projections
+**B2: Competitor Feature Comparison** - Table with High/Medium/Low ratings
+**B3: NGO Interview Insights** - Direct quotes from Segelflugverein, Sport- und Kulturverein
+**B4: Student Survey Data** - Full breakdown of 70%, 54%, 56% statistics
+**B5: Use of Funds Detail** - Specific breakdown of €150K allocation
+**B6: Technical Architecture** - System diagram if asked about scalability
+**B7: Risk Mitigation** - Cold-start, verification, competition risks with mitigations
+
+---
+
+### Pre-Presentation Checklist (Yiwen & Jenny)
+
+**Content Preparation:**
+- [ ] Review all 9 slides at least 3 times
+- [ ] Memorize key numbers (don't read from slides)
+- [ ] Practice transitions between slides
+- [ ] Practice handoff timing with each other
+- [ ] Know which backup slides exist and what's on them
+
+**Rehearsal:**
+- [ ] Full run-through with Ron (demo → handoff → Part 2&3)
+- [ ] Time each slide individually
+- [ ] Practice speaking at 30-second intervals
+- [ ] Practice the closing line together
+
+**Day Of:**
+- [ ] Have water at speaking position
+- [ ] Know where to stand during demo
+- [ ] Be ready to step forward on Ron's cue
+- [ ] Make eye contact with jury during closing
+
+---
 
