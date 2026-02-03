@@ -14,13 +14,17 @@ import {
   UserCheck,
   MapPin,
   Laptop,
+  Loader2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { useChallengeStore } from '@/store';
+import { uploadChallengeImage } from '@/lib/storage';
+import { useNotificationStore } from '@/components/ui/toast-notifications';
 import {
   type ChallengeLocation,
   type ChallengeSchedule,
@@ -61,6 +65,7 @@ export default function EditChallengePage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const addNotification = useNotificationStore((s) => s.addNotification);
 
   const { challenges, updateChallenge } = useChallengeStore();
   const challenge = challenges.find((c) => c.id === id);
@@ -78,6 +83,10 @@ export default function EditChallengePage() {
     verificationMethod: 'photo' as 'photo' | 'text' | 'ngo_confirmation',
     imageUrl: '',
   });
+
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Extended form data
   const [location, setLocation] = useState<Partial<ChallengeLocation>>({});
@@ -179,51 +188,96 @@ export default function EditChallengePage() {
     return Math.round(baseXP[formData.duration] * bonus);
   };
 
+  const handleImageChange = (url: string | null, file?: File) => {
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setImagePreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else if (url) {
+      setImagePreview(url);
+      setFormData({ ...formData, imageUrl: url });
+      setImageFile(null);
+    } else {
+      setImagePreview(null);
+      setFormData({ ...formData, imageUrl: '' });
+      setImageFile(null);
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
 
-    // Simulate save delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      let finalImageUrl = formData.imageUrl;
 
-    updateChallenge(challenge.id, {
-      ...formData,
-      xpReward: calculateXP(),
-      tags,
-      // Location only for onsite - cast to full type if name exists
-      location: formData.type === 'onsite' && location.name
-        ? { name: location.name, ...location } as any
-        : undefined,
-      // Schedule - cast to full type if type exists
-      schedule: schedule.type
-        ? { type: schedule.type, ...schedule } as any
-        : undefined,
-      // Contact - cast to full type if name exists
-      contact: contact.name
-        ? {
-            name: contact.name,
-            preferredMethod: contact.preferredMethod || 'email',
-            ...contact,
-          } as any
-        : undefined,
-      // Team data
-      isMultiPerson: teamData.isMultiPerson,
-      ...(teamData.isMultiPerson
-        ? {
-            minTeamSize: teamData.minTeamSize,
-            maxTeamSize: teamData.maxTeamSize,
-            teamDescription: teamData.teamDescription,
-            allowSoloJoin: teamData.allowSoloJoin,
-          }
-        : {
-            minTeamSize: undefined,
-            maxTeamSize: undefined,
-            teamDescription: undefined,
-            allowSoloJoin: undefined,
-          }),
-    });
+      // Upload new image if file is selected
+      if (imageFile) {
+        const uploadedUrl = await uploadChallengeImage(
+          imageFile,
+          challenge.id,
+          challenge.imageUrl
+        );
+        if (uploadedUrl) {
+          finalImageUrl = uploadedUrl;
+        } else {
+          addNotification({
+            title: t('edit.imageUploadFailed'),
+            type: 'error',
+          });
+          setIsSaving(false);
+          return;
+        }
+      }
 
-    setIsSaving(false);
-    router.push(`/challenges/${challenge.id}`);
+      updateChallenge(challenge.id, {
+        ...formData,
+        imageUrl: finalImageUrl,
+        xpReward: calculateXP(),
+        tags,
+        // Location only for onsite - cast to full type if name exists
+        location: formData.type === 'onsite' && location.name
+          ? { name: location.name, ...location } as any
+          : undefined,
+        // Schedule - cast to full type if type exists
+        schedule: schedule.type
+          ? { type: schedule.type, ...schedule } as any
+          : undefined,
+        // Contact - cast to full type if name exists
+        contact: contact.name
+          ? {
+              name: contact.name,
+              preferredMethod: contact.preferredMethod || 'email',
+              ...contact,
+            } as any
+          : undefined,
+        // Team data
+        isMultiPerson: teamData.isMultiPerson,
+        ...(teamData.isMultiPerson
+          ? {
+              minTeamSize: teamData.minTeamSize,
+              maxTeamSize: teamData.maxTeamSize,
+              teamDescription: teamData.teamDescription,
+              allowSoloJoin: teamData.allowSoloJoin,
+            }
+          : {
+              minTeamSize: undefined,
+              maxTeamSize: undefined,
+              teamDescription: undefined,
+              allowSoloJoin: undefined,
+            }),
+      });
+
+      router.push(`/challenges/${challenge.id}`);
+    } catch (error) {
+      console.error('Failed to save challenge:', error);
+      addNotification({
+        title: t('edit.saveFailed'),
+        type: 'error',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const CATEGORIES = [
@@ -313,16 +367,13 @@ export default function EditChallengePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    {t('edit.imageUrlLabel')}
+                    {t('edit.imageLabel')}
                   </label>
-                  <input
-                    type="url"
-                    value={formData.imageUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imageUrl: e.target.value })
-                    }
-                    placeholder="https://..."
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  <ImageUpload
+                    value={imagePreview || formData.imageUrl}
+                    onChange={handleImageChange}
+                    aspectRatio="16:9"
+                    maxSizeMB={2}
                   />
                 </div>
               </CardContent>
@@ -521,7 +572,7 @@ export default function EditChallengePage() {
               <CardContent>
                 <div className="border rounded-lg overflow-hidden">
                   <img
-                    src={formData.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800'}
+                    src={imagePreview || formData.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800'}
                     alt="Challenge"
                     className="w-full aspect-video object-cover"
                   />

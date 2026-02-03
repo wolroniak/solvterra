@@ -7,12 +7,20 @@
     "title": "Organization Profile",
     "description": "This information is shown to students in the app",
     "changeLogo": "Change logo",
-    "logoHint": "JPG, PNG, or SVG. Max 1MB.",
+    "cancelLogoChange": "Cancel",
+    "logoHint": "JPG, PNG, or SVG. Max 2MB.",
     "name": "Organization name",
     "descriptionLabel": "Description",
     "descriptionHint": "Brief description of your mission and work",
     "contactEmail": "Contact email",
-    "website": "Website"
+    "website": "Website",
+    "logoUpdated": "Logo successfully updated",
+    "logoUpdateFailed": "Failed to update logo",
+    "saving": "Saving...",
+    "currentLogo": "Current logo",
+    "uploadNewBelow": "Upload a new logo below",
+    "newLogo": "New logo",
+    "clickSaveToApply": "Click \"Save changes\" to apply"
   },
   "verification": {
     "title": "Verification Status",

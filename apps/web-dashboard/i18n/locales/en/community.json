@@ -37,6 +37,7 @@
     "highlight": "Highlight",
     "unhighlight": "Remove highlight",
     "delete": "Delete",
+    "moreActions": "More actions",
     "like": "Like",
     "unlike": "Unlike",
     "recentComments": "Recent comments",

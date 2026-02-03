@@ -116,22 +116,27 @@ function PostCard({
             {t('postCard.draft')}
           </Badge>
         )}
+
+        {/* Edit button - always visible */}
+        <Link
+          href={`/community/${post.id}/edit`}
+          className="p-1.5 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-700 transition-colors"
+          title={t('postCard.edit')}
+        >
+          <Edit className="w-4 h-4" />
+        </Link>
+
+        {/* More actions menu */}
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 hover:bg-slate-100 rounded"
+            className="p-1.5 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-700 transition-colors"
+            title={t('postCard.moreActions')}
           >
-            <MoreVertical className="w-4 h-4 text-slate-500" />
+            <MoreVertical className="w-4 h-4" />
           </button>
           {showMenu && (
-            <div className="absolute right-0 top-8 z-10 w-48 bg-white border rounded-lg shadow-lg py-1">
-              <Link
-                href={`/community/${post.id}/edit`}
-                className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-slate-50"
-              >
-                <Edit className="w-4 h-4" />
-                {t('postCard.edit')}
-              </Link>
+            <div className="absolute right-0 top-8 z-20 w-48 bg-white border rounded-lg shadow-lg py-1">
               {post.status === 'draft' ? (
                 <button
                   onClick={() => { onPublish(); setShowMenu(false); }}
@@ -177,14 +182,19 @@ function PostCard({
       </div>
 
       <CardContent className="pt-6">
-        {/* Post Image */}
+        {/* Post Image - mt-8 to clear the action buttons in top-right */}
         {post.imageUrl && (
-          <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
+          <div className="relative w-full h-48 mb-4 mt-8 rounded-lg overflow-hidden bg-slate-100">
             <Image
               src={post.imageUrl}
               alt={post.title || 'Post image'}
               fill
               className="object-cover"
+              unoptimized
+              onError={(e) => {
+                // Hide broken images
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
           </div>
         )}
@@ -206,12 +216,13 @@ function PostCard({
             className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors mb-4"
           >
             {post.linkedChallenge.imageUrl && (
-              <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
+              <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-slate-100">
                 <Image
                   src={post.linkedChallenge.imageUrl}
                   alt={post.linkedChallenge.title}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               </div>
             )}

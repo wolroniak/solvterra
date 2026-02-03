@@ -62,5 +62,15 @@
     "de": "Deutsch",
     "en": "English",
     "switch": "Sprache wechseln"
+  },
+  "imageUpload": {
+    "tabUpload": "Hochladen",
+    "tabUrl": "URL eingeben",
+    "dragDrop": "Bild hierher ziehen oder klicken zum Auswählen",
+    "hint": "JPG, PNG, WebP, SVG. Max {{size}}MB",
+    "urlPlaceholder": "https://beispiel.de/bild.jpg",
+    "apply": "Übernehmen",
+    "errorInvalidType": "Nur JPG, PNG, WebP und SVG Dateien sind erlaubt",
+    "errorTooLarge": "Datei muss kleiner als {{size}}MB sein"
   }
 }

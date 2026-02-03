@@ -2,18 +2,27 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Save, Building2, Mail, Globe, Shield, Bell } from 'lucide-react';
+import { Save, Building2, Mail, Globe, Shield, Bell, Loader2, X } from 'lucide-react';
 import { Header } from '@/components/layout/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { useAuthStore } from '@/store';
+import { uploadLogo } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
+import { useNotificationStore } from '@/components/ui/toast-notifications';
 
 export default function SettingsPage() {
-  const { organization } = useAuthStore();
+  const { organization, refreshOrganization } = useAuthStore();
   const { t } = useTranslation('settings');
+  const addNotification = useNotificationStore((s) => s.addNotification);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [isEditingLogo, setIsEditingLogo] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: organization?.name || '',
@@ -22,10 +31,96 @@ export default function SettingsPage() {
     website: organization?.website || '',
   });
 
-  const handleSave = () => {
-    // Demo: just show saved state
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleLogoChange = (url: string | null, file?: File) => {
+    if (file) {
+      setLogoFile(file);
+      // Preview will be handled by ImageUpload component
+      const reader = new FileReader();
+      reader.onload = (e) => setLogoPreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else if (url) {
+      setLogoPreview(url);
+      setLogoFile(null);
+    } else {
+      setLogoPreview(null);
+      setLogoFile(null);
+    }
+  };
+
+  const handleCancelLogoEdit = () => {
+    setIsEditingLogo(false);
+    setLogoFile(null);
+    setLogoPreview(null);
+  };
+
+  const handleSave = async () => {
+    if (!organization) return;
+
+    setSaving(true);
+
+    try {
+      let newLogoUrl = organization.logo;
+
+      // Upload new logo if selected
+      if (logoFile) {
+        const uploadedUrl = await uploadLogo(logoFile, organization.id, organization.logo);
+        if (uploadedUrl) {
+          newLogoUrl = uploadedUrl;
+        } else {
+          addNotification({
+            title: t('profile.logoUpdateFailed'),
+            type: 'error',
+          });
+          setSaving(false);
+          return;
+        }
+      } else if (logoPreview && logoPreview !== organization.logo) {
+        // URL was entered directly
+        newLogoUrl = logoPreview;
+      }
+
+      // Update organization in database
+      const { error } = await supabase
+        .from('organizations')
+        .update({
+          name: formData.name,
+          description: formData.description,
+          contact_email: formData.email,
+          website: formData.website,
+          logo: newLogoUrl,
+        })
+        .eq('id', organization.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Refresh organization in store
+      await refreshOrganization();
+
+      // Reset logo editing state
+      setIsEditingLogo(false);
+      setLogoFile(null);
+      setLogoPreview(null);
+
+      // Show success state
+      setSaved(true);
+      if (logoFile || (logoPreview && logoPreview !== organization.logo)) {
+        addNotification({
+          title: t('profile.logoUpdated'),
+          type: 'success',
+        });
+      }
+      setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      addNotification({
+        title: t('profile.logoUpdateFailed'),
+        type: 'error',
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -49,21 +144,90 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Logo */}
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={organization?.logo} />
-                <AvatarFallback className="text-2xl">
-                  {organization?.name?.[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <Button variant="outline" size="sm">
-                  {t('profile.changeLogo')}
-                </Button>
-                <p className="text-xs text-slate-500 mt-1">
-                  {t('profile.logoHint')}
-                </p>
-              </div>
+            <div className="space-y-4">
+              {isEditingLogo ? (
+                <div className="max-w-md space-y-4">
+                  {/* Current logo reference */}
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={organization?.logo} />
+                      <AvatarFallback>{organization?.name?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="text-sm">
+                      <p className="font-medium text-slate-700">{t('profile.currentLogo')}</p>
+                      <p className="text-xs text-slate-500">{t('profile.uploadNewBelow')}</p>
+                    </div>
+                  </div>
+
+                  {/* New logo preview if selected */}
+                  {logoPreview && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-slate-700">{t('profile.newLogo')}</p>
+                      <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-primary-300 bg-slate-50">
+                        <img
+                          src={logoPreview}
+                          alt="New logo preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => { setLogoPreview(null); setLogoFile(null); }}
+                          className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upload area - always show when editing */}
+                  {!logoPreview && (
+                    <ImageUpload
+                      value={null}
+                      onChange={handleLogoChange}
+                      aspectRatio="square"
+                      maxSizeMB={2}
+                    />
+                  )}
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancelLogoEdit}
+                    >
+                      {t('profile.cancelLogoChange')}
+                    </Button>
+                    {logoPreview && (
+                      <p className="text-xs text-slate-500 self-center ml-2">
+                        {t('profile.clickSaveToApply')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={organization?.logo} />
+                    <AvatarFallback className="text-2xl">
+                      {organization?.name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingLogo(true)}
+                    >
+                      {t('profile.changeLogo')}
+                    </Button>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {t('profile.logoHint')}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Name */}
@@ -216,8 +380,13 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={saved}>
-            {saved ? (
+          <Button onClick={handleSave} disabled={saved || saving}>
+            {saving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {t('profile.saving')}
+              </>
+            ) : saved ? (
               <>{t('save.saved')}</>
             ) : (
               <>

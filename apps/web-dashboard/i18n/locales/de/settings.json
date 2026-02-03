@@ -7,12 +7,20 @@
     "title": "Organisationsprofil",
     "description": "Diese Informationen werden Studenten in der App angezeigt",
     "changeLogo": "Logo ändern",
-    "logoHint": "JPG, PNG oder SVG. Max 1MB.",
+    "cancelLogoChange": "Abbrechen",
+    "logoHint": "JPG, PNG oder SVG. Max 2MB.",
     "name": "Organisationsname",
     "descriptionLabel": "Beschreibung",
     "descriptionHint": "Kurze Beschreibung eurer Mission und Arbeit",
     "contactEmail": "Kontakt-E-Mail",
-    "website": "Website"
+    "website": "Website",
+    "logoUpdated": "Logo erfolgreich aktualisiert",
+    "logoUpdateFailed": "Logo konnte nicht aktualisiert werden",
+    "saving": "Wird gespeichert...",
+    "currentLogo": "Aktuelles Logo",
+    "uploadNewBelow": "Lade unten ein neues Logo hoch",
+    "newLogo": "Neues Logo",
+    "clickSaveToApply": "Klicke \"Änderungen speichern\" zum Übernehmen"
   },
   "verification": {
     "title": "Verifizierungsstatus",
