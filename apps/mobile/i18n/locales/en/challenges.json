@@ -124,6 +124,7 @@
     "recurring": "Recurring",
     "timesOnRequest": "Times on request",
     "dueToday": "Due today!",
+    "dueTomorrow": "Due tomorrow",
     "daysLeft": "{{count}} day left",
     "daysLeftPlural": "{{count}} days left"
   },
@@ -154,11 +155,40 @@
   },
   "myChallenges": {
     "title": "My Challenges",
+    "tabs": {
+      "active": "Active",
+      "pending": "Pending",
+      "done": "Done"
+    },
     "active": "Active",
     "submitted": "Submitted",
     "completed": "Completed",
-    "empty": "No challenges yet",
-    "startExploring": "Discover challenges and get involved!"
+    "empty": {
+      "active": {
+        "title": "No active challenges",
+        "message": "Start a new challenge from the feed!"
+      },
+      "pending": {
+        "title": "No pending submissions",
+        "message": "Submit your active challenges"
+      },
+      "completed": {
+        "title": "No completed challenges yet",
+        "message": "Complete challenges to earn XP"
+      }
+    },
+    "startExploring": "Discover challenges and get involved!",
+    "post": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "share": "Share success"
+    },
+    "deletePost": {
+      "title": "Delete post",
+      "message": "Do you really want to delete this post?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
   },
   "submission": {
     "title": "Submit proof",
@@ -172,6 +202,7 @@
     "minTextLength": "Minimum {{count}} characters required"
   },
   "status": {
+    "accepted": "Accepted",
     "in_progress": "In progress",
     "submitted": "Submitted",
     "approved": "Approved",

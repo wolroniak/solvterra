@@ -124,6 +124,7 @@
     "recurring": "Regelmäßig",
     "timesOnRequest": "Zeiten auf Anfrage",
     "dueToday": "Heute fällig!",
+    "dueTomorrow": "Morgen fällig",
     "daysLeft": "Noch {{count}} Tag",
     "daysLeftPlural": "Noch {{count}} Tage"
   },
@@ -154,11 +155,40 @@
   },
   "myChallenges": {
     "title": "Meine Challenges",
+    "tabs": {
+      "active": "Aktiv",
+      "pending": "Wartend",
+      "done": "Fertig"
+    },
     "active": "Aktiv",
     "submitted": "Eingereicht",
     "completed": "Abgeschlossen",
-    "empty": "Noch keine Challenges",
-    "startExploring": "Entdecke Challenges und engagiere dich!"
+    "empty": {
+      "active": {
+        "title": "Keine aktiven Challenges",
+        "message": "Starte eine neue Challenge aus dem Feed!"
+      },
+      "pending": {
+        "title": "Keine ausstehenden Einreichungen",
+        "message": "Reiche deine aktiven Challenges ein"
+      },
+      "completed": {
+        "title": "Noch keine abgeschlossenen Challenges",
+        "message": "Schließe Challenges ab, um XP zu verdienen"
+      }
+    },
+    "startExploring": "Entdecke Challenges und engagiere dich!",
+    "post": {
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "share": "Erfolg teilen"
+    },
+    "deletePost": {
+      "title": "Beitrag löschen",
+      "message": "Möchtest du diesen Beitrag wirklich löschen?",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen"
+    }
   },
   "submission": {
     "title": "Nachweis einreichen",
@@ -172,6 +202,7 @@
     "minTextLength": "Mindestens {{count}} Zeichen erforderlich"
   },
   "status": {
+    "accepted": "Angenommen",
     "in_progress": "In Bearbeitung",
     "submitted": "Eingereicht",
     "approved": "Genehmigt",

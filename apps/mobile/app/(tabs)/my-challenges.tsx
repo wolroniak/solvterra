@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useChallengeStore, useCommunityStore } from '@/store';
 import { useSyncBadges } from '@/providers/AchievementProvider';
@@ -18,19 +19,20 @@ import PhotoSubmissionModal from '@/components/PhotoSubmissionModal';
 
 type TabValue = 'active' | 'pending' | 'completed';
 
-// Tab configuration with icons and short labels
-const TABS: { value: TabValue; label: string; icon: string }[] = [
-  { value: 'active', label: 'Aktiv', icon: 'play-circle-outline' },
-  { value: 'pending', label: 'Wartend', icon: 'clock-outline' },
-  { value: 'completed', label: 'Fertig', icon: 'check-circle-outline' },
-];
+// Tab icons configuration (labels come from i18n)
+const TAB_ICONS: Record<TabValue, string> = {
+  active: 'play-circle-outline',
+  pending: 'clock-outline',
+  completed: 'check-circle-outline',
+};
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  accepted: { label: 'Angenommen', color: Colors.primary[600], icon: 'check' },
-  in_progress: { label: 'In Bearbeitung', color: Colors.primary[600], icon: 'progress-clock' },
-  submitted: { label: 'Eingereicht', color: Colors.accent[500], icon: 'clock-outline' },
-  approved: { label: 'Genehmigt', color: Colors.success, icon: 'check-circle' },
-  rejected: { label: 'Abgelehnt', color: Colors.error, icon: 'close-circle' },
+// Status icons and colors (labels come from i18n)
+const STATUS_STYLE: Record<string, { color: string; icon: string }> = {
+  accepted: { color: Colors.primary[600], icon: 'check' },
+  in_progress: { color: Colors.primary[600], icon: 'progress-clock' },
+  submitted: { color: Colors.accent[500], icon: 'clock-outline' },
+  approved: { color: Colors.success, icon: 'check-circle' },
+  rejected: { color: Colors.error, icon: 'close-circle' },
 };
 
 // Timeline helper functions
@@ -54,7 +56,12 @@ const getUrgencyLevel = (daysLeft: number | null): 'urgent' | 'soon' | 'normal' 
   return 'normal';
 };
 
-const getTimelineLabel = (challenge: Challenge, submission: Submission): { text: string; icon: string; color: string } => {
+// Timeline label helper - t function passed from component
+const getTimelineLabel = (
+  challenge: Challenge,
+  submission: Submission,
+  t: (key: string, options?: Record<string, unknown>) => string
+): { text: string; icon: string; color: string } => {
   const deadline = getDeadline(challenge);
   const daysLeft = getDaysUntil(deadline);
   const urgency = getUrgencyLevel(daysLeft);
@@ -62,8 +69,8 @@ const getTimelineLabel = (challenge: Challenge, submission: Submission): { text:
   if (urgency === 'flexible') {
     return {
       text: challenge.schedule?.type === 'recurring'
-        ? challenge.schedule.timeSlots?.[0] || 'Flexibel'
-        : 'Jederzeit',
+        ? challenge.schedule.timeSlots?.[0] || t('schedule.flexible')
+        : t('schedule.anytime'),
       icon: 'calendar-check',
       color: Colors.success,
     };
@@ -71,26 +78,37 @@ const getTimelineLabel = (challenge: Challenge, submission: Submission): { text:
 
   if (daysLeft !== null) {
     if (daysLeft <= 0) {
-      return { text: 'Heute fällig!', icon: 'alert-circle', color: Colors.error };
+      return { text: t('schedule.dueToday'), icon: 'alert-circle', color: Colors.error };
     }
     if (daysLeft === 1) {
-      return { text: 'Morgen fällig', icon: 'alert', color: Colors.error };
+      return { text: t('schedule.dueTomorrow'), icon: 'alert', color: Colors.error };
     }
     if (daysLeft <= 3) {
-      return { text: `Noch ${daysLeft} Tage`, icon: 'clock-alert', color: Colors.accent[600] };
+      return { text: t('schedule.daysLeftPlural', { count: daysLeft }), icon: 'clock-alert', color: Colors.accent[600] };
     }
-    return { text: `Noch ${daysLeft} Tage`, icon: 'clock-outline', color: Colors.textSecondary };
+    return { text: t('schedule.daysLeftPlural', { count: daysLeft }), icon: 'clock-outline', color: Colors.textSecondary };
   }
 
-  return { text: 'Flexibel', icon: 'calendar-check', color: Colors.success };
+  return { text: t('schedule.flexible'), icon: 'calendar-check', color: Colors.success };
 };
 
 export default function MyChallengesScreen() {
+  const { t } = useTranslation('challenges');
   const { submissions, challenges, getActiveCount, updateProof, loadChallenges } = useChallengeStore();
   const { getPostBySubmissionId, deletePost } = useCommunityStore();
   const syncBadgesAndStats = useSyncBadges();
   const [activeTab, setActiveTab] = useState<TabValue>('active');
   const activeCount = getActiveCount();
+
+  // Tab configuration with translated labels
+  const TABS: { value: TabValue; label: string; icon: string }[] = [
+    { value: 'active', label: t('myChallenges.tabs.active'), icon: TAB_ICONS.active },
+    { value: 'pending', label: t('myChallenges.tabs.pending'), icon: TAB_ICONS.pending },
+    { value: 'completed', label: t('myChallenges.tabs.done'), icon: TAB_ICONS.completed },
+  ];
+
+  // Status labels with translations
+  const getStatusLabel = (status: string) => t(`status.${status}`);
 
   // Reload challenges and submissions when screen gains focus
   // Also sync badges to detect newly earned achievements
@@ -170,12 +188,12 @@ export default function MyChallengesScreen() {
 
   const handleDeletePost = (post: CommunityPost, submissionId: string) => {
     Alert.alert(
-      'Beitrag löschen',
-      'Möchtest du diesen Beitrag wirklich löschen?',
+      t('myChallenges.deletePost.title'),
+      t('myChallenges.deletePost.message'),
       [
-        { text: 'Abbrechen', style: 'cancel' },
+        { text: t('myChallenges.deletePost.cancel'), style: 'cancel' },
         {
-          text: 'Löschen',
+          text: t('myChallenges.deletePost.confirm'),
           style: 'destructive',
           onPress: async () => {
             await deletePost(post.id);
@@ -258,8 +276,9 @@ export default function MyChallengesScreen() {
     const challenge = getChallengeForSubmission(item.challengeId);
     if (!challenge) return null;
 
-    const statusConfig = STATUS_CONFIG[item.status];
-    const timelineInfo = getTimelineLabel(challenge, item);
+    const statusStyle = STATUS_STYLE[item.status];
+    const statusLabel = getStatusLabel(item.status);
+    const timelineInfo = getTimelineLabel(challenge, item, t);
     const deadline = getDeadline(challenge);
     const daysLeft = getDaysUntil(deadline);
     const urgency = getUrgencyLevel(daysLeft);
@@ -311,21 +330,21 @@ export default function MyChallengesScreen() {
 
                 {/* Status row with duration */}
                 <View style={styles.statusRow}>
-                  <View style={[styles.statusBadge, { backgroundColor: `${statusConfig.color}15` }]}>
+                  <View style={[styles.statusBadge, { backgroundColor: `${statusStyle.color}15` }]}>
                     <MaterialCommunityIcons
-                      name={statusConfig.icon as any}
+                      name={statusStyle.icon as any}
                       size={14}
-                      color={statusConfig.color}
+                      color={statusStyle.color}
                     />
-                    <Text style={[styles.statusText, { color: statusConfig.color }]}>
-                      {statusConfig.label}
+                    <Text style={[styles.statusText, { color: statusStyle.color }]}>
+                      {statusLabel}
                     </Text>
                   </View>
 
                   {/* Duration badge */}
                   <View style={styles.durationBadge}>
                     <MaterialCommunityIcons name="clock-outline" size={12} color={Colors.textMuted} />
-                    <Text style={styles.durationText}>{challenge.durationMinutes} Min</Text>
+                    <Text style={styles.durationText}>{challenge.durationMinutes} {t('durations.minutesShort')}</Text>
                   </View>
 
                   {item.status === 'approved' && (
@@ -409,14 +428,14 @@ export default function MyChallengesScreen() {
                         onPress={() => handleEditPost(existingPost, challenge)}
                       >
                         <MaterialCommunityIcons name="pencil-outline" size={16} color={Colors.primary[600]} />
-                        <Text style={styles.postActionText}>Bearbeiten</Text>
+                        <Text style={styles.postActionText}>{t('myChallenges.post.edit')}</Text>
                       </Pressable>
                       <Pressable
                         style={styles.postActionButtonDanger}
                         onPress={() => handleDeletePost(existingPost, item.id)}
                       >
                         <MaterialCommunityIcons name="delete-outline" size={16} color={Colors.error} />
-                        <Text style={styles.postActionTextDanger}>Löschen</Text>
+                        <Text style={styles.postActionTextDanger}>{t('myChallenges.post.delete')}</Text>
                       </Pressable>
                     </>
                   ) : (
@@ -425,7 +444,7 @@ export default function MyChallengesScreen() {
                       onPress={() => handleCreatePost(item, challenge)}
                     >
                       <MaterialCommunityIcons name="share-outline" size={16} color="#fff" />
-                      <Text style={styles.postActionTextPrimary}>Erfolg teilen</Text>
+                      <Text style={styles.postActionTextPrimary}>{t('myChallenges.post.share')}</Text>
                     </Pressable>
                   )}
                 </View>
@@ -474,7 +493,7 @@ export default function MyChallengesScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Title Bar */}
       <View style={styles.titleBar}>
-        <Text style={styles.titleText}>Meine Challenges</Text>
+        <Text style={styles.titleText}>{t('myChallenges.title')}</Text>
         {/* Active challenge counter */}
         <View style={[
           styles.activeCounter,
@@ -551,18 +570,10 @@ export default function MyChallengesScreen() {
               color={Colors.neutral[300]}
             />
             <Text variant="titleMedium" style={styles.emptyTitle}>
-              {activeTab === 'active'
-                ? 'Keine aktiven Challenges'
-                : activeTab === 'pending'
-                ? 'Keine ausstehenden Einreichungen'
-                : 'Noch keine abgeschlossenen Challenges'}
+              {t(`myChallenges.empty.${activeTab}.title`)}
             </Text>
             <Text variant="bodyMedium" style={styles.emptyText}>
-              {activeTab === 'active'
-                ? 'Starte eine neue Challenge aus dem Feed!'
-                : activeTab === 'pending'
-                ? 'Reiche deine aktiven Challenges ein'
-                : 'Schließe Challenges ab, um XP zu verdienen'}
+              {t(`myChallenges.empty.${activeTab}.message`)}
             </Text>
           </View>
         }
