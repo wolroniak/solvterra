@@ -1,7 +1,7 @@
 // Profile Screen
 // User stats, badges, and settings
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { View, StyleSheet, ScrollView, Image, Pressable, Dimensions, Alert, ActivityIndicator } from 'react-native';
 import { Text, Surface, Button, ProgressBar } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors, spacing } from '@/constants/theme';
 import { useUserStore, useLanguageStore, useCommunityStore } from '@/store';
-import { useSyncBadges } from '@/providers/AchievementProvider';
 import { supabase } from '@/lib/supabase';
 import type { CommunityPost } from '@solvterra/shared';
 import { XP_LEVELS } from '@solvterra/shared';
@@ -52,40 +51,58 @@ export default function ProfileScreen() {
   const { t } = useTranslation('profile');
   const { user, logout, updateProfile } = useUserStore();
   const { language, setLanguage } = useLanguageStore();
-  const { getUserPosts, deletePost } = useCommunityStore();
-  const syncBadgesAndStats = useSyncBadges();
+  const { deletePost } = useCommunityStore();
 
   const [activeTab, setActiveTab] = useState<ProfileTab>('posts');
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
+  // Use ref to prevent multiple simultaneous loads and track if initial load done
+  const isLoadingRef = useRef(false);
+  const hasLoadedRef = useRef(false);
+
   const loadUserPosts = useCallback(async () => {
-    if (!user) return;
+    // Get user from store to avoid dependency on user object reference
+    const currentUser = useUserStore.getState().user;
+    if (!currentUser || isLoadingRef.current) return;
+    isLoadingRef.current = true;
     setIsLoadingPosts(true);
-    const posts = await getUserPosts(user.id);
-    setUserPosts(posts);
-    setIsLoadingPosts(false);
-  }, [user, getUserPosts]);
+    try {
+      const posts = await useCommunityStore.getState().getUserPosts(currentUser.id);
+      setUserPosts(posts);
+    } finally {
+      setIsLoadingPosts(false);
+      isLoadingRef.current = false;
+    }
+  }, []); // No dependencies - accesses store directly
 
   // Reload data when the profile tab is focused
-  // Sync badges to detect newly earned achievements
+  // Sync badges only once per focus (not on every re-render)
   useFocusEffect(
     useCallback(() => {
-      if (user) {
-        syncBadgesAndStats();
-        if (activeTab === 'posts') {
-          loadUserPosts();
-        }
-      }
-    }, [user, activeTab, loadUserPosts, syncBadgesAndStats])
-  );
+      const currentUser = useUserStore.getState().user;
+      if (!currentUser) return;
 
-  useEffect(() => {
-    if (user && activeTab === 'posts') {
-      loadUserPosts();
-    }
-  }, [user, activeTab]);
+      // Only sync badges/stats once when screen is focused
+      if (!hasLoadedRef.current) {
+        hasLoadedRef.current = true;
+        // Run sync in background, don't await to prevent blocking
+        useUserStore.getState().refreshStats();
+        useUserStore.getState().syncBadges();
+      }
+
+      // Load posts if on posts tab
+      if (activeTab === 'posts') {
+        loadUserPosts();
+      }
+
+      // Reset on unfocus
+      return () => {
+        hasLoadedRef.current = false;
+      };
+    }, [activeTab, loadUserPosts])
+  );
 
   const handleAvatarPress = useCallback(async () => {
     if (!user) return;
