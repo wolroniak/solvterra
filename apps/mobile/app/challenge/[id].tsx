@@ -10,7 +10,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useChallengeStore, useUserStore, useLanguageStore, useTeamStore } from '@/store';
-import { useTranslatedChallenge } from '@/hooks';
 import { CATEGORIES, MOCK_FRIENDS, MAX_ACTIVE_CHALLENGES } from '@solvterra/shared';
 import type { ChallengeSchedule, ChallengeLocation, ChallengeContact, TeammateSeeker } from '@solvterra/shared';
 import InviteFriendsModal from '@/components/InviteFriendsModal';
@@ -72,13 +71,10 @@ export default function ChallengeDetailScreen() {
     ?.filter(m => m.role === 'member' && m.status === 'invited')
     ?.map(m => m.userId) || [];
 
-  const rawChallenge = challenges.find(c => c.id === id);
+  const challenge = challenges.find(c => c.id === id);
   const existingSubmission = submissions.find(
     s => s.challengeId === id && (s.status === 'in_progress' || s.status === 'submitted')
   );
-
-  // Translate challenge content based on language
-  const challenge = useTranslatedChallenge(rawChallenge);
 
   // Helper to get category label based on language
   const getCategoryLabel = (categoryId: string) => {
@@ -151,7 +147,7 @@ export default function ChallengeDetailScreen() {
       : t('schedule.daysLeft', { count: daysLeft });
   };
 
-  if (!rawChallenge || !challenge) {
+  if (!challenge) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorState}>

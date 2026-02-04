@@ -48,11 +48,8 @@ interface DbChallenge {
   id: string;
   organization_id: string;
   title: string;
-  title_en: string | null;
   description: string;
-  description_en: string | null;
   instructions: string | null;
-  instructions_en: string | null;
   category: string;
   type: string;
   duration_minutes: number;
@@ -128,11 +125,8 @@ function mapDbChallenge(row: DbChallenge): Challenge {
     organizationId: row.organization_id,
     organization: org,
     title: row.title,
-    title_en: row.title_en || undefined,
     description: row.description,
-    description_en: row.description_en || undefined,
     instructions: row.instructions || '',
-    instructions_en: row.instructions_en || undefined,
     category: row.category as ChallengeCategory,
     type: row.type as ChallengeType,
     durationMinutes: row.duration_minutes as ChallengeDuration,

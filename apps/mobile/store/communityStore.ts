@@ -45,7 +45,6 @@ interface DbPost {
   challenges?: {
     id: string;
     title: string;
-    title_en: string | null;
     image_url: string | null;
     xp_reward: number;
     duration_minutes: number;
@@ -114,7 +113,6 @@ function mapDbPost(row: DbPost, likesCount: number, userHasLiked: boolean, comme
     linkedChallenge: challenge ? {
       id: challenge.id,
       title: challenge.title,
-      title_en: challenge.title_en || undefined,
       imageUrl: challenge.image_url || undefined,
       organizationName: challenge.organizations?.name || '',
       category: challenge.category as CommunityPost['linkedChallenge'] extends { category: infer C } ? C : never,

@@ -10,7 +10,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useChallengeStore, useUserStore } from '@/store';
-import { useTranslatedChallenges } from '@/hooks';
 import { supabase } from '@/lib/supabase';
 import ChallengeCard from '@/components/ChallengeCard';
 import ChallengeFilters from '@/components/ChallengeFilters';
@@ -21,9 +20,6 @@ export default function FeedScreen() {
   const { t: tCommon } = useTranslation('common');
   const { user, addXp } = useUserStore();
   const { challenges, isLoading, loadChallenges } = useChallengeStore();
-
-  // Translate challenges for display
-  const translatedChallenges = useTranslatedChallenges(challenges);
 
   const initialLoadDone = useRef(false);
 
@@ -133,9 +129,9 @@ export default function FeedScreen() {
   const [showQuickOnly, setShowQuickOnly] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Filter challenges (use translated version)
+  // Filter challenges
   const filteredChallenges = useMemo(() => {
-    let result = translatedChallenges.filter(c => c.status === 'active');
+    let result = challenges.filter(c => c.status === 'active');
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -168,7 +164,7 @@ export default function FeedScreen() {
     }
 
     return result;
-  }, [translatedChallenges, searchQuery, selectedCategory, selectedType, selectedTeamMode, showQuickOnly]);
+  }, [challenges, searchQuery, selectedCategory, selectedType, selectedTeamMode, showQuickOnly]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

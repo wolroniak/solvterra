@@ -26,11 +26,8 @@ interface DbChallenge {
   id: string;
   organization_id: string;
   title: string;
-  title_en: string | null;
   description: string;
-  description_en: string | null;
   instructions: string | null;
-  instructions_en: string | null;
   category: string;
   type: string;
   duration_minutes: number;

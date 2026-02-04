@@ -146,7 +146,6 @@ export default function PostDetailScreen() {
       linkedChallenge: challenge ? {
         id: challenge.id,
         title: challenge.title,
-        title_en: challenge.title_en || undefined,
         imageUrl: challenge.image_url || undefined,
         organizationName: challenge.organizations?.name || '',
         category: challenge.category,

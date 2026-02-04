@@ -39,11 +39,8 @@ export type VerificationStatus = 'pending' | 'verified' | 'rejected';
 export interface Organization {
   id: string;
   name: string;
-  name_en?: string;           // English translation
   description: string;
-  description_en?: string;    // English translation
   mission?: string;
-  mission_en?: string;        // English translation
   logoUrl: string;
   website?: string;
   contactEmail?: string;
@@ -109,17 +106,13 @@ export type ScheduleType = 'anytime' | 'fixed' | 'range' | 'recurring';
 
 export interface ChallengeLocation {
   name: string;                    // e.g., "Stadtpark Frankfurt"
-  name_en?: string;                // English translation
   address?: string;                // Full address
-  address_en?: string;             // English translation
   coordinates?: {
     lat: number;
     lng: number;
   };
   meetingPoint?: string;           // e.g., "Am Haupteingang"
-  meetingPoint_en?: string;        // English translation
   additionalInfo?: string;         // e.g., "Parkplätze vorhanden"
-  additionalInfo_en?: string;      // English translation
 }
 
 export interface ChallengeSchedule {
@@ -134,13 +127,11 @@ export interface ChallengeSchedule {
 
 export interface ChallengeContact {
   name: string;                    // Contact person name
-  role?: string;                   // e.g., "Ehrenamtskoordinator"
-  role_en?: string;                // English translation
+  role?: string;                   // e.g., "Volunteer Coordinator"
   email?: string;
   phone?: string;
   preferredMethod: 'email' | 'phone' | 'app';
-  responseTime?: string;           // e.g., "Innerhalb von 24 Stunden"
-  responseTime_en?: string;        // English translation
+  responseTime?: string;           // e.g., "Within 24 hours"
 }
 
 // Teammate seeker for matchmaking
@@ -157,11 +148,8 @@ export interface Challenge {
   organizationId: string;
   organization: Organization;
   title: string;
-  title_en?: string;               // English translation
   description: string;
-  description_en?: string;         // English translation
   instructions: string;
-  instructions_en?: string;        // English translation
   category: ChallengeCategory;
   type: ChallengeType;
   durationMinutes: ChallengeDuration;
@@ -185,7 +173,6 @@ export interface Challenge {
   minTeamSize?: number;
   maxTeamSize?: number;
   teamDescription?: string;
-  teamDescription_en?: string;     // English translation
 
   // Solo join for team challenges (matchmaking)
   allowSoloJoin?: boolean;          // Can join without bringing team
@@ -232,13 +219,10 @@ export interface Submission {
 export interface Badge {
   id: string;
   name: string;
-  name_en?: string;              // English translation
   description: string;
-  description_en?: string;       // English translation
   iconName: string; // Icon identifier for the app
   category: 'milestone' | 'category' | 'special' | 'streak';
   criteria: string;
-  criteria_en?: string;          // English translation
   xpBonus?: number;
 }
 
@@ -304,18 +288,14 @@ export interface WeeklyDataPoint {
 export interface ChallengeTemplate {
   id: string;
   name: string;
-  name_en?: string;                    // English translation
   description: string;
-  description_en?: string;             // English translation
   icon: string;
   category: ChallengeCategory;
   type: ChallengeType;
   suggestedDuration: ChallengeDuration;
   suggestedVerification: VerificationMethod;
   defaultDescription: string;
-  defaultDescription_en?: string;      // English translation
   defaultInstructions: string;
-  defaultInstructions_en?: string;     // English translation
 }
 
 // ============================================
@@ -327,9 +307,7 @@ export interface Notification {
   userId: string;
   type: 'submission_approved' | 'submission_rejected' | 'badge_earned' | 'level_up' | 'new_challenge';
   title: string;
-  title_en?: string;             // English translation
   message: string;
-  message_en?: string;           // English translation
   read: boolean;
   data?: Record<string, unknown>;
   createdAt: Date;
@@ -398,10 +376,8 @@ export interface CommunityComment {
 export interface LinkedChallengeInfo {
   id: string;
   title: string;
-  title_en?: string;                   // English translation
   imageUrl?: string;
   organizationName: string;
-  organizationName_en?: string;        // English translation
   category: ChallengeCategory;
   xpReward: number;
   durationMinutes: ChallengeDuration;
@@ -423,9 +399,7 @@ export interface CommunityPost {
 
   // Content
   title?: string;           // For NGO promotions, success stories
-  title_en?: string;        // English translation
   content?: string;         // Post text content
-  content_en?: string;      // English translation
   imageUrl?: string;        // Post image
 
   // Challenge Link (for promotions and success stories)
@@ -439,7 +413,6 @@ export interface CommunityPost {
   // Auto-generated activity fields (backward compatible)
   badgeId?: string;
   badgeName?: string;
-  badgeName_en?: string;    // English translation
   badgeIcon?: string;
   newLevel?: UserLevel;
   teamMemberNames?: string[];

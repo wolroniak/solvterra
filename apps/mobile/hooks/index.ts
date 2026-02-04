@@ -1,10 +1,2 @@
 // Hooks exports
-export {
-  useTranslatedField,
-  useTranslatedChallenge,
-  useTranslatedOrganization,
-  useTranslatedCommunityPost,
-  useTranslatedLinkedChallenge,
-  useTranslatedChallenges,
-  useTranslatedCommunityPosts,
-} from './useTranslatedContent';
+// Note: Translation hooks removed in favor of English-only content

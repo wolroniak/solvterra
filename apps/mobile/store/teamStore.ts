@@ -58,7 +58,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         .from('teams')
         .select(`
           *,
-          challenge:challenges(id, title, title_en, min_team_size, max_team_size, xp_reward),
+          challenge:challenges(id, title, min_team_size, max_team_size, xp_reward),
           members:team_members(
             id, user_id, role, status, invited_at, accepted_at,
             user:users(id, name, avatar, level)
@@ -206,7 +206,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
         .from('teams')
         .select(`
           *,
-          challenge:challenges(id, title, title_en, min_team_size, max_team_size, xp_reward),
+          challenge:challenges(id, title, min_team_size, max_team_size, xp_reward),
           members:team_members(
             id, user_id, role, status, invited_at, accepted_at,
             user:users(id, name, avatar, level),
