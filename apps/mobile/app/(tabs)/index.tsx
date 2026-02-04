@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useChallengeStore, useUserStore } from '@/store';
 import { supabase } from '@/lib/supabase';
+import type { ChallengeDuration } from '@solvterra/shared';
 import ChallengeCard from '@/components/ChallengeCard';
 import ChallengeFilters from '@/components/ChallengeFilters';
 import CreatePostModal from '@/components/CreatePostModal';
@@ -124,9 +125,9 @@ export default function FeedScreen() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<ChallengeDuration | null>(null);
   const [selectedType, setSelectedType] = useState<'digital' | 'onsite' | null>(null);
   const [selectedTeamMode, setSelectedTeamMode] = useState<'solo' | 'team' | null>(null);
-  const [showQuickOnly, setShowQuickOnly] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   // Filter challenges
@@ -147,6 +148,10 @@ export default function FeedScreen() {
       result = result.filter(c => c.category === selectedCategory);
     }
 
+    if (selectedDuration) {
+      result = result.filter(c => c.durationMinutes === selectedDuration);
+    }
+
     if (selectedType) {
       result = result.filter(c => c.type === selectedType);
     }
@@ -157,14 +162,8 @@ export default function FeedScreen() {
       result = result.filter(c => !c.isMultiPerson);
     }
 
-    // Quick filter: show only 5-10 min challenges, sorted by duration
-    if (showQuickOnly) {
-      result = result.filter(c => c.durationMinutes <= 10);
-      result = [...result].sort((a, b) => a.durationMinutes - b.durationMinutes);
-    }
-
     return result;
-  }, [challenges, searchQuery, selectedCategory, selectedType, selectedTeamMode, showQuickOnly]);
+  }, [challenges, searchQuery, selectedCategory, selectedDuration, selectedType, selectedTeamMode]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -225,13 +224,13 @@ export default function FeedScreen() {
       {/* Filters */}
       <ChallengeFilters
         selectedCategory={selectedCategory}
+        selectedDuration={selectedDuration}
         selectedType={selectedType}
         selectedTeamMode={selectedTeamMode}
-        showQuickOnly={showQuickOnly}
         onCategoryChange={setSelectedCategory}
+        onDurationChange={setSelectedDuration}
         onTypeChange={setSelectedType}
         onTeamModeChange={setSelectedTeamMode}
-        onQuickFilterChange={setShowQuickOnly}
       />
 
       {/* Challenge List */}

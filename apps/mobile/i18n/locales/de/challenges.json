@@ -43,8 +43,6 @@
     "participants": "{{count}} Teilnehmer",
     "teamChallenge": "Team-Challenge",
     "lookingForTeammates": "{{count}} suchen Teammitglieder",
-    "superQuick": "Blitzschnell",
-    "quick": "Schnell erledigt",
     "team": "Team",
     "teamSize": "{{min}}-{{max}} Personen",
     "spotsLeft": "Nur noch {{count}} Plätze!"

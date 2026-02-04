@@ -43,8 +43,6 @@
     "participants": "{{count}} participants",
     "teamChallenge": "Team challenge",
     "lookingForTeammates": "{{count}} looking for teammates",
-    "superQuick": "Lightning fast",
-    "quick": "Quick win",
     "team": "Team",
     "teamSize": "{{min}}-{{max}} people",
     "spotsLeft": "Only {{count}} spots left!"

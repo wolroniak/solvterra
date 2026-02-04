@@ -1,5 +1,5 @@
 // Challenge Filters Component
-// Single horizontal scrollable row with Quick, Categories, Type, and Team filters
+// Single horizontal scrollable row with Categories, Duration, Type, and Team filters
 
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Chip } from 'react-native-paper';
@@ -7,17 +7,17 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Colors, spacing } from '@/constants/theme';
 import { useLanguageStore } from '@/store';
-import { CATEGORIES as SHARED_CATEGORIES } from '@solvterra/shared';
+import { CATEGORIES as SHARED_CATEGORIES, type ChallengeDuration } from '@solvterra/shared';
 
 interface FiltersProps {
   selectedCategory: string | null;
+  selectedDuration: ChallengeDuration | null;
   selectedType: 'digital' | 'onsite' | null;
   selectedTeamMode: 'solo' | 'team' | null;
-  showQuickOnly?: boolean;
   onCategoryChange: (category: string | null) => void;
+  onDurationChange: (duration: ChallengeDuration | null) => void;
   onTypeChange: (type: 'digital' | 'onsite' | null) => void;
   onTeamModeChange: (mode: 'solo' | 'team' | null) => void;
-  onQuickFilterChange?: (quickOnly: boolean) => void;
 }
 
 // Map category IDs to Material Community Icons
@@ -30,15 +30,23 @@ const CATEGORY_ICONS: Record<string, string> = {
   culture: 'palette',
 };
 
+// Duration options with icons
+const DURATION_OPTIONS: { value: ChallengeDuration; icon: string }[] = [
+  { value: 5, icon: 'lightning-bolt' },
+  { value: 10, icon: 'clock-fast' },
+  { value: 15, icon: 'clock-outline' },
+  { value: 30, icon: 'clock' },
+];
+
 export default function ChallengeFilters({
   selectedCategory,
+  selectedDuration,
   selectedType,
   selectedTeamMode,
-  showQuickOnly = false,
   onCategoryChange,
+  onDurationChange,
   onTypeChange,
   onTeamModeChange,
-  onQuickFilterChange,
 }: FiltersProps) {
   const { t } = useTranslation('challenges');
   const { language } = useLanguageStore();
@@ -63,27 +71,6 @@ export default function ChallengeFilters({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Quick Challenge Filter */}
-        <Chip
-          mode="flat"
-          selected={showQuickOnly}
-          onPress={() => onQuickFilterChange?.(!showQuickOnly)}
-          style={[styles.quickChip, showQuickOnly && styles.quickChipSelected]}
-          textStyle={[styles.quickChipText, showQuickOnly && styles.quickChipTextSelected]}
-          icon={() => (
-            <MaterialCommunityIcons
-              name="lightning-bolt"
-              size={16}
-              color={showQuickOnly ? '#fbbf24' : Colors.accent[500]}
-            />
-          )}
-        >
-          {t('card.quick')}
-        </Chip>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
         {/* Category filters */}
         {categories.map(category => (
           <Chip
@@ -104,6 +91,32 @@ export default function ChallengeFilters({
             )}
           >
             {getCategoryLabel(category.id)}
+          </Chip>
+        ))}
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Duration filters */}
+        {DURATION_OPTIONS.map(duration => (
+          <Chip
+            key={duration.value}
+            mode="flat"
+            selected={selectedDuration === duration.value}
+            onPress={() =>
+              onDurationChange(selectedDuration === duration.value ? null : duration.value)
+            }
+            style={[styles.chip, selectedDuration === duration.value && styles.chipSelected]}
+            textStyle={[styles.chipText, selectedDuration === duration.value && styles.chipTextSelected]}
+            icon={() => (
+              <MaterialCommunityIcons
+                name={duration.icon as any}
+                size={14}
+                color={selectedDuration === duration.value ? Colors.primary[600] : Colors.textSecondary}
+              />
+            )}
+          >
+            {t('durations.minutes', { count: duration.value })}
           </Chip>
         ))}
 
@@ -194,26 +207,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: spacing.xs,
     alignItems: 'center',
-  },
-  quickChip: {
-    backgroundColor: Colors.accent[50],
-    borderRadius: 20,
-    height: 32,
-    borderWidth: 1,
-    borderColor: Colors.accent[200],
-  },
-  quickChipSelected: {
-    backgroundColor: Colors.accent[100],
-    borderColor: Colors.accent[400],
-  },
-  quickChipText: {
-    fontSize: 13,
-    color: Colors.accent[700],
-    fontWeight: '600',
-  },
-  quickChipTextSelected: {
-    color: Colors.accent[800],
-    fontWeight: '700',
   },
   chip: {
     backgroundColor: Colors.neutral[100],

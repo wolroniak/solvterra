@@ -44,14 +44,10 @@ const getCategoryConfig = (categoryId: string) => {
   };
 };
 
-// Get duration styling (label will be added via translation)
+// Get duration styling
 const getDurationConfig = (minutes: number) => {
   const colors = DURATION_COLORS[minutes] || DURATION_COLORS[30];
-  return {
-    colors,
-    isQuickWin: minutes <= 10,
-    quickLevel: minutes <= 5 ? 'superQuick' : minutes <= 10 ? 'quick' : null,
-  };
+  return { colors };
 };
 
 export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps) {
@@ -67,13 +63,6 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
     const category = CATEGORIES.find(c => c.id === challenge.category);
     if (!category) return t('categories.other');
     return language === 'de' ? category.labelDe : category.label;
-  };
-
-  // Get quick win label
-  const getQuickWinLabel = () => {
-    if (durationConfig.quickLevel === 'superQuick') return t('card.superQuick');
-    if (durationConfig.quickLevel === 'quick') return t('card.quick');
-    return null;
   };
 
   // Animation for press feedback
@@ -110,15 +99,7 @@ export default function ChallengeCard({ challenge, onPress }: ChallengeCardProps
               resizeMode="cover"
             />
 
-            {/* Quick Win Badge - prominent for 5-10 min challenges */}
-            {durationConfig.isQuickWin && getQuickWinLabel() && (
-              <View style={styles.quickWinBadge}>
-                <MaterialCommunityIcons name="lightning-bolt" size={12} color="#fbbf24" />
-                <Text style={styles.quickWinText}>{getQuickWinLabel()}</Text>
-              </View>
-            )}
-
-            {/* Enhanced Duration Badge - color coded */}
+            {/* Duration Badge - color coded */}
             <View style={[
               styles.durationBadge,
               { backgroundColor: durationConfig.colors.bg }
@@ -261,25 +242,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-  },
-  quickWinBadge: {
-    position: 'absolute',
-    bottom: spacing.sm,
-    left: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 4,
-  },
-  quickWinText: {
-    color: '#fbbf24',
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   durationBadge: {
     position: 'absolute',

@@ -1,0 +1,380 @@
+# SolvTerra Pitch - Speaker Notes for Actors
+
+**Total Duration: ~7 minutes (Introduction + Demo + Recap)**
+
+---
+
+## INTRODUCTION SLIDES
+
+---
+
+### Slide 1: Title Slide `[0:00 - 0:05]`
+
+**On Screen:** SolvTerra Logo + "Turning Intention into Action"
+
+**RON**
+*[Don't speak yet. Let the slide settle. Make eye contact with jury. Take a breath, then begin.]*
+
+---
+
+### Slide 2: The Paradox `[0:05 - 0:20]`
+
+**On Screen:** "70% want to volunteer / 70% can't because of time / 2.9 MILLION STUDENTS stuck"
+
+**RON**
+> "70% of students want to volunteer. 70% say they can't because of time. That's 2.9 million people in Germany stuck between intention and action."
+
+---
+
+### Slide 3: Meet the Three Sides `[0:20 - 1:00]` — LIVE PERSONA DELIVERY
+
+**On Screen:** Three persona cards with photos (Nico, Steffi, Chuong) — names and roles visible, quotes delivered LIVE
+
+**RON**
+> "Meet the three sides of this problem."
+
+**NICO**
+*[Steps forward, gestures to his card]*
+> "I want to help - but I can't commit to fixed schedules."
+
+**STEFFI**
+*[Steps forward, gestures to her card]*
+> "We need volunteers - but we can't reach students."
+
+**CHUONG**
+*[Steps forward, gestures to his card]*
+> "We want to connect with young people and support local causes - but our small team can't run big campaigns. Is there a solution?"
+
+**RON**
+> "Yes. SolvTerra connects them."
+
+*[Each person speaks for ~5-7 seconds. Brief pause between each speaker for impact. Ron's "Yes. SolvTerra connects them." is the payoff.]*
+
+---
+
+### Slide 4: The Question `[1:00 - 1:15]`
+
+**On Screen:** "Why does doing good require such a big commitment?"
+
+**RON**
+> "Nico can't commit to 4-hour volunteer shifts. Steffi's NGO can't digitize fast enough. And companies? They want to show they care, but a press release about a charity donation doesn't move anyone. They need real stories from real people."
+>
+> "We asked: why does helping others require such a big commitment? Why can't doing good be as easy as checking your phone?"
+>
+> "That's why we built SolvTerra."
+
+*[Pause after "SolvTerra" — let the name land]*
+
+---
+
+### Slide 5: Our Solution - SolvTerra `[1:15 - 1:45]`
+
+**On Screen:** Three columns: STUDENTS / NGOs / COMPANIES with bullet points
+
+**RON**
+> "SolvTerra is a micro-volunteering platform. Students like Nico complete bite-sized tasks in 5 to 30 minutes and earn XP. NGOs like Steffi's Tierheim get reliable help, reach more people, and skip the administrative burden. And companies can sponsor challenges for authentic, verified CSR impact."
+
+---
+
+### Slide 6: Our Vision `[1:45 - 2:00]`
+
+**On Screen:** "A world where every person can make a measurable contribution to society with just 5 minutes of their time."
+
+**RON**
+> "Our vision: A world where every person can make a measurable contribution to society with just 5 minutes of their time."
+
+*[Pause for 2 seconds — let it land]*
+
+---
+
+### Slide 7: Demo Transition `[2:00 - 2:10]`
+
+**On Screen:** "Let us show you how it works." + device icons
+
+**RON**
+> "Now let us show you how this actually works. Nico and Steffi are here to demonstrate - live, right now. And you might just become part of the story."
+
+*[NICO and STEFFI move to their stage positions (Left/Right)]*
+
+---
+
+## LIVE DEMO
+
+---
+
+### Demo Start `[0:00]`
+
+*[Screens activate: NICO's phone (left), STEFFI's dashboard (right)]*
+
+**RON**
+> "You've met Nico and Steffi. Now watch them in action."
+
+---
+
+### Scene 1: Steffi's Challenge `[0:05 - 0:25]`
+
+**FOCUS:** Screen 2 — STEFFI's Dashboard
+
+*[STEFFI's dashboard shows the Challenge Detail page for "Show Us the Animal Lovers Community!"]*
+
+**STEFFI**
+*[Pointing at her screen]*
+> "I created this challenge for our shelter. We need photos showing that people in our community care about animals - it's for our social media campaign. 10 XP for students who help, just upload a photo. I am posting the challenge and then I'm waiting for submissions..."
+
+*[Show: challenge title, description, 5 min duration, 10 XP, photo verification]*
+
+---
+
+### Scene 2: Nico's Starting Point `[0:25 - 0:45]`
+
+**FOCUS:** Screen 1 — NICO's Phone
+
+*[NICO's phone shows his Profile tab with 0 XP]*
+
+**NICO**
+*[Looking at phone, then at audience]*
+> "I want to make a difference, but I only have 5 minutes before my next class. Look at my profile - zero XP, no badges yet. Let's see if I can change that."
+
+*[Navigate from Profile to Discover tab]*
+
+---
+
+### Scene 3: Finding the Challenge `[0:45 - 1:15]`
+
+**FOCUS:** Screen 1 — NICO's Phone
+
+**NICO**
+> "Let me filter by what I care about..."
+
+*[Tap filter icon, select "Animals" category (orange), Tierheim challenge appears]*
+
+**NICO**
+> "Oh! Steffi's challenge. Let me check it out."
+
+*[Tap to open Challenge Details, scroll through showing details]*
+
+**NICO**
+> "5 minutes, 10 XP, I just need to take a photo. Perfect."
+
+---
+
+### Scene 4: Accept Challenge `[1:15 - 1:30]`
+
+**FOCUS:** Screen 1 — NICO's Phone
+
+**NICO**
+> "I'll accept this."
+
+*[Tap "Accept Challenge" button, confirmation animation]*
+
+**NICO**
+> "Now I need to complete it..."
+
+---
+
+### Scene 5: Audience Engagement `[1:30 - 2:05]` — KEY WOW MOMENT ⭐
+
+*[NICO puts phone down, faces audience directly]*
+
+**NICO**
+*[Reading from phone, then looking up with realization]*
+> "The challenge says 'show us the animal lovers community'..."
+>
+> *[Looks at audience, pauses]*
+>
+> "Hmm... wait. YOU are a community! And I bet you love animals."
+>
+> "Let's prove it - on three, everyone who loves animals, raise your hands high!"
+>
+> "One... two... THREE!"
+
+*[Audience raises hands / waves / reacts]*
+
+---
+
+### Scene 6: Capture & Submit `[2:05 - 2:35]`
+
+**FOCUS:** Screen 1 — NICO's Phone
+
+*[NICO picks up phone, opens camera in submission flow]*
+
+**NICO**
+> "Perfect! Hold that energy!"
+
+*[Point phone at audience, take photo]*
+
+**NICO**
+*[Typing caption]*
+> "Amazing community of animal lovers!"
+
+*[Tap Submit, upload progress, "Submitted" confirmation]*
+
+**NICO**
+> "Done. Now let's see if it worked..."
+
+*[Look toward STEFFI]*
+
+---
+
+### Scene 7: Narrator Bridge `[2:35 - 2:45]`
+
+**RON**
+*[Building suspense, gesturing from NICO to STEFFI]*
+> "The submission is traveling to Steffi's dashboard right now. Steffi, what do you see?"
+
+---
+
+### Scene 8: Steffi Receives Submission `[2:45 - 3:15]` — WOW MOMENT ⭐
+
+**FOCUS:** Screen 2 — STEFFI's Dashboard
+
+*[Navigate to Submissions tab]*
+
+**STEFFI**
+*[Genuine surprise/delight]*
+> "Oh! A new submission just came in!"
+
+*[Click on submission, review modal opens]*
+
+**STEFFI**
+> "Let me see the photo..."
+
+*[Click to maximize/expand the photo — AUDIENCE PHOTO appears large on Screen 2]*
+
+**STEFFI**
+*[Delighted]*
+> "Look at that! The whole audience is in the photo!"
+
+*[If submission doesn't appear immediately: Click refresh button]*
+**BACKUP:** "Let me check... there it is!"
+
+---
+
+### Scene 9: Steffi Approves `[3:15 - 3:45]`
+
+**FOCUS:** Screen 2 — STEFFI's Dashboard
+
+**STEFFI**
+> "This is exactly what we needed. Let me approve this..."
+
+*[Click 5 stars (one by one for visual effect)]*
+
+*[Type feedback:]*
+> "Wonderful community spirit! Thank you for helping Tierheim!"
+
+*[Click "Approve" button]*
+
+**STEFFI**
+> "Approved! Nico will get his XP now."
+
+---
+
+### Scene 10: Parallel Actions `[3:45 - 4:25]`
+
+**BOTH SCREENS ACTIVE — Parallel action**
+
+**Screen 1 — NICO's Phone**
+
+*[Notification pops up: "Submission Approved!"]*
+
+**NICO**
+> "I got the notification!"
+
+*[See "Share to Community" option]*
+
+**NICO**
+> "I can share this success with the community..."
+
+*[Tap "Share", create quick post: "Just helped Tierheim!", post]*
+
+---
+
+**Screen 2 — STEFFI's Dashboard** *(happening simultaneously)*
+
+*[While NICO creates his post, STEFFI navigates to Statistics tab]*
+
+**STEFFI**
+*[To audience]*
+> "And here's where it gets interesting for NGOs. I can see all our impact data..."
+
+*[Show statistics briefly: participant chart, approval rate, category distribution]*
+
+---
+
+### Scene 11: Before/After Reveal `[4:25 - 4:45]`
+
+**FOCUS:** Screen 1 — NICO's Phone
+
+*[Navigate to Profile tab]*
+
+**NICO**
+> "Remember I started at zero? Look now..."
+
+*[Profile shows: 10 XP earned, progress bar toward next level]*
+
+**NICO**
+> "10 XP. My first contribution. I'm on my way to my first badge."
+
+---
+
+### Scene 12: Joint Closing `[4:45 - 5:05]` — MEMORABLE CLOSE ⭐
+
+*[BOTH presenters face audience, screens visible behind them]*
+
+**NICO**
+> "I helped in just minutes."
+
+**STEFFI**
+> "I have verified proof for my campaign."
+
+**NICO + STEFFI** *(together)*
+> "Everyone wins."
+
+---
+
+## DEMO RECAP
+
+---
+
+### Slide 10: Demo Recap
+
+**On Screen:** NICO — STEFFI with checkmarks: 5 minutes, Verified proof, Real impact, XP earned + "Student helped. NGO gained. Everyone wins."
+
+**RON**
+> "That's the complete workflow. In under 5 minutes, Nico helped Steffi's NGO, earned recognition, and Steffi has verified proof for her campaign. Student helped. NGO gained. Everyone wins."
+
+*[Pause, then transition to next presenter for Part 2]*
+
+---
+
+## HANDOFF CUES
+
+| Handoff | Cue | Who speaks next |
+|---------|-----|-----------------|
+| STEFFI → NICO | "Now I'm waiting for submissions..." | NICO begins |
+| NICO → RON | NICO taps Submit and looks at STEFFI | RON delivers bridge |
+| RON → STEFFI | "Steffi, what do you see?" | STEFFI responds |
+| Parallel action | STEFFI: "Approved!" | Both act simultaneously |
+| Joint close | NICO: "...just minutes" | STEFFI picks up immediately |
+
+---
+
+## BACKUP LINES (If Technical Issues)
+
+| Issue | Line to say |
+|-------|-------------|
+| Submission doesn't appear | **STEFFI:** "Let me check..." *(click refresh)* "...there it is!" |
+| Photo upload fails | **NICO:** "Let me try again..." |
+| Notification delayed | **NICO:** "The notification's coming..." |
+
+---
+
+## REMEMBER
+
+- Rehearse the Slide 3 live delivery together (NICO, STEFFI, CHUONG)
+- Scene 5 audience engagement is THE memorable moment
+- Make eye contact with jury during joint closing
+
+---
+
+*Formatted using theater script conventions for easy reading*
