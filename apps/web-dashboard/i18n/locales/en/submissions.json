@@ -63,6 +63,7 @@
       "earned": "Earned",
       "notEarned": "Not earned",
       "onApproval": "Upon approval"
-    }
+    },
+    "closeLightbox": "Close"
   }
 }

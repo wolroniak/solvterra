@@ -4,6 +4,7 @@
 node_modules
 .expo
 .next
+.playwright-mcp
 
 # Environment variables
 .env

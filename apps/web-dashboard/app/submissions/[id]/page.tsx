@@ -14,6 +14,8 @@ import {
   User,
   Calendar,
   MessageSquare,
+  ZoomIn,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/layout/header';
@@ -21,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog } from '@/components/ui/dialog';
 import { useSubmissionStore, useChallengeStore } from '@/store';
 import { formatDateTime, formatRelativeTime } from '@/lib/utils';
 
@@ -46,6 +49,7 @@ export default function SubmissionDetailPage() {
   const [feedback, setFeedback] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   if (!submission) {
     return (
@@ -129,11 +133,21 @@ export default function SubmissionDetailPage() {
               </CardHeader>
               <CardContent>
                 {submission.proofType === 'photo' ? (
-                  <img
-                    src={submission.proofUrl}
-                    alt={t('detailPage.proofAlt')}
-                    className="w-full max-h-[500px] object-contain rounded-lg bg-slate-100"
-                  />
+                  <button
+                    onClick={() => setLightboxOpen(true)}
+                    className="relative w-full group cursor-zoom-in"
+                  >
+                    <img
+                      src={submission.proofUrl}
+                      alt={t('detailPage.proofAlt')}
+                      className="w-full max-h-[500px] object-contain rounded-lg bg-slate-100"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-3 shadow-lg">
+                        <ZoomIn className="h-6 w-6 text-slate-700" />
+                      </div>
+                    </div>
+                  </button>
                 ) : (
                   <div className="p-6 bg-slate-50 rounded-lg">
                     <p className="text-slate-700 whitespace-pre-wrap leading-relaxed">
@@ -441,6 +455,30 @@ export default function SubmissionDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Image Lightbox */}
+      {submission.proofType === 'photo' && (
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <div
+            className="relative w-full h-full flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-colors"
+              aria-label={t('detailPage.closeLightbox')}
+            >
+              <X className="h-6 w-6 text-slate-700" />
+            </button>
+            <img
+              src={submission.proofUrl}
+              alt={t('detailPage.proofAlt')}
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 }

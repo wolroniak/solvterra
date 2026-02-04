@@ -63,6 +63,7 @@
       "earned": "Verdient",
       "notEarned": "Nicht verdient",
       "onApproval": "Bei Genehmigung"
-    }
+    },
+    "closeLightbox": "Schließen"
   }
 }
